@@ -78,10 +78,10 @@ index 0000000000..4206c283e2
 +list(APPEND PLATFORM_REQUIRED_DEPS OpenGLES AML EGL LibInput Xkbcommon)
 +set(APP_RENDER_SYSTEM gles)
 diff --git a/cmake/scripts/android/ArchSetup.cmake b/cmake/scripts/android/ArchSetup.cmake
-index d76ce93a16..a8e66af9fc 100644
+index 935af74930..d32a359cfb 100644
 --- a/cmake/scripts/android/ArchSetup.cmake
 +++ b/cmake/scripts/android/ArchSetup.cmake
-@@ -35,6 +35,7 @@ endif()
+@@ -36,6 +36,7 @@ endif()
  list(APPEND SYSTEM_DEFINES -DHAS_ZEROCONF)
  
  set(ENABLE_X11 OFF CACHE BOOL "" FORCE)
@@ -173,7 +173,7 @@ index 531974f3f4..9b85a3bf92 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 97ffe80296..397f593577 100755
+index 97ffe80296..969212d192 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -87,6 +87,125 @@
@@ -332,27 +332,27 @@ index 97ffe80296..397f593577 100755
            </dependencies>
            <control type="toggle" />
          </setting>
-+        <setting id="videoscreen.forcergb" type="boolean" parent="videoscreen.screen" label="13133" help="40065">
++        <setting id="videoscreen.forcergb" type="boolean" parent="videoscreen.screen" label="13133" help="38385">
 +          <level>1</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="videoscreen.lockhpd" type="boolean" parent="videoscreen.screen" label="13134" help="40066">
++        <setting id="videoscreen.lockhpd" type="boolean" parent="videoscreen.screen" label="13134" help="38386">
 +          <level>1</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="videoscreen.mutehdmi" type="boolean" parent="videoscreen.screen" label="13135" help="40067">
++        <setting id="videoscreen.mutehdmi" type="boolean" parent="videoscreen.screen" label="13135" help="38387">
 +          <level>1</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="videoscreen.force422" type="boolean" parent="videoscreen.screen" label="13136" help="40068">
++        <setting id="videoscreen.force422" type="boolean" parent="videoscreen.screen" label="13136" help="38388">
 +          <level>1</level>
 +          <default>false</default>
 +          <control type="toggle" />
 +        </setting>
-+        <setting id="videoscreen.maxlum" type="integer" parent="videoscreen.screen" label="13137" help="40069">
++        <setting id="videoscreen.maxlum" type="integer" parent="videoscreen.screen" label="13137" help="38389">
 +          <level>1</level>
 +          <default>100</default>
 +          <constraints>
@@ -1487,7 +1487,7 @@ index 0a2c1b1c2f..953674933c 100644
                                         CSettings::SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE,
                                         CSettings::SETTING_AUDIOOUTPUT_VOLUMESTEPS,
 diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
-index ebe9aaaa36..7e212b1562 100644
+index 6aee94c6d3..dcbae016ef 100644
 --- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
 +++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
 @@ -8,6 +8,8 @@
@@ -2999,10 +2999,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..b5da423616
+index 0000000000..9dbbdeac4f
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1332 @@
+@@ -0,0 +1,1333 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4012,6 +4012,7 @@ index 0000000000..b5da423616
 +		return m_drainRepeatCount-- > 0 ? CDVDVideoCodec::VC_NONE : CDVDVideoCodec::VC_EOF;
 +	}
 +
++	unsigned int fps = UNIT_FREQ / m_am_private->video_rate;
 +	float level = m_decInputQueue->fillLevel();
 +	unsigned waitingFrameCount = m_decInputQueue->frameCount();
 +
@@ -4020,9 +4021,9 @@ index 0000000000..b5da423616
 +	}
 +
 +	// give decoder some time to settle
-+	std::this_thread::sleep_for(5ms);
++	std::this_thread::sleep_for(7ms);
 +
-+	m_filling = (waitingFrameCount < 10 && level < maxDecoderInputLevel) || m_libamcodec->isVCodecBuffering();
++	m_filling = (waitingFrameCount < fps && level < maxDecoderInputLevel) || m_libamcodec->isVCodecBuffering();
 +
 +	if (!dequeueBuffer()) {
 +		return m_filling ? CDVDVideoCodec::VC_BUFFER : CDVDVideoCodec::VC_NONE;
@@ -9182,10 +9183,10 @@ index a8ffb9807b..25f43406b0 100644
      }
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 22ff110501..166e3c2641 100644
+index f3d3db772c..10fc37ab66 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -1324,17 +1324,14 @@ void CVideoPlayer::Prepare()
+@@ -1326,17 +1326,14 @@ void CVideoPlayer::Prepare()
      if (m_pDemuxer)
      {
        if (m_pDemuxer->SeekTime(starttime, true, &startpts))
@@ -9204,7 +9205,7 @@ index 22ff110501..166e3c2641 100644
          CLog::Log(LOGDEBUG, "{} - starting subtitle demuxer from: {}", __FUNCTION__, starttime);
        else
          CLog::Log(LOGDEBUG, "{} - failed to start subtitle demuxing from: {}", __FUNCTION__,
-@@ -1564,6 +1561,11 @@ void CVideoPlayer::Process()
+@@ -1566,6 +1563,11 @@ void CVideoPlayer::Process()
      CheckBetterStream(m_CurrentRadioRDS, pStream);
      CheckBetterStream(m_CurrentAudioID3, pStream);
  
@@ -9216,7 +9217,7 @@ index 22ff110501..166e3c2641 100644
      // demux video stream
      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
      {
-@@ -1724,6 +1726,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+@@ -1726,6 +1728,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
@@ -9228,7 +9229,7 @@ index 22ff110501..166e3c2641 100644
    m_VideoPlayerVideo->SendMessage(std::make_shared<CDVDMsgDemuxerPacket>(pPacket, drop));
  
    if (!drop)
-@@ -1868,7 +1875,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1870,7 +1877,7 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        if (cache.level < 0.0)
        {
@@ -9237,7 +9238,7 @@ index 22ff110501..166e3c2641 100644
          SetCaching(CACHESTATE_INIT);
        }
        // Note: Previously used cache.level >= 1 would keep video stalled
-@@ -1973,10 +1980,10 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1975,10 +1982,10 @@ void CVideoPlayer::HandlePlaySpeed()
          if (m_CurrentAudio.id >= 0)
          {
            double adjust = -1.0; // a unique value
@@ -9250,7 +9251,7 @@ index 22ff110501..166e3c2641 100644
              adjust = 0.0;
  
            if (adjust != -1.0)
-@@ -2016,6 +2023,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2018,6 +2025,7 @@ void CVideoPlayer::HandlePlaySpeed()
               (m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT ||
               m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_INSYNC))
      {
@@ -9258,7 +9259,7 @@ index 22ff110501..166e3c2641 100644
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(
-@@ -2163,17 +2171,19 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2165,17 +2173,19 @@ void CVideoPlayer::HandlePlaySpeed()
            error /= errorwin;
          }
  
@@ -9281,7 +9282,7 @@ index 22ff110501..166e3c2641 100644
              CDVDMsgPlayerSeek::CMode mode;
              mode.time = iTime;
              mode.backward = (m_playSpeed < 0);
-@@ -2692,14 +2702,14 @@ void CVideoPlayer::HandleMessages()
+@@ -2694,14 +2704,14 @@ void CVideoPlayer::HandleMessages()
        if (m_pInputStream->GetIPosTime() == nullptr)
          time -= m_State.time_offset/1000l;
  
@@ -9299,7 +9300,7 @@ index 22ff110501..166e3c2641 100644
          }
          // dts after successful seek
          if (start == DVD_NOPTS_VALUE)
-@@ -2709,6 +2719,7 @@ void CVideoPlayer::HandleMessages()
+@@ -2711,6 +2721,7 @@ void CVideoPlayer::HandleMessages()
          m_State.lastSeek = m_clock.GetAbsoluteClock();
  
          FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
@@ -9307,7 +9308,7 @@ index 22ff110501..166e3c2641 100644
        }
        else if (m_pDemuxer)
        {
-@@ -3081,7 +3092,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
+@@ -3083,7 +3094,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
    if(m_caching == state)
      return;
  
@@ -9318,7 +9319,7 @@ index 22ff110501..166e3c2641 100644
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -3746,23 +3759,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3748,23 +3761,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
    if (hint.flags & AV_DISPOSITION_ATTACHED_PIC)
      return false;
  
@@ -9342,7 +9343,7 @@ index 22ff110501..166e3c2641 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3776,8 +3772,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3778,8 +3774,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -9373,7 +9374,7 @@ index 22ff110501..166e3c2641 100644
      // look for any EDL files
      m_Edl.Clear();
      float fFramesPerSecond = 0.0f;
-@@ -3966,6 +3984,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3968,6 +3986,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -9381,7 +9382,7 @@ index 22ff110501..166e3c2641 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -4013,7 +4032,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -4015,7 +4034,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -9391,7 +9392,7 @@ index 22ff110501..166e3c2641 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
-@@ -4905,15 +4925,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4907,15 +4927,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -9409,7 +9410,7 @@ index 22ff110501..166e3c2641 100644
      m_processInfo->SetStateRealtime(realtime);
    }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index 9d4e16700b..bdc86cc159 100644
+index 178dc47741..81a9995346 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 @@ -78,7 +78,7 @@ CVideoPlayerAudio::~CVideoPlayerAudio()
@@ -9442,7 +9443,7 @@ index 9d4e16700b..bdc86cc159 100644
      allowpassthrough = false;
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
-index 0924703702..2eca8d1083 100644
+index c42f8f3dd7..21176a818a 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.cpp
 @@ -319,6 +319,7 @@ void CVideoPlayerVideo::Process()
@@ -10427,7 +10428,7 @@ index 6c5bceae7c..6161fa56f1 100644
 +
  core_add_library(linuxsupport)
 diff --git a/xbmc/platform/linux/PlatformLinux.cpp b/xbmc/platform/linux/PlatformLinux.cpp
-index 6be5163883..062894bfff 100644
+index 25eb9818da..822580112f 100644
 --- a/xbmc/platform/linux/PlatformLinux.cpp
 +++ b/xbmc/platform/linux/PlatformLinux.cpp
 @@ -36,6 +36,9 @@
@@ -10674,7 +10675,7 @@ index b5df5118dd..d47857b013 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 75ce481a6c..bfb7a26379
+index 75ce481a6c..74c85a8644
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -23,6 +23,7 @@
@@ -10717,7 +10718,7 @@ index 75ce481a6c..bfb7a26379
 +          if (resInfo.iScreenHeight >= 2160)
 +          {
 +            CLog::Log(LOGWARNING, "The user has chosen a UHD resolution. We will warn them not to apply this");
-+            if (HELPERS::ShowYesNoDialogText(CVariant{13110}, CVariant{40064}, CVariant{""}, CVariant{""}, 15000) != DialogResponse::CHOICE_YES)
++            if (HELPERS::ShowYesNoDialogText(CVariant{13110}, CVariant{38384}, CVariant{""}, CVariant{""}, 15000) != DialogResponse::CHOICE_YES)
 +            {
 +              m_resolutionChangeAborted = true;
 +              return false;

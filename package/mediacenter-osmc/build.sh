@@ -7,7 +7,7 @@
 
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ]
 then
-pull_source "https://github.com/xbmc/xbmc/archive/60c450005472e6d38929bb28c07d00589102818d.tar.gz" "$(pwd)/src"
+pull_source "https://github.com/xbmc/xbmc/archive/5898715748222e8e63b3e5ad58eaedc7767c8cf6.tar.gz" "$(pwd)/src"
 API_VERSION="21"
 else
 pull_source "https://github.com/xbmc/xbmc/archive/master.tar.gz" "$(pwd)/kodi"
