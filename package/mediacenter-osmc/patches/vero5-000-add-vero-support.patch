@@ -10575,6 +10575,21 @@ index 0859158c9c..988f0f3888 100644
    if(LIBINPUT_FOUND)
      list(APPEND SOURCES LibInputHandler.cpp
                          LibInputKeyboard.cpp
+diff --git a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+index bd04197a51..7cb68a19b4 100644
+--- a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
++++ b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+@@ -39,8 +39,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
+   if (!m_hasUPower)
+     CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
+ 
+-  m_canPowerdown = LogindCheckCapability("CanPowerOff");
+-  m_canReboot    = LogindCheckCapability("CanReboot");
++  m_canPowerdown = true;
++  m_canReboot    = true;
+   m_canHibernate = LogindCheckCapability("CanHibernate");
+   m_canSuspend   = LogindCheckCapability("CanSuspend");
+ 
 diff --git a/xbmc/platform/linux/storage/UDevProvider.cpp b/xbmc/platform/linux/storage/UDevProvider.cpp
 index 2d94c39daa..58e17c1882 100644
 --- a/xbmc/platform/linux/storage/UDevProvider.cpp

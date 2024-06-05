@@ -1,7 +1,203 @@
-From ce883c55140c3ef0890116d4ac35bf54d69e94ee Mon Sep 17 00:00:00 2001
+From 31acfdc558652ea480c773f095ab675218af8195 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 2 Jun 2015 22:56:15 +0100
+Subject: [PATCH 01/24] Fix UPower capability detection on Vero
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+index bd04197a51..7cb68a19b4 100644
+--- a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
++++ b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+@@ -39,8 +39,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
+   if (!m_hasUPower)
+     CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
+ 
+-  m_canPowerdown = LogindCheckCapability("CanPowerOff");
+-  m_canReboot    = LogindCheckCapability("CanReboot");
++  m_canPowerdown = true;
++  m_canReboot    = true;
+   m_canHibernate = LogindCheckCapability("CanHibernate");
+   m_canSuspend   = LogindCheckCapability("CanSuspend");
+ 
+-- 
+2.34.1
+
+
+From 4ae22b3482359e9ce9a015b61001eb1e9385c19c Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 21 Dec 2017 11:38:02 +0000
+Subject: [PATCH 02/24] Add OSMC Helper routines to improve Kodi integration
+ with OSMC
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/CMakeLists.txt |  2 ++
+ xbmc/OSMCHelper.cpp | 36 ++++++++++++++++++++++++++++++++++++
+ xbmc/OSMCHelper.h   | 38 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 76 insertions(+)
+ create mode 100644 xbmc/OSMCHelper.cpp
+ create mode 100644 xbmc/OSMCHelper.h
+
+diff --git a/xbmc/CMakeLists.txt b/xbmc/CMakeLists.txt
+index b7c838b3da..3ddcc4da76 100644
+--- a/xbmc/CMakeLists.txt
++++ b/xbmc/CMakeLists.txt
+@@ -16,6 +16,7 @@ set(SOURCES AutoSwitch.cpp
+             LangInfo.cpp
+             MediaSource.cpp
+             NfoFile.cpp
++            OSMCHelper.cpp
+             PasswordManager.cpp
+             PlayListPlayer.cpp
+             PartyModeManager.cpp
+@@ -58,6 +59,7 @@ set(HEADERS AutoSwitch.h
+             LockType.h
+             MediaSource.h
+             NfoFile.h
++	    OSMCHelper.h
+             PartyModeManager.h
+             PasswordManager.h
+             PlayListPlayer.h
+diff --git a/xbmc/OSMCHelper.cpp b/xbmc/OSMCHelper.cpp
+new file mode 100644
+index 0000000000..2b605881b1
+--- /dev/null
++++ b/xbmc/OSMCHelper.cpp
+@@ -0,0 +1,36 @@
++/*                                                   
++ *      Copyright (C) 2005-2013 Team XBMC            
++ *      http://xbmc.org                              
++ *                                                   
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option) 
++ *  any later version.                                                  
++ *                                                                      
++ *  This Program is distributed in the hope that it will be useful,     
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of      
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the        
++ *  GNU General Public License for more details.                        
++ *                                                                      
++ *  You should have received a copy of the GNU General Public License   
++ *  along with XBMC; see the file COPYING.  If not, see                 
++ *  <http://www.gnu.org/licenses/>.                                     
++ *                                                                      
++ */                                                                     
++// OSMCHelper.cpp: implementation of OSMC helper routines
++//                                                                       
++//////////////////////////////////////////////////////////////////////   
++                                                                         
++extern "C" {                                                            
++#include "OSMCHelper.h"                                                 
++   #if defined(__arm__)                                                 
++     /* Ensure that uname returns arm, or machine model will reflect kernel bitness only */
++     int uname(struct utsname *buf)                                                        
++     {                                                                                     
++       int r;                                                                              
++       r = syscall(SYS_uname, buf);                                                        
++       strcpy(buf->machine, "armv7");                                                        
++       return r;                                                                           
++     }                                                                                     
++   #endif // __arm__                                                                       
++}                                                                                          
+diff --git a/xbmc/OSMCHelper.h b/xbmc/OSMCHelper.h
+new file mode 100644
+index 0000000000..709d21afbe
+--- /dev/null
++++ b/xbmc/OSMCHelper.h
+@@ -0,0 +1,38 @@
++/*                                                                                         
++ *      Copyright (C) 2005-2013 Team XBMC                                                  
++ *      http://xbmc.org                                                                    
++ *                                                                                         
++ *  This Program is free software; you can redistribute it and/or modify                   
++ *  it under the terms of the GNU General Public License as published by                   
++ *  the Free Software Foundation; either version 2, or (at your option)                    
++ *  any later version.                                                                     
++ *                                                                                         
++ *  This Program is distributed in the hope that it will be useful,                        
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of                         
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.                                           
++ *                                                                                         
++ *  You should have received a copy of the GNU General Public License                      
++ *  along with XBMC; see the file COPYING.  If not, see                                    
++ *  <http://www.gnu.org/licenses/>.                                                        
++ *                                                                                         
++ */                                                                                        
++// OSMCHelper.h: routines to improve behaviour of Kodi on OSMC                             
++//                                                                                         
++//////////////////////////////////////////////////////////////////////                     
++                                                                                           
++#pragma once                                                                               
++                                                                                           
++#include <sys/syscall.h>                                                                   
++#include <sys/types.h>                                                                     
++#include <sys/utsname.h>                                                                   
++#include <unistd.h>                                                                        
++#include <stdio.h>                                                                         
++#include <string.h>                                                                        
++                                                                                           
++extern "C" {                                                                               
++    #if defined(__arm__)                                                                   
++      /* Fix up uname for 64-bit kernels with 32-bit userland */                           
++      int uname(struct utsname *buf);                                                      
++    #endif // __arm__                                                                      
++}                                                                                          
+-- 
+2.34.1
+
+
+From 74b81e0fe134756e283f93b2acd20fada7bdc545 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sat, 6 Mar 2021 18:29:22 +0000
+Subject: [PATCH 03/24] Enable DRM-PRIME for Raspberry Pi
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/linux.xml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/system/settings/linux.xml b/system/settings/linux.xml
+index 531974f3f4..89b91db23b 100644
+--- a/system/settings/linux.xml
++++ b/system/settings/linux.xml
+@@ -165,12 +165,12 @@
+           <requirement>HAS_GLES</requirement>
+           <visible>false</visible>
+           <level>2</level>
+-          <default>false</default>
++          <default>true</default>
+           <control type="toggle" />
+         </setting>
+         <setting id="videoplayer.useprimedecoderforhw" type="boolean" parent="videoplayer.useprimedecoder" label="13438" help="36172">
+           <requirement>HAS_GLES</requirement>
+-          <visible>false</visible>
++          <visible>true</visible>
+           <dependencies>
+             <dependency type="enable">
+               <condition setting="videoplayer.useprimedecoder" operator="is">true</condition>
+@@ -184,7 +184,7 @@
+           <requirement>HAS_GLES</requirement>
+           <visible>false</visible>
+           <level>2</level>
+-          <default>1</default>
++          <default>0</default>
+           <constraints>
+             <options>
+               <option label="13464">0</option> <!-- DIRECT -->
+-- 
+2.34.1
+
+
+From 945c325a7ff47f0aa9ed3988349bfb7bee7938a9 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 20 Jan 2020 16:53:52 +0000
-Subject: [PATCH 01/21] ffmpeg: Add v4l2 support
+Subject: [PATCH 04/24] ffmpeg: Add v4l2 support
 
 ---
  cmake/modules/FindFFMPEG.cmake                |     5 +-
@@ -23760,10 +23956,10 @@ index 0bbc23540a..1bf9f53499 100644
 2.34.1
 
 
-From 084e857afbdafe9f44cd5a91ba3fae954edf5d70 Mon Sep 17 00:00:00 2001
+From 13b7bc03c1be11acdc93a68aaabecb8b0483bb3c Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 14 Jan 2021 18:36:57 +0000
-Subject: [PATCH 02/21] DVDVideoCodecDRMPRIME: Discard corrupt frames
+Subject: [PATCH 05/24] DVDVideoCodecDRMPRIME: Discard corrupt frames
 
 ffmpeg/V4L2 decoder can set AV_FRAME_FLAG_CORRUPT if the frame failed to decode.#
 Pass that onto VideoPlayer so the frame can skip renderer
@@ -23787,10 +23983,10 @@ index eb2943bb8c..d8827e8296 100644
 2.34.1
 
 
-From 2fb5bb75f1d5ebe800973d5f22d7764523090a5d Mon Sep 17 00:00:00 2001
+From 49ab54b99684f7a364b3b94b56c71b36625eb2fb Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 3 Dec 2021 16:00:50 +0000
-Subject: [PATCH 03/21] gbm: Set max bpc for high bit depth videos
+Subject: [PATCH 06/24] gbm: Set max bpc for high bit depth videos
 
 ---
  .../HwDecRender/VideoLayerBridgeDRMPRIME.cpp      | 15 +++++++++++++++
@@ -23833,10 +24029,10 @@ index 34d1ab6235..f1e73ee364 100644
 2.34.1
 
 
-From 694586427ca23af02c4964f7708d9b395bb19c73 Mon Sep 17 00:00:00 2001
+From 413cf5370b1f14888c95565b05c54343a698dc0b Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 20 Oct 2019 17:10:07 +0000
-Subject: [PATCH 04/21] WIP: DVDVideoCodecDRMPRIME: add support for filters
+Subject: [PATCH 07/24] WIP: DVDVideoCodecDRMPRIME: add support for filters
 
 ---
  .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 62 +++++++++++++++++--
@@ -23973,10 +24169,10 @@ index db49d165e7..b5cacf1a3c 100644
 2.34.1
 
 
-From 709906379a5eba35876023fe293a4c6ecdfc63d7 Mon Sep 17 00:00:00 2001
+From f84f77a9c1f0b8a3a24a9f3cd9dd9de1c8df8f66 Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Thu, 26 Dec 2019 11:01:51 +0100
-Subject: [PATCH 05/21] WIP: DRMPRIME deinterlace filter
+Subject: [PATCH 08/24] WIP: DRMPRIME deinterlace filter
 
 ---
  .../DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 379 +++++++++++++++---
@@ -24495,10 +24691,10 @@ index b5cacf1a3c..fab3431d40 100644
 2.34.1
 
 
-From f9b89522df755e1e08d04466d17abbef4774bb69 Mon Sep 17 00:00:00 2001
+From 6328258a5eafd638962f1ae7ab69ee99d0a3fbcf Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 24 Nov 2021 20:22:41 +0000
-Subject: [PATCH 06/21] CDVDVideoCodecDRMPRIME: Fix Format calls and some
+Subject: [PATCH 09/24] CDVDVideoCodecDRMPRIME: Fix Format calls and some
  logging
 
 ---
@@ -24533,10 +24729,10 @@ index 8476a3981d..ef8819c72b 100644
 2.34.1
 
 
-From 1529f93e0f286b4d8a973336bbc4bf173c8c53b7 Mon Sep 17 00:00:00 2001
+From 9e3d889343073fda5fc3e02fbfc205eeb5bbc929 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 27 Aug 2021 20:29:50 +0100
-Subject: [PATCH 07/21] DVDVideoCodecDRMPRIME: Avoid exception with
+Subject: [PATCH 10/24] DVDVideoCodecDRMPRIME: Avoid exception with
  AV_PIX_FMT_NONE
 
 ---
@@ -24560,10 +24756,10 @@ index ef8819c72b..98b0830488 100644
 2.34.1
 
 
-From 41415e728c0bb51933f186302e52fd17b29308d9 Mon Sep 17 00:00:00 2001
+From b117d37af068b5958dcc5de2e3395c7664fa7077 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 11 Sep 2021 14:03:05 +0100
-Subject: [PATCH 08/21] CDVDVideoCodecDRMPRIME: Also support YUV420 buffers
+Subject: [PATCH 11/24] CDVDVideoCodecDRMPRIME: Also support YUV420 buffers
 
 CDVDVideoCodecDRMPRIME: Add support for deinterlace of sw decoded buffers
 
@@ -24615,10 +24811,10 @@ index 98b0830488..72064b8310 100644
 2.34.1
 
 
-From 424fd4246f74a06f60e51f4343ce5db70ad028c2 Mon Sep 17 00:00:00 2001
+From b40ce61b487f4d2883da72de7cc650f12fcd47e8 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 17 Sep 2021 15:23:16 +0100
-Subject: [PATCH 09/21] DVDVideoCodecDRMPRIME: Leave deinterlace filter active
+Subject: [PATCH 12/24] DVDVideoCodecDRMPRIME: Leave deinterlace filter active
  on a progressive frame
 
 Interlaced content often has strange mixtures of interlace and progressive frames (e.g. IIPPPPIIPPPP)
@@ -24649,10 +24845,10 @@ index 72064b8310..76f9ad49cd 100644
 2.34.1
 
 
-From 945ab9efed7d2797b13ffcca2ad818475cfaf65f Mon Sep 17 00:00:00 2001
+From 74ad14a451626fec56a25803e8ffa6f20fef4307 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Tue, 30 Nov 2021 16:05:06 +0000
-Subject: [PATCH 10/21] SetVideoInterlaced: Set and unset deinterlace method
+Subject: [PATCH 13/24] SetVideoInterlaced: Set and unset deinterlace method
  name reported
 
 ---
@@ -24691,10 +24887,10 @@ index 76f9ad49cd..a49418bc0e 100644
 2.34.1
 
 
-From c26267ea448f56f3a530f259985bf92b2be6e4ce Mon Sep 17 00:00:00 2001
+From 6285a4d1465c6dc193d49a1752b7a9b6e90c3686 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 24 Nov 2021 20:21:28 +0000
-Subject: [PATCH 11/21] DVDVideoCodecDRMPRIME: Close deinterlace filter on
+Subject: [PATCH 14/24] DVDVideoCodecDRMPRIME: Close deinterlace filter on
  error
 
 Otherwise we crash later with an invalid m_pFilterGraph pointer
@@ -24766,10 +24962,10 @@ index a49418bc0e..fa7c4b28e5 100644
 2.34.1
 
 
-From 50f212abd20973ca68a8ac06f24588fc0e30907a Mon Sep 17 00:00:00 2001
+From 9b2aa82a0a69fe6c06249a43496256f29c87b19e Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 18 Jan 2023 16:41:00 +0000
-Subject: [PATCH 12/21] CDVDVideoCodecDRMPRIME: Adjust av formats to match
+Subject: [PATCH 15/24] CDVDVideoCodecDRMPRIME: Adjust av formats to match
  recent ffmpeg changes
 
 ---
@@ -24817,10 +25013,10 @@ index fa7c4b28e5..ced0ebac8d 100644
 2.34.1
 
 
-From c711c8fb86034eb7193133988d15f78d06f9d655 Mon Sep 17 00:00:00 2001
+From 3524b47a3153011d6c5afddddac3c280b7f37c8a Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Mon, 6 Feb 2023 15:19:51 +0000
-Subject: [PATCH 13/21] DVDVideoCodecDRMPRIME: Add support for arbitrary output
+Subject: [PATCH 16/24] DVDVideoCodecDRMPRIME: Add support for arbitrary output
  pixel formats
 
 This enables any ffmpeg pixel formats to be supported by DRMPRIME decoder
@@ -25150,10 +25346,10 @@ index fab3431d40..bb88fde1f9 100644
 2.34.1
 
 
-From ef0a57fe7a659e0ab57bb5bea8cc4838b81d5491 Mon Sep 17 00:00:00 2001
+From 9d7c4cd5305a52b7806029860b40d79348475cdf Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 14 Apr 2023 19:59:42 +0100
-Subject: [PATCH 14/21] DVDVideoCodecDRMPRIME: Remove obsolete
+Subject: [PATCH 17/24] DVDVideoCodecDRMPRIME: Remove obsolete
  thread_safe_callbacks
 
 ---
@@ -25176,10 +25372,10 @@ index 62fc0cf822..3ed59af9f7 100644
 2.34.1
 
 
-From 309db83b22e65705421fd995a2d1ffac2817766f Mon Sep 17 00:00:00 2001
+From 0c73ce0ada72ec08efbb4b77e7401d91e498f56d Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Mon, 15 May 2023 12:50:16 +0100
-Subject: [PATCH 15/21] DVDVideoCodecDRMPRIME: Fix missing flush after eof
+Subject: [PATCH 18/24] DVDVideoCodecDRMPRIME: Fix missing flush after eof
 
 ---
  .../VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 8 ++++++++
@@ -25209,10 +25405,10 @@ index 3ed59af9f7..c9ea5d52d5 100644
 2.34.1
 
 
-From b69b22a6f40874a34a67241f08fdc04f1905095c Mon Sep 17 00:00:00 2001
+From 647cfba9f3f8feb7b4b9b31a7a235e8d7fbb066c Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 31 May 2023 19:40:37 +0100
-Subject: [PATCH 16/21] DVDVideoCodecDRMPRIME: Clear m_pFilterGraph
+Subject: [PATCH 19/24] DVDVideoCodecDRMPRIME: Clear m_pFilterGraph
 
 ---
  xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecDRMPRIME.cpp | 1 +
@@ -25234,10 +25430,10 @@ index c9ea5d52d5..a3eecf0aed 100644
 2.34.1
 
 
-From 7a3e0375f7f82b3945fa73f0a31f4cf287c7c6b2 Mon Sep 17 00:00:00 2001
+From bf72fb426a6f1d6f2903d3f0fc825f3b69c2eea4 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 2 Jun 2023 11:34:22 +0100
-Subject: [PATCH 17/21] DVDVideoCodecDRMPRIME: Move FilterTest from open to
+Subject: [PATCH 20/24] DVDVideoCodecDRMPRIME: Move FilterTest from open to
  first frame returned
 
 The pixel format is not accurate until the first frame is returned
@@ -25305,10 +25501,10 @@ index bb88fde1f9..df17f89b96 100644
 2.34.1
 
 
-From 9d08271f9dd4d46e81fbcb2326cd23c68f18219c Mon Sep 17 00:00:00 2001
+From d1ca2d8b7bf6bcf3abe5dbffabb0d03f432925ed Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 31 May 2023 14:19:20 +0100
-Subject: [PATCH 18/21] DVDVideoCodecDRMPRIME: Rework filtering code to handle
+Subject: [PATCH 21/24] DVDVideoCodecDRMPRIME: Rework filtering code to handle
  sw deinterlace
 
 ---
@@ -25583,10 +25779,10 @@ index df17f89b96..55675c3c2e 100644
 2.34.1
 
 
-From b5494f4f5b9b57b17e942b11c14c8fda6579c578 Mon Sep 17 00:00:00 2001
+From 5c5a019635595b296c0f52783e59a8fb85ee9694 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Tue, 20 Jun 2023 15:13:09 +0100
-Subject: [PATCH 19/21] CDVDVideoCodecDRMPRIME: Support decoding to DRMPRIME
+Subject: [PATCH 22/24] CDVDVideoCodecDRMPRIME: Support decoding to DRMPRIME
  with sw deinterlace
 
 We can map a YUV style DRM_PRIME buffer back to AV_PIX_FMT_YUV420P
@@ -25639,10 +25835,10 @@ index 521a4c174b..326d33e8a0 100644
 2.34.1
 
 
-From f1f1feb018d7f2ba609c885f7bc2331e39757d6e Mon Sep 17 00:00:00 2001
+From 56510bc7aac6c7b4a88bb952fbfabbbbe30df455 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Tue, 20 Jun 2023 15:14:02 +0100
-Subject: [PATCH 20/21] DVDVideoCodecDRMPRIME: Request v4l2 buffers be
+Subject: [PATCH 23/24] DVDVideoCodecDRMPRIME: Request v4l2 buffers be
  allocated through cache
 
 This is an optional request, but will improve performance of sw deinterlace
@@ -25670,10 +25866,10 @@ index 326d33e8a0..8c0d37bf59 100644
 2.34.1
 
 
-From b62005fc9cf0da258570ee7bc2b527c3f65fed0b Mon Sep 17 00:00:00 2001
+From a77c833ea78ab14259b298e60b86205a98099f87 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 21 Jun 2023 13:16:01 +0100
-Subject: [PATCH 21/21] DVDVideoCodecDRMPRIME: Add setting to enable hw
+Subject: [PATCH 24/24] DVDVideoCodecDRMPRIME: Add setting to enable hw
  deinterlace
 
 HW deinterlace has lower cpu, but may have higher quality,
@@ -25715,7 +25911,7 @@ index 9fb3dcb2b0..c2d0f4352a 100644
  #: system/settings/settings.xml
  msgctxt "#36173"
 diff --git a/system/settings/linux.xml b/system/settings/linux.xml
-index 531974f3f4..c2df62c047 100644
+index 89b91db23b..4cdb0982af 100644
 --- a/system/settings/linux.xml
 +++ b/system/settings/linux.xml
 @@ -180,6 +180,18 @@
