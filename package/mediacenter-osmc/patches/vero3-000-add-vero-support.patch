@@ -8019,10 +8019,10 @@ index 03fb98552c..c49a4e4068 100644
  
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp
 new file mode 100644
-index 0000000000..3da34b98af
+index 0000000000..a3db862a57
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp
-@@ -0,0 +1,272 @@
+@@ -0,0 +1,278 @@
 +/*
 +*      Copyright (C) 2005-2013 Team XBMC
 +*      http://xbmc.org
@@ -8059,7 +8059,13 @@ index 0000000000..3da34b98af
 +static int mvc_file_read(void *h, uint8_t* buf, int size)
 +{
 +  CDVDInputStream* pInputStream = static_cast<CDemuxMVC*>(h)->m_pInput;
-+  return pInputStream->Read(buf, size);
++  int s = pInputStream->Read(buf, size);
++
++  if (pInputStream->IsEOF()) {
++	  return AVERROR_EOF;
++  }
++
++  return s;
 +}
 +
 +static int64_t mvc_file_seek(void *h, int64_t pos, int whence)
