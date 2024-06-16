@@ -8695,7 +8695,7 @@ index 46337576ab..763c45dec6 100644
    {
      NEXTSTREAM_NONE,
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index a87888c7be..6eab3dfb46 100644
+index a87888c7be..63a9429d18 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 @@ -10,6 +10,8 @@
@@ -8731,7 +8731,19 @@ index a87888c7be..6eab3dfb46 100644
    {
      BLURAY_TITLE_INFO *t = bd_get_title_info(m_bd, i, 0);
      if(!t)
-@@ -260,6 +262,7 @@ bool CDVDInputStreamBluray::Open()
+@@ -179,6 +181,11 @@ bool CDVDInputStreamBluray::Open()
+   }
+   else if (m_item.IsDiscImage())
+   {
++    CURL url2("udf://");
++
++    url2.SetHostName(m_item.GetPath());
++    root = url2.Get();
++
+     if (!OpenStream(m_item))
+       return false;
+ 
+@@ -260,6 +267,7 @@ bool CDVDInputStreamBluray::Open()
  
    bd_get_event(m_bd, nullptr);
  
@@ -8739,7 +8751,7 @@ index a87888c7be..6eab3dfb46 100644
    const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(m_bd);
  
    if (!disc_info)
-@@ -302,6 +305,7 @@ bool CDVDInputStreamBluray::Open()
+@@ -302,6 +310,7 @@ bool CDVDInputStreamBluray::Open()
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::Open - no menus (libmmbd, or profile 6 bdj)  : {}",
                disc_info->no_menu_support);
  #endif
@@ -8747,7 +8759,7 @@ index a87888c7be..6eab3dfb46 100644
    }
    else
      CLog::Log(LOGERROR, "CDVDInputStreamBluray::Open - BluRay not detected");
-@@ -320,6 +324,7 @@ bool CDVDInputStreamBluray::Open()
+@@ -320,6 +329,7 @@ bool CDVDInputStreamBluray::Open()
      return false;
    }
  
@@ -8755,7 +8767,7 @@ index a87888c7be..6eab3dfb46 100644
    int mode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_DISC_PLAYBACK);
  
    if (URIUtils::HasExtension(filename, ".mpls"))
-@@ -385,19 +390,21 @@ bool CDVDInputStreamBluray::Open()
+@@ -385,19 +395,21 @@ bool CDVDInputStreamBluray::Open()
                  m_titleInfo->idx);
        return false;
      }
@@ -8778,7 +8790,7 @@ index a87888c7be..6eab3dfb46 100644
    FreeTitleInfo();
  
    if(m_bd)
-@@ -422,7 +429,7 @@ void CDVDInputStreamBluray::FreeTitleInfo()
+@@ -422,7 +434,7 @@ void CDVDInputStreamBluray::FreeTitleInfo()
  
  void CDVDInputStreamBluray::ProcessEvent() {
  
@@ -8787,7 +8799,7 @@ index a87888c7be..6eab3dfb46 100644
    switch (m_event.event) {
  
     /* errors */
-@@ -537,14 +544,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -537,14 +549,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
    case BD_EVENT_PLAYLIST:
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - BD_EVENT_PLAYLIST {}", m_event.param);
      m_playlist = m_event.param;
@@ -8807,7 +8819,7 @@ index a87888c7be..6eab3dfb46 100644
      break;
  
    case BD_EVENT_CHAPTER:
-@@ -627,6 +637,25 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -627,6 +642,25 @@ void CDVDInputStreamBluray::ProcessEvent() {
  
    /* event has been consumed */
    m_event.event = BD_EVENT_NONE;
@@ -8833,7 +8845,7 @@ index a87888c7be..6eab3dfb46 100644
  }
  
  int CDVDInputStreamBluray::Read(uint8_t* buf, int buf_size)
-@@ -928,9 +957,15 @@ bool CDVDInputStreamBluray::PosTime(int ms)
+@@ -928,9 +962,15 @@ bool CDVDInputStreamBluray::PosTime(int ms)
    if(bd_seek_time(m_bd, ms * 90) < 0)
      return false;
  
@@ -8849,7 +8861,7 @@ index a87888c7be..6eab3dfb46 100644
    return true;
  }
  
-@@ -955,9 +990,15 @@ bool CDVDInputStreamBluray::SeekChapter(int ch)
+@@ -955,9 +995,15 @@ bool CDVDInputStreamBluray::SeekChapter(int ch)
    if(m_titleInfo && bd_seek_chapter(m_bd, ch-1) < 0)
      return false;
  
@@ -8865,7 +8877,7 @@ index a87888c7be..6eab3dfb46 100644
    return true;
  }
  
-@@ -1197,6 +1238,151 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
+@@ -1197,6 +1243,151 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
    return MenuType::NONE;
  }
  
