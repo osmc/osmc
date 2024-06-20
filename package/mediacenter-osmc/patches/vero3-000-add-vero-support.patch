@@ -2999,7 +2999,7 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..9dbbdeac4f
+index 0000000000..5d9c6fc3f1
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 @@ -0,0 +1,1333 @@
@@ -3230,7 +3230,7 @@ index 0000000000..9dbbdeac4f
 +
 +	// check for 1920x1080, interlaced, 25 fps
 +	// incorrectly reported as 50 fps (yes, video_rate == 1920)
-+	if (hints.width == 1920 && video_rate == 1920) {
++	if (hints.width == 1920 && video_rate == 1920 && hints.interlaced) {
 +		CLog::Log(LOGDEBUG, "AMLInsecureVideoCodec::getVideoRate: video_rate exception");
 +		video_rate = 0.5 + (float) UNIT_FREQ * 1000 / 25000;
 +	}
