@@ -531,7 +531,7 @@ class OSMCBackup(object):
             try:
                 shutil.copyfile(local_tarball_name, remote_tarball_name)
                 xbmc.sleep(300)
-                success = os.path.isfile(remote_tarball_name)
+                success = xbmcvfs.exists(remote_tarball_name)
             except FileNotFoundError:  # smb:// target will raise FileNotFoundError
                 success = False
 
@@ -551,7 +551,7 @@ class OSMCBackup(object):
                     .format(local=local_tarball_name, remote=remote_tarball_name))
                 subprocess.Popen(['cp', local_tarball_name, remote_tarball_name])
                 xbmc.sleep(300)
-                success = os.path.isfile(remote_tarball_name)
+                success = xbmcvfs.exists(remote_tarball_name)
                 if not success:
                     log('Failed to copy {local} to {remote} using subprocess.Popen'
                         .format(local=local_tarball_name, remote=remote_tarball_name))
