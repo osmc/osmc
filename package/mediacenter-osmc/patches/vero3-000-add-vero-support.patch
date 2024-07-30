@@ -173,7 +173,7 @@ index 531974f3f4..9b85a3bf92 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 97ffe80296..969212d192 100755
+index be3bd9e29c..5798528c96 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -87,6 +87,125 @@
@@ -1347,7 +1347,7 @@ index ed36a27e18..2b4ae95884 100644
    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
  }
 diff --git a/xbmc/application/ApplicationPowerHandling.cpp b/xbmc/application/ApplicationPowerHandling.cpp
-index 4354b9b626..b0bb48553a 100644
+index 8000a7ee9e..c6d7aef793 100644
 --- a/xbmc/application/ApplicationPowerHandling.cpp
 +++ b/xbmc/application/ApplicationPowerHandling.cpp
 @@ -16,6 +16,7 @@
@@ -1373,7 +1373,7 @@ index 4354b9b626..b0bb48553a 100644
  
  void CApplicationPowerHandling::ResetScreenSaver()
  {
-@@ -150,6 +157,8 @@ bool CApplicationPowerHandling::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPresse
+@@ -144,6 +151,8 @@ bool CApplicationPowerHandling::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPresse
  
  bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -1382,7 +1382,7 @@ index 4354b9b626..b0bb48553a 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -228,6 +237,57 @@ bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* =
+@@ -222,6 +231,57 @@ bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* =
      return false;
  }
  
@@ -9428,7 +9428,7 @@ index f3d3db772c..10fc37ab66 100644
      m_processInfo->SetStateRealtime(realtime);
    }
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
-index 178dc47741..81a9995346 100644
+index d7795f7311..d34b7cf145 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayerAudio.cpp
 @@ -78,7 +78,7 @@ CVideoPlayerAudio::~CVideoPlayerAudio()
@@ -9451,7 +9451,7 @@ index 178dc47741..81a9995346 100644
      m_synctype = SYNC_RESAMPLE;
  
    if (m_synctype == SYNC_DISCON)
-@@ -677,7 +675,7 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
+@@ -649,7 +647,7 @@ bool CVideoPlayerAudio::SwitchCodecIfNeeded()
  
    m_displayReset = false;
  
@@ -9913,7 +9913,7 @@ index 0000000000..be598196f8
 +  bool m_bConfigured;
 +};
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
-index dfd4b31227..dd5fec1457 100644
+index dfd4b31227..1774eba28f 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 @@ -241,7 +241,7 @@ void CRenderer::Render(COverlay* o)
@@ -9971,6 +9971,19 @@ index dfd4b31227..dd5fec1457 100644
      rOpts.position = 100 - pos * 100;
    }
    else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_OUTSIDE)
+@@ -575,6 +571,12 @@ std::shared_ptr<COverlay> CRenderer::Convert(CDVDOverlay& o, double pts)
+   else if (o.IsOverlayType(DVDOVERLAY_TYPE_SPU))
+     r = COverlay::Create(static_cast<CDVDOverlaySpu&>(o));
+ 
++  if (r)
++  {
++    r->m_3dSubtitleDepth = o.m_3dSubtitleDepth;
++    r->m_pgsSubtitle = o.IsOverlayType(DVDOVERLAY_TYPE_IMAGE);
++  }
++
+   m_textureCache[m_textureid] = r;
+   o.m_textureid = m_textureid;
+   m_textureid++;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
 index a6690004e6..8126ebc90f 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.h
@@ -10446,7 +10459,7 @@ index 6c5bceae7c..6161fa56f1 100644
 +
  core_add_library(linuxsupport)
 diff --git a/xbmc/platform/linux/PlatformLinux.cpp b/xbmc/platform/linux/PlatformLinux.cpp
-index 25eb9818da..822580112f 100644
+index e01f8216bf..9aa8f20ce6 100644
 --- a/xbmc/platform/linux/PlatformLinux.cpp
 +++ b/xbmc/platform/linux/PlatformLinux.cpp
 @@ -36,6 +36,9 @@
@@ -10665,7 +10678,7 @@ index fb04187763..beec394924 100644
  
  bool CPowerManager::Hibernate()
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index c3f20878f8..2c15d55be7 100644
+index 34dafe7ea7..76518d8db2 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
 @@ -424,7 +424,7 @@ void CAdvancedSettings::Initialize()
@@ -10694,10 +10707,10 @@ index c3f20878f8..2c15d55be7 100644
      XMLUtils::GetFloat(pElement, "audiodelayrange", m_videoAudioDelayRange, 10, 600);
      XMLUtils::GetString(pElement, "defaultplayer", m_videoDefaultPlayer);
 diff --git a/xbmc/settings/AdvancedSettings.h b/xbmc/settings/AdvancedSettings.h
-index b5df5118dd..d47857b013 100644
+index 3351caff55..7d38223e08 100644
 --- a/xbmc/settings/AdvancedSettings.h
 +++ b/xbmc/settings/AdvancedSettings.h
-@@ -361,6 +361,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
+@@ -362,6 +362,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
      std::string m_stereoscopicregex_3d;
      std::string m_stereoscopicregex_sbs;
      std::string m_stereoscopicregex_tab;
