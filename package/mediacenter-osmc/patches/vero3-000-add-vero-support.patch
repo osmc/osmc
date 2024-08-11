@@ -2999,10 +2999,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..5d9c6fc3f1
+index 0000000000..8b0311f842
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1333 @@
+@@ -0,0 +1,1340 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4235,7 +4235,6 @@ index 0000000000..5d9c6fc3f1
 +	}
 +
 +	if (m_guiStereoMode == RENDER_STEREO_MODE_MONO) {
-+		std::string videoStereoMode = m_processInfo.GetVideoStereoMode();
 +		if (videoStereoMode == "left_right" || videoStereoMode == "right_left")
 +			dst_rect.x2 *= 2.0;
 +		else if (videoStereoMode == "top_bottom" || videoStereoMode == "bottom_top")
@@ -4248,6 +4247,7 @@ index 0000000000..5d9c6fc3f1
 +		// 3D frame packed output: get the screen height from the graphic context
 +		// (will work in fullscreen mode only)
 +		RESOLUTION_INFO info = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
++		dst_rect.x2 = info.iWidth;
 +		dst_rect.y2 = info.iHeight * 2 + info.iBlanking;
 +		setFramepackingResolution(info.iWidth, info.iHeight, info.iBlanking);
 +	}
@@ -4308,6 +4308,13 @@ index 0000000000..5d9c6fc3f1
 +	} else if (videoInputMode == "block_rl") {
 +		vimode = VIDEO_INPUT_MODE_MVC;
 +		leftEyeFirst = false;
++	}
++
++	// handle Full-SBS/Full-TAB
++	if (vimode == VIDEO_INPUT_MODE_HSBS && m_hints.width == 3840) {
++		vimode = VIDEO_INPUT_MODE_FSBS;
++	} else if (vimode == VIDEO_INPUT_MODE_HTAB && m_hints.height > 1080) {
++		vimode = VIDEO_INPUT_MODE_FTAB;
 +	}
 +
 +	if (vimode != VIDEO_INPUT_MODE_2D) {
@@ -7637,7 +7644,7 @@ index 0cdf8c3864..0f82d44372 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 1aebc3dcbc..4d987720ed 100644
+index 1aebc3dcbc..7fca68604e 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -21,6 +21,8 @@
@@ -7657,7 +7664,18 @@ index 1aebc3dcbc..4d987720ed 100644
    m_speed = DVD_PLAYSPEED_NORMAL;
    m_program = UINT_MAX;
    m_pkt.result = -1;
-@@ -528,7 +531,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
+@@ -516,6 +519,10 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
+   bool skipCreateStreams = false;
+   bool isBluray = pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY);
+ 
++  // increase probesize for mpegts streams only
++  if (iformat && strcmp(iformat->name, "mpegts") == 0)
++    av_opt_set_int(m_pFormatContext, "probesize", 10000000, 0);
++
+   // this should never happen. Log it to inform about the error.
+   if (m_pFormatContext->nb_streams > 0 && m_pFormatContext->streams == nullptr)
+   {
+@@ -528,7 +535,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
        m_pFormatContext->nb_streams > 0 && m_pFormatContext->streams != nullptr &&
        m_pFormatContext->streams[0]->codecpar->codec_id != AV_CODEC_ID_HEVC)
    {
@@ -7666,7 +7684,7 @@ index 1aebc3dcbc..4d987720ed 100644
      m_checkTransportStream = true;
      skipCreateStreams = true;
    }
-@@ -659,17 +662,6 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
+@@ -659,17 +666,6 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
    m_startTime = 0;
    m_seekStream = -1;
  
@@ -7684,7 +7702,7 @@ index 1aebc3dcbc..4d987720ed 100644
    return true;
  }
  
-@@ -678,6 +670,9 @@ void CDVDDemuxFFmpeg::Dispose()
+@@ -678,6 +674,9 @@ void CDVDDemuxFFmpeg::Dispose()
    m_pkt.result = -1;
    av_packet_unref(&m_pkt.pkt);
  
@@ -7694,7 +7712,7 @@ index 1aebc3dcbc..4d987720ed 100644
    if (m_pFormatContext)
    {
      if (m_ioContext && m_pFormatContext->pb && m_pFormatContext->pb != m_ioContext)
-@@ -727,6 +722,9 @@ void CDVDDemuxFFmpeg::Flush()
+@@ -727,6 +726,9 @@ void CDVDDemuxFFmpeg::Flush()
    m_displayTime = 0;
    m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
    m_seekToKeyFrame = false;
@@ -7704,7 +7722,7 @@ index 1aebc3dcbc..4d987720ed 100644
  }
  
  void CDVDDemuxFFmpeg::Abort()
-@@ -1104,7 +1102,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1104,7 +1106,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
  
          if (IsTransportStreamReady())
          {
@@ -7714,7 +7732,7 @@ index 1aebc3dcbc..4d987720ed 100644
            {
              /* check so packet belongs to selected program */
              for (unsigned int i = 0; i < m_pFormatContext->programs[m_program]->nb_stream_indexes;
-@@ -1225,7 +1224,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1225,7 +1228,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
      else if (stream->type == STREAM_VIDEO)
      {
        if (static_cast<CDemuxStreamVideo*>(stream)->iWidth != m_pFormatContext->streams[pPacket->iStreamId]->codecpar->width ||
@@ -7724,7 +7742,7 @@ index 1aebc3dcbc..4d987720ed 100644
        {
          // content has changed
          stream = AddStream(pPacket->iStreamId);
-@@ -1234,6 +1234,12 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1234,6 +1238,12 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
          pPacket->recoveryPoint = m_seekToKeyFrame;
        m_seekToKeyFrame = false;
      }
@@ -7737,7 +7755,7 @@ index 1aebc3dcbc..4d987720ed 100644
      if (!stream)
      {
        CDVDDemuxUtils::FreeDemuxPacket(pPacket);
-@@ -1282,6 +1288,9 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1282,6 +1292,9 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
      return true;
    }
  
@@ -7747,7 +7765,7 @@ index 1aebc3dcbc..4d987720ed 100644
    if (!m_pInput->Seek(0, SEEK_POSSIBLE) &&
        !m_pInput->IsStreamType(DVDSTREAM_TYPE_FFMPEG))
    {
-@@ -1306,6 +1315,9 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1306,6 +1319,9 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
        m_pkt.result = -1;
        av_packet_unref(&m_pkt.pkt);
  
@@ -7757,7 +7775,7 @@ index 1aebc3dcbc..4d987720ed 100644
        if (timer.IsTimePast())
        {
          CLog::Log(LOGERROR, "CDVDDemuxFFmpeg::{} - Timed out waiting for video to be ready",
-@@ -1380,8 +1392,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1380,8 +1396,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
    if (m_currentPts == DVD_NOPTS_VALUE)
      CLog::Log(LOGDEBUG, "{} - unknown position after seek", __FUNCTION__);
    else
@@ -7768,7 +7786,7 @@ index 1aebc3dcbc..4d987720ed 100644
  
    // in this case the start time is requested time
    if (startpts)
-@@ -1595,6 +1607,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
+@@ -1595,6 +1611,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
    m_parsers.clear();
  }
  
@@ -7786,7 +7804,7 @@ index 1aebc3dcbc..4d987720ed 100644
  CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
  {
    AVStream* pStream = m_pFormatContext->streams[streamIdx];
-@@ -1642,6 +1665,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1642,6 +1669,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
        }
        case AVMEDIA_TYPE_VIDEO:
        {
@@ -7802,7 +7820,7 @@ index 1aebc3dcbc..4d987720ed 100644
          CDemuxStreamVideoFFmpeg* st = new CDemuxStreamVideoFFmpeg(pStream);
          stream = st;
          if (strcmp(m_pFormatContext->iformat->name, "flv") == 0)
-@@ -1650,11 +1682,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1650,11 +1686,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->bVFR = false;
  
          // never trust pts in avi files with h264.
@@ -7827,7 +7845,7 @@ index 1aebc3dcbc..4d987720ed 100644
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
-@@ -1666,6 +1710,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1666,6 +1714,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->iFpsRate = r_frame_rate.num;
            st->iFpsScale = r_frame_rate.den;
          }
@@ -7839,7 +7857,7 @@ index 1aebc3dcbc..4d987720ed 100644
          else
          {
            st->iFpsRate  = 0;
-@@ -1677,13 +1726,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1677,13 +1730,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
                           pStream->codecpar->field_order == AV_FIELD_TB ||
                           pStream->codecpar->field_order == AV_FIELD_BT;
  
@@ -7873,7 +7891,7 @@ index 1aebc3dcbc..4d987720ed 100644
          st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
          st->bitDepth = 8;
          const AVPixFmtDescriptor* desc =
-@@ -1762,7 +1830,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1762,7 +1834,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          }
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
@@ -7884,7 +7902,7 @@ index 1aebc3dcbc..4d987720ed 100644
 +            int mvcIndex;
 +            AVStream *mvcStream = nullptr;
 +            const std::shared_ptr<CDVDInputStream::IExtentionStream> pExt = std::dynamic_pointer_cast<CDVDInputStream::IExtentionStream>(m_pInput);
-+
+ 
 +            if (pExt && pExt->HasExtention())
 +            {
 +              delete m_pSSIF;
@@ -7929,7 +7947,7 @@ index 1aebc3dcbc..4d987720ed 100644
 +          else if (CDVDCodecUtils::ProcessH264MVCExtradata(pStream->codecpar->extradata, pStream->codecpar->extradata_size))
 +          {
 +            pStream->codecpar->codec_tag = MKTAG('M', 'V', 'C', '1');
- 
++
 +            // use lr if we don't know what the stereo mode is
 +            st->stereo_mode = stereoMode.empty() ? "block_lr" : stereoMode;
 +          }
@@ -7937,7 +7955,7 @@ index 1aebc3dcbc..4d987720ed 100644
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1788,6 +1912,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1788,6 +1916,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -7954,7 +7972,7 @@ index 1aebc3dcbc..4d987720ed 100644
            break;
          }
        }
-@@ -2101,7 +2235,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -2101,7 +2239,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -7976,7 +7994,7 @@ index 1aebc3dcbc..4d987720ed 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2132,6 +2279,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
+@@ -2132,6 +2283,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
  
  bool CDVDDemuxFFmpeg::IsProgramChange()
  {
@@ -10207,10 +10225,21 @@ index a7135da5d8..aeedf893cd 100644
  
  class CVideoSettings
 diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
-index 3aa269bca3..67c2b4dc8a 100644
+index 3aa269bca3..e281b550a7 100644
 --- a/xbmc/guilib/StereoscopicsManager.cpp
 +++ b/xbmc/guilib/StereoscopicsManager.cpp
-@@ -61,8 +61,8 @@ static const struct StereoModeMap VideoModeToGuiModeMap[] =
+@@ -52,6 +52,10 @@ static const struct StereoModeMap VideoModeToGuiModeMap[] =
+   { "right_left",               RENDER_STEREO_MODE_SPLIT_VERTICAL },
+   { "top_bottom",               RENDER_STEREO_MODE_SPLIT_HORIZONTAL },
+   { "bottom_top",               RENDER_STEREO_MODE_SPLIT_HORIZONTAL },
++  { "full_left_right",          RENDER_STEREO_MODE_HARDWAREBASED },
++  { "full_right_left",          RENDER_STEREO_MODE_HARDWAREBASED },
++  { "full_top_bottom",          RENDER_STEREO_MODE_HARDWAREBASED },
++  { "full_bottom_top",          RENDER_STEREO_MODE_HARDWAREBASED },
+   { "checkerboard_rl",          RENDER_STEREO_MODE_CHECKERBOARD },
+   { "checkerboard_lr",          RENDER_STEREO_MODE_CHECKERBOARD },
+   { "row_interleaved_rl",       RENDER_STEREO_MODE_INTERLACED },
+@@ -61,8 +65,8 @@ static const struct StereoModeMap VideoModeToGuiModeMap[] =
    { "anaglyph_cyan_red",        RENDER_STEREO_MODE_ANAGLYPH_RED_CYAN },
    { "anaglyph_green_magenta",   RENDER_STEREO_MODE_ANAGLYPH_GREEN_MAGENTA },
    { "anaglyph_yellow_blue",     RENDER_STEREO_MODE_ANAGLYPH_YELLOW_BLUE },
@@ -10221,7 +10250,7 @@ index 3aa269bca3..67c2b4dc8a 100644
    {}
  };
  
-@@ -130,10 +130,76 @@ void CStereoscopicsManager::SetStereoMode(const RENDER_STEREO_MODE &mode)
+@@ -130,10 +134,76 @@ void CStereoscopicsManager::SetStereoMode(const RENDER_STEREO_MODE &mode)
    RENDER_STEREO_MODE currentMode = GetStereoMode();
    RENDER_STEREO_MODE applyMode = mode;
  
@@ -10298,7 +10327,7 @@ index 3aa269bca3..67c2b4dc8a 100644
    if (applyMode != currentMode && applyMode >= RENDER_STEREO_MODE_OFF)
    {
      if (CServiceBroker::GetRenderSystem()->SupportsStereo(applyMode))
-@@ -198,6 +264,15 @@ std::string CStereoscopicsManager::DetectStereoModeByString(const std::string &n
+@@ -198,6 +268,15 @@ std::string CStereoscopicsManager::DetectStereoModeByString(const std::string &n
    if (re.RegFind(searchString) > -1)
      stereoMode = "top_bottom";
  
@@ -10314,7 +10343,7 @@ index 3aa269bca3..67c2b4dc8a 100644
    return stereoMode;
  }
  
-@@ -304,7 +379,7 @@ int CStereoscopicsManager::ConvertVideoToGuiStereoMode(const std::string &mode)
+@@ -304,7 +383,7 @@ int CStereoscopicsManager::ConvertVideoToGuiStereoMode(const std::string &mode)
    size_t i = 0;
    while (VideoModeToGuiModeMap[i].name)
    {
@@ -10323,6 +10352,34 @@ index 3aa269bca3..67c2b4dc8a 100644
        return VideoModeToGuiModeMap[i].mode;
      i++;
    }
+@@ -512,8 +591,25 @@ std::string CStereoscopicsManager::GetVideoStereoMode() const
+ 
+   const auto& components = CServiceBroker::GetAppComponents();
+   const auto appPlayer = components.GetComponent<CApplicationPlayer>();
+-  if (appPlayer->IsPlaying())
+-    playerMode = CServiceBroker::GetDataCacheCore().GetVideoStereoMode();
++  if (appPlayer->IsPlaying()) {
++	  playerMode = CServiceBroker::GetDataCacheCore().GetVideoStereoMode();
++
++	  if (playerMode.find("left") != std::string::npos) {
++		  // check for Full-SBS
++		  int width = CServiceBroker::GetDataCacheCore().GetVideoWidth();
++
++		  if (width == 3840) {
++			  playerMode = "full_" + playerMode;
++		  }
++	  } else if (playerMode.find("bottom") != std::string::npos) {
++		  // check for Full-TAB
++		  int height = CServiceBroker::GetDataCacheCore().GetVideoHeight();
++
++		  if (height > 1080) {
++			  playerMode = "full_" + playerMode;
++		  }
++	  }
++  }
+ 
+   return playerMode;
+ }
 diff --git a/xbmc/interfaces/generic/LanguageInvokerThread.cpp b/xbmc/interfaces/generic/LanguageInvokerThread.cpp
 index 67f3d14875..d2d785ef4c 100644
 --- a/xbmc/interfaces/generic/LanguageInvokerThread.cpp
@@ -10721,7 +10778,7 @@ index 3351caff55..7d38223e08 100644
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 75ce481a6c..74c85a8644
+index 75ce481a6c..14af860578
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
 @@ -23,6 +23,7 @@
@@ -10901,7 +10958,7 @@ index 75ce481a6c..74c85a8644
  
      std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
      for (size_t resolution = RES_DESKTOP; resolution < CDisplaySettings::GetInstance().ResolutionInfoSize(); resolution++)
-@@ -672,6 +729,33 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -672,6 +729,37 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
    return RES_DESKTOP;
  }
  
@@ -10918,6 +10975,10 @@ index 75ce481a6c..74c85a8644
 +      stereo += "SBS)";
 +    else if(info.dwFlags & D3DPRESENTFLAG_MODE3DTB)
 +      stereo += "TAB)";
++    else if((info.dwFlags & D3DPRESENTFLAG_MODE3DFP) && (info.dwFlags & D3DPRESENTFLAG_MODE3DFSBS))
++      stereo += "Full-SBS)";
++    else if((info.dwFlags & D3DPRESENTFLAG_MODE3DFP) && (info.dwFlags & D3DPRESENTFLAG_MODE3DFTAB))
++      stereo += "Full-TAB)";
 +    else if(info.dwFlags & D3DPRESENTFLAG_MODE3DFP)
 +      stereo += "FP)";
 +  }
@@ -10935,7 +10996,7 @@ index 75ce481a6c..74c85a8644
  std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, float refreshrate /* = 0.0f */)
  {
    if (resolution == RES_WINDOW)
-@@ -680,13 +764,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+@@ -680,13 +768,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
    if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
    {
      const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
@@ -10952,7 +11013,7 @@ index 75ce481a6c..74c85a8644
    }
  
    return "DESKTOP";
-@@ -716,14 +796,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
+@@ -716,14 +800,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
      const auto mode = CDisplaySettings::GetInstance().GetResolutionInfo(index);
  
      if (mode.dwFlags ^ D3DPRESENTFLAG_INTERLACED)
@@ -10969,7 +11030,7 @@ index 75ce481a6c..74c85a8644
    }
  
    std::sort(list.begin(), list.end(), ModeSort);
-@@ -795,15 +869,8 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
+@@ -795,15 +873,8 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
      std::vector<RESOLUTION_WHR> resolutions = CServiceBroker::GetWinSystem()->ScreenResolutions(info.fRefreshRate);
      for (std::vector<RESOLUTION_WHR>::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
      {
@@ -11101,10 +11162,10 @@ index dad5da5528..4a9211342e 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..3ab1ad5649
+index 0000000000..91e39cae7a
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,921 @@
+@@ -0,0 +1,958 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11669,34 +11730,71 @@ index 0000000000..3ab1ad5649
 +
 +  aml_enable_PHY(true);
 +
-+
 +  return result;
++}
++
++static void aml_add_resolution(RESOLUTION_INFO res, std::vector<RESOLUTION_INFO> &resolutions)
++{
++    res.strMode = StringUtils::Format("{}x{} @ {:.2f}{} - Full Screen",
++									  res.iScreenWidth, res.iScreenHeight, res.fRefreshRate, res.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
++	resolutions.push_back(res);
++}
++
++static void aml_add_3d_full_sbs_resolution(RESOLUTION_INFO res, std::vector<RESOLUTION_INFO> &resolutions)
++{
++	if ((res.dwFlags & D3DPRESENTFLAG_MODE3DFP) && res.iScreenWidth == 1920) {
++		// add Full SBS resolution displayed as FP
++		res.dwFlags |= D3DPRESENTFLAG_MODE3DFSBS;
++		res.iScreenWidth *= 2;
++		res.fPixelRatio *= 2;
++		aml_add_resolution(res, resolutions);
++	}
++}
++
++static void aml_add_3d_full_tab_resolution(RESOLUTION_INFO res, std::vector<RESOLUTION_INFO> &resolutions)
++{
++	if ((res.dwFlags & D3DPRESENTFLAG_MODE3DFP) && res.iScreenWidth == 1920) {
++		// add Full TAB resolution displayed as FP
++		res.dwFlags |= D3DPRESENTFLAG_MODE3DFTAB;
++		res.iScreenHeight *= 2;
++		res.fPixelRatio /= 2;
++		aml_add_resolution(res, resolutions);
++	}
 +}
 +
 +static void aml_add_resolution(const std::string &mode, std::vector<RESOLUTION_INFO> &resolutions)
 +{
-+  RESOLUTION_INFO res;
++	if (StringUtils::StartsWith(mode, "4k2k") && aml_support_h264_4k2k() <= AML_NO_H264_4K2K) {
++		// 4k2k is not supported
++		return;
++	}
 +
-+  if (((StringUtils::StartsWith(mode, "4k2k")) && (aml_support_h264_4k2k() > AML_NO_H264_4K2K)) || !(StringUtils::StartsWith(mode, "4k2k")))
-+  {
-+    if (aml_mode_to_resolution(mode.c_str(), &res))
-+      resolutions.push_back(res);
++	RESOLUTION_INFO res;
 +
-+    if (aml_has_frac_rate_policy())
-+    {
-+      // Add fractional frame rates: 23.976, 29.97 and 59.94 Hz
-+      switch ((int)res.fRefreshRate)
-+      {
-+        case 24:
-+        case 30:
-+        case 60:
-+        res.fRefreshRate /= 1.001;
-+        res.strMode       = StringUtils::Format("{}x{} @ {:.2f}{} - Full Screen", res.iScreenWidth, res.iScreenHeight, res.fRefreshRate,
-+            res.dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
-+        resolutions.push_back(res);
-+      }
-+    }
-+  }
++	if (!aml_mode_to_resolution(mode.c_str(), &res)) {
++		// there's no resolution that fits the mode
++		return;
++	}
++
++	aml_add_resolution(res, resolutions);
++	aml_add_3d_full_sbs_resolution(res, resolutions);
++	aml_add_3d_full_tab_resolution(res, resolutions);
++
++	if (!aml_has_frac_rate_policy()) {
++		// no fractional frame rates supported
++		return;
++	}
++
++	switch ((int) res.fRefreshRate) {
++		case 24:
++		case 30:
++		case 60:
++			res.fRefreshRate /= 1.001;
++			aml_add_resolution(res, resolutions);
++			aml_add_3d_full_sbs_resolution(res, resolutions);
++			aml_add_3d_full_tab_resolution(res, resolutions);
++			break;
++	}
 +}
 +
 +static bool aml_modes_to_resolutions(const std::vector<std::string> &probe_str, std::vector<RESOLUTION_INFO> &resolutions)
@@ -12923,14 +13021,16 @@ index e3300e925c..3e179f1fb6 100644
  
  void CGraphicContext::GetAllowedResolutions(std::vector<RESOLUTION> &res)
 diff --git a/xbmc/windowing/GraphicContext.h b/xbmc/windowing/GraphicContext.h
-index 0c5201f1e7..fa605a83e2 100644
+index 0c5201f1e7..30b7877c18 100644
 --- a/xbmc/windowing/GraphicContext.h
 +++ b/xbmc/windowing/GraphicContext.h
-@@ -29,11 +29,17 @@
+@@ -29,11 +29,19 @@
  #define D3DPRESENTFLAG_PROGRESSIVE  4
  #define D3DPRESENTFLAG_MODE3DSBS    8
  #define D3DPRESENTFLAG_MODE3DTB    16
 +#define D3DPRESENTFLAG_MODE3DFP    32
++#define D3DPRESENTFLAG_MODE3DFSBS  0x4000000
++#define D3DPRESENTFLAG_MODE3DFTAB  0x8000000
  
  /* what types are important for mode setting */
  #define D3DPRESENTFLAG_MODEMASK ( D3DPRESENTFLAG_INTERLACED \
@@ -12945,7 +13045,7 @@ index 0c5201f1e7..fa605a83e2 100644
  
  enum VIEW_TYPE { VIEW_TYPE_NONE = 0,
                   VIEW_TYPE_LIST,
-@@ -82,7 +88,6 @@ public:
+@@ -82,7 +90,6 @@ public:
  
    void Flip(bool rendered, bool videoLayer);
  
@@ -12953,7 +13053,7 @@ index 0c5201f1e7..fa605a83e2 100644
    int GetWidth() const;
    int GetHeight() const;
    bool SetViewPort(float fx, float fy , float fwidth, float fheight, bool intersectPrevious = false);
-@@ -101,6 +106,9 @@ public:
+@@ -101,6 +108,9 @@ public:
    void ApplyStateBlock();
    void Clear(UTILS::COLOR::Color color = 0);
    void GetAllowedResolutions(std::vector<RESOLUTION> &res);
@@ -12964,7 +13064,7 @@ index 0c5201f1e7..fa605a83e2 100644
    /* \brief Get UI scaling information from a given resolution to the screen resolution.
     Takes account of overscan and UI zooming.
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
-index 270392c163..0ee4f52042 100644
+index 270392c163..0009a8ab5c 100644
 --- a/xbmc/windowing/Resolution.cpp
 +++ b/xbmc/windowing/Resolution.cpp
 @@ -68,16 +68,16 @@ float RESOLUTION_INFO::DisplayRatio() const
@@ -12997,9 +13097,10 @@ index 270392c163..0ee4f52042 100644
  {
    RESOLUTION_INFO curr = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo(resolution);
    CLog::Log(LOGINFO,
-             "[WHITELIST] Searching the whitelist for: width: {}, height: {}, fps: {:0.3f}, 3D: {}",
+-            "[WHITELIST] Searching the whitelist for: width: {}, height: {}, fps: {:0.3f}, 3D: {}",
 -            width, height, fps, is3D ? "true" : "false");
-+            width, height, fps, modeflag3d ? "true" : "false");
++            "[WHITELIST] Searching the whitelist for: width: {}, height: {}, fps: {:0.3f}, 3D: {}, 3d mode flags: 0x{:x}",
++            width, height, fps, modeflag3d ? "true" : "false", modeflag3d);
  
    std::vector<CVariant> indexList = CServiceBroker::GetSettingsComponent()->GetSettings()->GetList(CSettings::SETTING_VIDEOSCREEN_WHITELIST);
  
