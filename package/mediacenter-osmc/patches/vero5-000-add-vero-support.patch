@@ -2999,10 +2999,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..8b0311f842
+index 0000000000..36d0be0d5d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1340 @@
+@@ -0,0 +1,1344 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3226,6 +3226,10 @@ index 0000000000..8b0311f842
 +	if (hints.fpsrate > 0 && hints.fpsscale != 0) {
 +		// then ffmpeg avg_frame_rate next
 +		video_rate = 0.5 + (float) UNIT_FREQ * hints.fpsscale / hints.fpsrate;
++	} else {
++		// the video_rate can't be calculated because fpsrate and/or fpsscale are invalid, so
++		// we're using a default one as a fallback
++		video_rate = 0.5 + (float) UNIT_FREQ * 1001 / 30000;
 +	}
 +
 +	// check for 1920x1080, interlaced, 25 fps

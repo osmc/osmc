@@ -33,6 +33,11 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
+# look for custom edid
+if [ -f /lib/firmware/edid ]; then
+    echo load /lib/firmware/edid > /sys/class/amhdmitx/amhdmitx0/edid
+fi
+
 syspaths="/sys/class/video/
 /sys/class/tsync/pts_pcrscr
 /sys/class/tsync/enable

@@ -33,6 +33,11 @@ if [ "$1" = "stop" ]; then
 	exit
 fi
 
+# look for custom edid
+if [ -f /lib/firmware/edid ]; then
+    echo load /lib/firmware/edid > /sys/class/amhdmitx/amhdmitx0/edid
+fi
+
 # fix 4k resolutions on V fb
 find /home/osmc/.kodi -type f -name "guisettings.xml" -print0 | while read -d $'\0' file
 do
