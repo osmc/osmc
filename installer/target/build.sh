@@ -85,8 +85,8 @@ else
     count=150
     while [ $count -gt 0 ]; do wget --spider -q ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz
            if [ "$?" -eq 0 ]; then
-	        wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O $(pwd)/../../../filesystem.tar.xz
-		wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.md5 -O $(pwd)/../../../filesystem.md5
+	        wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.tar.xz -O $(pwd)/../../../filesystem.tar.xz || echo -e "Could not obtain filesystem" && exit 1
+		wget ${DOWNLOAD_URL}/filesystems/osmc-${1}-filesystem-${date}.md5 -O $(pwd)/../../../filesystem.md5 || echo -e "Could not obtain filesystem checksum" && exit 1
                 break
            fi
            date=$(date +%Y%m%d --date "yesterday $date")
