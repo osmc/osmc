@@ -1,18 +1,18 @@
-From e7a63779ace69f547361e83b65d4481daed7d0fb Mon Sep 17 00:00:00 2001
+From 941793721e2d4cf3318eb4f9d98dfc57d2b58918 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sun, 8 Oct 2017 18:38:32 +0100
 Subject: [PATCH] Ensure that some add-ons are always enabled at Kodi startup
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/addons/AddonDatabase.cpp | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ xbmc/addons/AddonDatabase.cpp | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/xbmc/addons/AddonDatabase.cpp b/xbmc/addons/AddonDatabase.cpp
-index 29837be2f6..05b6d36435 100644
+index 29837be2f6..7376659324 100644
 --- a/xbmc/addons/AddonDatabase.cpp
 +++ b/xbmc/addons/AddonDatabase.cpp
-@@ -448,6 +448,15 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
+@@ -448,6 +448,16 @@ void CAddonDatabase::SyncInstalled(const std::set<std::string>& ids,
                               id.c_str()));
      }
  
@@ -24,6 +24,7 @@ index 29837be2f6..05b6d36435 100644
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'inputstream.adaptive'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'inputstream.rtmp'"));
 +    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID LIKE 'resource.language.%%'"));
++    m_pDS->exec(PrepareSQL("UPDATE installed SET enabled=1 WHERE addonID == 'script.globalsearch'"));
 +
      CommitTransaction();
    }
