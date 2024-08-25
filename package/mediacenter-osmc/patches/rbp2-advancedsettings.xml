@@ -22,21 +22,21 @@
         <usetags>false</usetags>
     </myvideos>
     <video>
-        <excludefromscan>
+        <excludefromscan action="append">
             <regexp>(?i)(@eadir|system.volume.information|\$recycle)</regexp>
         </excludefromscan>
-        <excludetvshowsfromscan>
+        <excludetvshowsfromscan action="append">
             <regexp>(?i)(@eadir|system.volume.information|\$recycle)</regexp>
         </excludetvshowsfromscan>
-        <excludefromlisting>
+        <excludefromlisting action="append">
             <regexp>(?i)(@eadir|system.volume.information|\$recycle)</regexp>
         </excludefromlisting>
     </video>
     <audio>
-        <excludefromscan>
+        <excludefromscan action="append">
             <regexp>(?i)(@eadir|system.volume.information|\$recycle)</regexp>
         </excludefromscan>
-        <excludefromlisting>
+        <excludefromlisting action="append">
             <regexp>(?i)(@eadir|system.volume.information|\$recycle)</regexp>
         </excludefromlisting>
     </audio>
