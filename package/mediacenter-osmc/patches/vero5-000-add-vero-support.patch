@@ -173,7 +173,7 @@ index 531974f3f4..9b85a3bf92 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index be3bd9e29c..5798528c96 100755
+index 6e69bb9cab..020e95d6cc 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -87,6 +87,125 @@
@@ -2376,7 +2376,7 @@ index ca83b1a04f..ee1b6f287d 100644
  };
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..d1e1d3d20c
+index 0000000000..b6c99ade26
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 @@ -0,0 +1,305 @@
@@ -2488,7 +2488,7 @@ index 0000000000..d1e1d3d20c
 +  // allow only 1 instance here
 +  if (m_InstanceGuard.exchange(true))
 +  {
-+    CLog::Log(LOGERROR, "CDVDVideoCodecAmlogic::Open - InstanceGuard locked\n");
++    CLog::Log(LOGERROR, "CDVDVideoCodecAmlogic::Open - InstanceGuard locked");
 +    return false;
 +  }
 +
@@ -2999,10 +2999,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..36d0be0d5d
+index 0000000000..0782839461
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1344 @@
+@@ -0,0 +1,1347 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3590,8 +3590,11 @@ index 0000000000..36d0be0d5d
 +		m_libamcodec->setControlMode(TRICKMODE_NONE);
 +	}
 +
-+	m_libamcodec->close();
-+	m_opened = false;
++	if (m_opened) {
++		// close the codec only if it was opened before
++		m_libamcodec->close();
++		m_opened = false;
++	}
 +
 +	am_packet_release(&m_am_private->am_pkt);
 +	free(m_am_private->extradata);
@@ -5952,10 +5955,10 @@ index 0000000000..5c8655bd15
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
 new file mode 100644
-index 0000000000..876e4b7a09
+index 0000000000..2cb4cb794d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
-@@ -0,0 +1,312 @@
+@@ -0,0 +1,315 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6114,6 +6117,9 @@ index 0000000000..876e4b7a09
 +	}
 +
 +	m_codec = new codec_para_t;
++
++	memset(m_codec, 0x00, sizeof(codec_para_t));
++
 +	m_codec->handle             = -1; //init to invalid
 +	m_codec->cntl_handle        = -1;
 +	m_codec->sub_handle         = -1;
