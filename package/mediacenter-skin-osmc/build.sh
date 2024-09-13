@@ -11,7 +11,6 @@ process_skin() {
 echo -e "Moving ${2} files in to place"
 mkdir -p files/usr/share/kodi/addons
 cp -ar src/skin.osmc-${1} files/usr/share/kodi/addons/${2} # Always called skin.osmc in src because of repo name
-if [ "$2" == "skin.osmc.scope" ]; then cp -ar files/usr/share/kodi/addons/skin.osmc/language/resource.language.* files/usr/share/kodi/addons/${2}/language/; fi
 if [ -f files/usr/share/kodi/addons/${2}/media/Textures.xbt ]
 then
     echo "TexturePacked file detected, deleting unneeded artefacts"
