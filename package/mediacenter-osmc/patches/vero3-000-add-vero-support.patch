@@ -2999,10 +2999,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..0782839461
+index 0000000000..1cc157127e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1347 @@
+@@ -0,0 +1,1348 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3363,6 +3363,7 @@ index 0000000000..0782839461
 +	params.ratio        = m_am_private->video_ratio;
 +	params.ratio64      = m_am_private->video_ratio64;
 +	params.param        = NULL;
++	params.use_dv_vpath = false;
 +}
 +
 +int AMLInsecureVideoCodec::handle_pre_header_feeding(am_private_t *para, am_packet_t *pkt) const
@@ -5955,10 +5956,10 @@ index 0000000000..5c8655bd15
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
 new file mode 100644
-index 0000000000..2cb4cb794d
+index 0000000000..da707f4a3d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.cpp
-@@ -0,0 +1,315 @@
+@@ -0,0 +1,316 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6172,6 +6173,7 @@ index 0000000000..2cb4cb794d
 +	m_codec->am_sysinfo.ratio	= gparam.ratio;
 +	m_codec->am_sysinfo.ratio64	= gparam.ratio64;
 +	m_codec->am_sysinfo.param	= gparam.param;
++	m_codec->use_dv_vpath		= gparam.use_dv_vpath ? 1 : 0;
 +
 +	return m_dll->codec_init(m_codec);
 +}
@@ -6276,10 +6278,10 @@ index 0000000000..2cb4cb794d
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
 new file mode 100644
-index 0000000000..eaece56f82
+index 0000000000..00b8e6e8f6
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/LibAmcodec.h
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,101 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6340,6 +6342,7 @@ index 0000000000..eaece56f82
 +	void *param;
 +	int config_len;
 +	char *config;
++	bool use_dv_vpath;
 +} aml_generic_param;
 +
 +class amlogic::LibAmcodec
