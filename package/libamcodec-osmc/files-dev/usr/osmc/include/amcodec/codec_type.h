@@ -137,6 +137,7 @@ unsigned int noblock:
     enum FRAME_BASE_VIDEO_PATH video_path;
     int config_len;
     char *config;
+    int use_dv_vpath;
 } codec_para_t;
 
 typedef struct {
