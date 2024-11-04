@@ -2350,7 +2350,7 @@ index 495d6a25f5..18213a0218 100644
    qstride = 0;
    qscale_type = 0;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
-index ca83b1a04f..ee1b6f287d 100644
+index ca83b1a04f..8a4f019c23 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 @@ -59,6 +59,8 @@ public:
@@ -2362,18 +2362,6 @@ index ca83b1a04f..ee1b6f287d 100644
    int8_t* qp_table;                //< Quantization parameters, primarily used by filters
    int qstride;
    int qscale_type;
-@@ -240,6 +242,11 @@ public:
-    */
-   virtual void Reopen() {}
- 
-+  /**
-+  * Indicates that the decoder supports extention streams.
-+  */
-+  virtual bool SupportsExtention() { return false; }
-+
- protected:
-   CProcessInfo &m_processInfo;
- };
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
 index 0000000000..b6c99ade26
@@ -2687,10 +2675,10 @@ index 0000000000..b6c99ade26
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 new file mode 100644
-index 0000000000..fb51cbccf7
+index 0000000000..4d0b1730c0
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -0,0 +1,89 @@
+@@ -0,0 +1,88 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2762,7 +2750,6 @@ index 0000000000..fb51cbccf7
 +  virtual void SetSpeed(int iSpeed) override;
 +  virtual void SetCodecControl(int flags) override;
 +  virtual const char* GetName(void) override { return (const char*)m_pFormatName; }
-+  virtual bool SupportsExtention() { return true; }
 +
 +protected:
 +  void            Dispose(void);
@@ -7608,27 +7595,27 @@ index 0000000000..f27363f4a8
 +	class VP9Codec;
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
-index 48710f847c..72caa812c0 100644
+index 48710f847c..2660efc321 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
-@@ -5,6 +5,8 @@ set(SOURCES DemuxMultiSource.cpp
-             DVDDemuxCDDA.cpp
-             DVDDemuxClient.cpp
+@@ -7,6 +7,8 @@ set(SOURCES DemuxMultiSource.cpp
              DVDDemuxFFmpeg.cpp
-+            DemuxStreamSSIF.cpp
-+            DemuxMVC.cpp
              DVDDemuxUtils.cpp
              DVDDemuxVobsub.cpp
++            DVDStreamMuxer.cpp
++            DVDMvcStreamMuxer.cpp
              DVDFactoryDemuxer.cpp)
-@@ -16,6 +18,8 @@ set(HEADERS DemuxMultiSource.h
-             DVDDemuxCDDA.h
-             DVDDemuxClient.h
+ 
+ set(HEADERS DemuxMultiSource.h
+@@ -18,6 +20,8 @@ set(HEADERS DemuxMultiSource.h
              DVDDemuxFFmpeg.h
-+            DemuxStreamSSIF.h
-+            DemuxMVC.h
              DVDDemuxUtils.h
              DVDDemuxVobsub.h
++            DVDStreamMuxer.h
++            DVDMvcStreamMuxer.h
              DVDFactoryDemuxer.h)
+ 
+ core_add_library(dvddemuxers)
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
 index a1d229b5b6..b0ae61db1e 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemux.h
@@ -7657,15 +7644,22 @@ index 0cdf8c3864..0f82d44372 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 1aebc3dcbc..7fca68604e 100644
+index 1aebc3dcbc..3894fe1938 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-@@ -21,6 +21,8 @@
+@@ -9,6 +9,7 @@
+ #include "DVDDemuxFFmpeg.h"
+ 
+ #include "DVDDemuxUtils.h"
++#include "DVDMvcStreamMuxer.h"
+ #include "DVDInputStreams/DVDInputStream.h"
+ #ifdef HAVE_LIBBLURAY
+ #include "DVDInputStreams/DVDInputStreamBluray.h"
+@@ -21,6 +22,7 @@
  #include "cores/FFmpeg.h"
  #include "cores/MenuType.h"
  #include "cores/VideoPlayer/Interface/TimingConstants.h" // for DVD_TIME_BASE
 +#include "DVDCodecs/DVDCodecUtils.h"
-+#include "DemuxMVC.h"
  #include "filesystem/CurlFile.h"
  #include "filesystem/Directory.h"
  #include "filesystem/File.h"
@@ -7673,7 +7667,7 @@ index 1aebc3dcbc..7fca68604e 100644
    m_bMatroska = false;
    m_bAVI = false;
    m_bSup = false;
-+  m_pSSIF = nullptr;
++  m_muxer = nullptr;
    m_speed = DVD_PLAYSPEED_NORMAL;
    m_program = UINT_MAX;
    m_pkt.result = -1;
@@ -7715,80 +7709,69 @@ index 1aebc3dcbc..7fca68604e 100644
    return true;
  }
  
-@@ -678,6 +674,9 @@ void CDVDDemuxFFmpeg::Dispose()
+@@ -678,6 +674,8 @@ void CDVDDemuxFFmpeg::Dispose()
    m_pkt.result = -1;
    av_packet_unref(&m_pkt.pkt);
  
-+  delete m_pSSIF;
-+  m_pSSIF = nullptr;
++  delete m_muxer, m_muxer = nullptr;
 +
    if (m_pFormatContext)
    {
      if (m_ioContext && m_pFormatContext->pb && m_pFormatContext->pb != m_ioContext)
-@@ -727,6 +726,9 @@ void CDVDDemuxFFmpeg::Flush()
+@@ -727,6 +725,10 @@ void CDVDDemuxFFmpeg::Flush()
    m_displayTime = 0;
    m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
    m_seekToKeyFrame = false;
 +
-+  if (m_pSSIF)
-+    m_pSSIF->Flush();
++  if (m_muxer) {
++	  m_muxer->flush();
++  }
  }
  
  void CDVDDemuxFFmpeg::Abort()
-@@ -1104,7 +1106,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1086,7 +1088,7 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
  
-         if (IsTransportStreamReady())
+         if (IsProgramChange())
          {
--          if (m_program != UINT_MAX)
-+        // libavformat is confused by the interleaved SSIF.
-+        if ((!m_pSSIF || m_pSSIF->IsBluRay()) && m_program != UINT_MAX)
-           {
-             /* check so packet belongs to selected program */
-             for (unsigned int i = 0; i < m_pFormatContext->programs[m_program]->nb_stream_indexes;
-@@ -1225,7 +1228,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+-          CLog::Log(LOGINFO, "CDVDDemuxFFmpeg::Read() stream change");
++          CLog::Log(LOGINFO, "CDVDDemuxFFmpeg::ReadInternal() stream change");
+           av_dump_format(m_pFormatContext, 0, CURL::GetRedacted(m_pInput->GetFileName()).c_str(),
+                          0);
+ 
+@@ -1225,7 +1227,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
      else if (stream->type == STREAM_VIDEO)
      {
        if (static_cast<CDemuxStreamVideo*>(stream)->iWidth != m_pFormatContext->streams[pPacket->iStreamId]->codecpar->width ||
 -          static_cast<CDemuxStreamVideo*>(stream)->iHeight != m_pFormatContext->streams[pPacket->iStreamId]->codecpar->height)
 +          static_cast<CDemuxStreamVideo*>(stream)->iHeight != m_pFormatContext->streams[pPacket->iStreamId]->codecpar->height ||
-+		  (stream->disabled && stream->extraData.GetSize() != m_pFormatContext->streams[pPacket->iStreamId]->codecpar->extradata_size))
++		  (stream->disabled && stream->extraData.GetSize() != (size_t) m_pFormatContext->streams[pPacket->iStreamId]->codecpar->extradata_size))
        {
          // content has changed
          stream = AddStream(pPacket->iStreamId);
-@@ -1234,6 +1238,12 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
-         pPacket->recoveryPoint = m_seekToKeyFrame;
-       m_seekToKeyFrame = false;
-     }
-+    if (stream && m_pSSIF)
-+    {
-+      pPacket = m_pSSIF->AddPacket(pPacket);
-+      if (stream->type == STREAM_DATA && stream->codec == AV_CODEC_ID_H264_MVC && pPacket->iSize)
-+        stream = GetStream(pPacket->iStreamId);
-+    }
-     if (!stream)
-     {
-       CDVDDemuxUtils::FreeDemuxPacket(pPacket);
-@@ -1282,6 +1292,9 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
-     return true;
-   }
+@@ -1249,7 +1252,13 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
  
-+  else if (m_pSSIF)
-+	  m_pSSIF->Flush();
+ DemuxPacket* CDVDDemuxFFmpeg::Read()
+ {
+-  return ReadInternal(false);
++  DemuxPacket *p = ReadInternal(false);
 +
-   if (!m_pInput->Seek(0, SEEK_POSSIBLE) &&
-       !m_pInput->IsStreamType(DVDSTREAM_TYPE_FFMPEG))
-   {
-@@ -1306,6 +1319,9 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
++  if (m_muxer) {
++	  return m_muxer->addPacket(p);
++  }
++
++  return p;
+ }
+ 
+ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1306,6 +1315,7 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
        m_pkt.result = -1;
        av_packet_unref(&m_pkt.pkt);
  
-+      if (m_pSSIF)
-+        m_pSSIF->Flush();
 +
        if (timer.IsTimePast())
        {
          CLog::Log(LOGERROR, "CDVDDemuxFFmpeg::{} - Timed out waiting for video to be ready",
-@@ -1380,8 +1396,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1380,8 +1390,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
    if (m_currentPts == DVD_NOPTS_VALUE)
      CLog::Log(LOGDEBUG, "{} - unknown position after seek", __FUNCTION__);
    else
@@ -7799,7 +7782,74 @@ index 1aebc3dcbc..7fca68604e 100644
  
    // in this case the start time is requested time
    if (startpts)
-@@ -1595,6 +1611,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
+@@ -1389,8 +1399,10 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+ 
+   if (ret >= 0)
+   {
+-    if (!hitEnd)
++    if (!hitEnd) {
++      Flush();
+       return true;
++    }
+     else
+       return false;
+   }
+@@ -1409,7 +1421,12 @@ bool CDVDDemuxFFmpeg::SeekByte(int64_t pos)
+   m_pkt.result = -1;
+   av_packet_unref(&m_pkt.pkt);
+ 
+-  return (ret >= 0);
++  if (ret >= 0) {
++	  Flush();
++	  return true;
++  }
++
++  return false;
+ }
+ 
+ int CDVDDemuxFFmpeg::GetStreamLength()
+@@ -1584,6 +1601,40 @@ void CDVDDemuxFFmpeg::CreateStreams(unsigned int program)
+     for (unsigned int i = 0; i < m_pFormatContext->nb_streams; i++)
+       AddStream(i);
+   }
++
++  checkNeedMuxer();
++}
++
++void CDVDDemuxFFmpeg::checkNeedMuxer()
++{
++  CDemuxStreamVideo *vmain = nullptr, *vext = nullptr;
++
++  for (int i = 0; i < GetNrOfStreams(); i++) {
++    CDemuxStream *s = GetStream(i);
++
++    if (s && s->type == STREAM_VIDEO) {
++      CDemuxStreamVideo *vs = reinterpret_cast<CDemuxStreamVideo*>(s);
++
++      if (vs->codec == AV_CODEC_ID_H264_MVC) {
++        vext = vs;
++      } else if (vmain == nullptr) {
++        vmain = vs;
++      }
++    }
++  }
++
++  if (vmain != nullptr && vext != nullptr) {
++    // we need the stream muxer
++    if (vext->codec == AV_CODEC_ID_H264_MVC) {
++      CLog::Log(LOGINFO, "{}: creating MVC track muxer", __FUNCTION__);
++      m_muxer = new DVDMvcStreamMuxer(vmain, vext);
++    }
++  } else if (m_pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY) &&
++             std::static_pointer_cast<CDVDInputStreamBluray>(m_pInput)->IsExtensionStreamFound()) {
++      CLog::Log(LOGINFO, "{}: creating MVC track muxer for 3DBD playback", __FUNCTION__);
++      std::static_pointer_cast<CDVDInputStreamBluray>(m_pInput)->SetExtensionStreamStartTime(m_pFormatContext->start_time);
++      m_muxer = new DVDMvcStreamMuxer(vmain, std::static_pointer_cast<CDVDInputStreamBluray>(m_pInput));
++  }
+ }
+ 
+ void CDVDDemuxFFmpeg::DisposeStreams()
+@@ -1595,6 +1646,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
    m_parsers.clear();
  }
  
@@ -7817,23 +7867,7 @@ index 1aebc3dcbc..7fca68604e 100644
  CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
  {
    AVStream* pStream = m_pFormatContext->streams[streamIdx];
-@@ -1642,6 +1669,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
-       }
-       case AVMEDIA_TYPE_VIDEO:
-       {
-+        if (pStream->codecpar->codec_id == AV_CODEC_ID_H264_MVC)
-+        {
-+          stream = new CDemuxStream();
-+          stream->type = STREAM_DATA;
-+          stream->disabled = true;
-+// todo tanio: check if needed          pStream->need_parsing = AVSTREAM_PARSE_NONE;
-+          pStream->codecpar->codec_type = AVMEDIA_TYPE_DATA;
-+          break;
-+        }
-         CDemuxStreamVideoFFmpeg* st = new CDemuxStreamVideoFFmpeg(pStream);
-         stream = st;
-         if (strcmp(m_pFormatContext->iformat->name, "flv") == 0)
-@@ -1650,11 +1686,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1650,11 +1712,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->bVFR = false;
  
          // never trust pts in avi files with h264.
@@ -7858,7 +7892,7 @@ index 1aebc3dcbc..7fca68604e 100644
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
-@@ -1666,6 +1714,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1666,6 +1740,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->iFpsRate = r_frame_rate.num;
            st->iFpsScale = r_frame_rate.den;
          }
@@ -7870,7 +7904,7 @@ index 1aebc3dcbc..7fca68604e 100644
          else
          {
            st->iFpsRate  = 0;
-@@ -1677,13 +1730,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1677,13 +1756,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
                           pStream->codecpar->field_order == AV_FIELD_TB ||
                           pStream->codecpar->field_order == AV_FIELD_BT;
  
@@ -7904,71 +7938,23 @@ index 1aebc3dcbc..7fca68604e 100644
          st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
          st->bitDepth = 8;
          const AVPixFmtDescriptor* desc =
-@@ -1762,7 +1834,63 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
-         }
+@@ -1763,6 +1861,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
+ 
 +        if (pStream->codecpar->codec_id == AV_CODEC_ID_H264)
 +        {
-+          if (CDVDCodecUtils::IsH264AnnexB(m_pFormatContext->iformat->name, pStream))
-+          {
-+            int mvcIndex;
-+            AVStream *mvcStream = nullptr;
-+            const std::shared_ptr<CDVDInputStream::IExtentionStream> pExt = std::dynamic_pointer_cast<CDVDInputStream::IExtentionStream>(m_pInput);
- 
-+            if (pExt && pExt->HasExtention())
-+            {
-+              delete m_pSSIF;
-+              m_pSSIF = new CDemuxStreamSSIF();
-+              m_pSSIF->SetH264StreamId(streamIdx);
-+              m_pSSIF->SetBluRay(pExt);
++		  if (CDVDCodecUtils::ProcessH264MVCExtradata(pStream->codecpar->extradata, pStream->codecpar->extradata_size)) {
++			  pStream->codecpar->codec_tag = MKTAG('M', 'V', 'C', '1');
 +
-+              st->stereo_mode = pExt && pExt->AreEyesFlipped() ? "block_rl" : "block_lr";
-+
-+              CDemuxMVC *extDemux = static_cast<CDemuxMVC*>(pExt->GetExtentionDemux());
-+              extDemux->SetStartTime(m_pFormatContext->start_time);
-+              mvcStream = extDemux->GetAVStream();
-+            }
-+            else if (CDVDCodecUtils::GetH264MvcStreamIndex(m_pFormatContext, &mvcIndex))
-+            {
-+              if (!m_pSSIF)
-+                m_pSSIF = new CDemuxStreamSSIF();
-+              m_pSSIF->SetH264StreamId(streamIdx);
-+              m_pSSIF->SetMVCStreamId(mvcIndex);
-+
-+              // use lr if we don't know what the stereo mode is
-+              st->stereo_mode = stereoMode.empty() ? "block_lr" : stereoMode;
-+              mvcStream = m_pFormatContext->streams[m_pSSIF->GetMVCStreamId()];
-+            }
-+
-+            if (mvcStream)
-+            {
-+              pStream->codecpar->codec_tag = MKTAG('A', 'M', 'V', 'C');
-+
-+              if (pStream->codecpar->extradata_size > 0 && mvcStream->codecpar->extradata_size > 0)
-+              {
-+                uint8_t* extr = pStream->codecpar->extradata;
-+
-+                pStream->codecpar->extradata = (uint8_t*)av_mallocz(pStream->codecpar->extradata_size + mvcStream->codecpar->extradata_size + AV_INPUT_BUFFER_PADDING_SIZE);
-+                memcpy(pStream->codecpar->extradata, extr, pStream->codecpar->extradata_size);
-+                memcpy(pStream->codecpar->extradata + pStream->codecpar->extradata_size, mvcStream->codecpar->extradata, mvcStream->codecpar->extradata_size);
-+                pStream->codecpar->extradata_size += mvcStream->codecpar->extradata_size;
-+                av_free(extr);
-+              }
-+            }
-+          }
-+          else if (CDVDCodecUtils::ProcessH264MVCExtradata(pStream->codecpar->extradata, pStream->codecpar->extradata_size))
-+          {
-+            pStream->codecpar->codec_tag = MKTAG('M', 'V', 'C', '1');
-+
-+            // use lr if we don't know what the stereo mode is
-+            st->stereo_mode = stereoMode.empty() ? "block_lr" : stereoMode;
-+          }
++			  // use lr if we don't know what the stereo mode is
++			  st->stereo_mode = stereoMode.empty() ? "block_lr" : stereoMode;
++		  }
 +        }
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1788,6 +1916,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1788,6 +1895,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -7985,7 +7971,7 @@ index 1aebc3dcbc..7fca68604e 100644
            break;
          }
        }
-@@ -2101,7 +2239,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -2101,7 +2218,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -8007,671 +7993,341 @@ index 1aebc3dcbc..7fca68604e 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2132,6 +2283,11 @@ std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
- 
- bool CDVDDemuxFFmpeg::IsProgramChange()
- {
-+  // libavformat is confused by the interleaved SSIF.
-+  // disable program management for those
-+  if (m_pSSIF && !m_pSSIF->IsBluRay())
-+    return false;
-+     
+@@ -2135,6 +2265,10 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
    if (m_program == UINT_MAX)
      return false;
  
++  // TODO t99 check dovi usage
++  if (m_muxer)
++    return false;
++
+   if (m_program == 0 && !m_pFormatContext->nb_programs)
+     return false;
+ 
+@@ -2184,7 +2318,7 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
+         return true;
+       }
+     }
+-    if (m_pFormatContext->streams[idx]->codecpar->extradata_size !=
++    if (m_muxer == nullptr && m_pFormatContext->streams[idx]->codecpar->extradata_size !=
+         static_cast<int>(stream->extraData.GetSize()))
+       return true;
+   }
+@@ -2289,7 +2423,7 @@ void CDVDDemuxFFmpeg::ParsePacket(AVPacket* pkt)
+ {
+   AVStream* st = m_pFormatContext->streams[pkt->stream_index];
+ 
+-  if (st && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
++  if (st && st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO && st->codecpar->codec_id != AV_CODEC_ID_H264_MVC)
+   {
+     auto parser = m_parsers.find(st->index);
+     if (parser == m_parsers.end())
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
-index 03fb98552c..c49a4e4068 100644
+index 03fb98552c..d559a2f1f2 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
-@@ -9,6 +9,7 @@
- #pragma once
+@@ -19,6 +19,7 @@ extern "C" {
+ #include <libavformat/avformat.h>
+ }
  
- #include "DVDDemux.h"
-+#include "DemuxStreamSSIF.h"
- #include "threads/CriticalSection.h"
- #include "threads/SystemClock.h"
- #include <map>
-@@ -152,6 +153,7 @@ protected:
-   bool     m_bMatroska;
-   bool     m_bAVI;
-   bool     m_bSup;
-+  CDemuxStreamSSIF* m_pSSIF;
-   int      m_speed;
-   unsigned int m_program;
-   unsigned int m_streamsInProgram;
-@@ -177,5 +179,8 @@ protected:
++class DVDStreamMuxer;
+ class CDVDDemuxFFmpeg;
+ class CURL;
+ 
+@@ -177,5 +178,11 @@ protected:
    double m_dtsAtDisplayTime;
    bool m_seekToKeyFrame = false;
    double m_startTime = 0;
 +
++  DVDStreamMuxer *m_muxer;
++
 +private:
 +  bool isFpsNonsense(const AVRational &frameRate);
++  void checkNeedMuxer();
  };
  
-diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.cpp
 new file mode 100644
-index 0000000000..a3db862a57
+index 0000000000..b9259353da
 --- /dev/null
-+++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.cpp
-@@ -0,0 +1,278 @@
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.cpp
+@@ -0,0 +1,80 @@
 +/*
-+*      Copyright (C) 2005-2013 Team XBMC
-+*      http://xbmc.org
-+*
-+*  This Program is free software; you can redistribute it and/or modify
-+*  it under the terms of the GNU General Public License as published by
-+*  the Free Software Foundation; either version 2, or (at your option)
-+*  any later version.
-+*
-+*  This Program is distributed in the hope that it will be useful,
-+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+*  GNU General Public License for more details.
-+*
-+*  You should have received a copy of the GNU General Public License
-+*  along with XBMC; see the file COPYING.  If not, see
-+*  <http://www.gnu.org/licenses/>.
-+*
-+*/
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
 +
-+#include "DemuxMVC.h"
-+#include "DVDDemuxUtils.h"
-+#include "DVDInputStreams/DVDInputStream.h"
-+#include "cores/VideoPlayer/Interface/TimingConstants.h"
-+#include "cores/FFmpeg.h"
-+#include "utils/log.h"
-+
-+extern "C" {
-+#include "libavutil/opt.h"
-+};
-+
-+#define MVC_SEEK_TIME_WINDOW 75000 // experimental value depends on seeking accurate
-+
-+static int mvc_file_read(void *h, uint8_t* buf, int size)
-+{
-+  CDVDInputStream* pInputStream = static_cast<CDemuxMVC*>(h)->m_pInput;
-+  int s = pInputStream->Read(buf, size);
-+
-+  if (pInputStream->IsEOF()) {
-+	  return AVERROR_EOF;
-+  }
-+
-+  return s;
-+}
-+
-+static int64_t mvc_file_seek(void *h, int64_t pos, int whence)
-+{
-+  CDVDInputStream* pInputStream = static_cast<CDemuxMVC*>(h)->m_pInput;
-+  if (whence == AVSEEK_SIZE)
-+    return pInputStream->GetLength();
-+  else
-+    return pInputStream->Seek(pos, whence & ~AVSEEK_FORCE);
-+}
-+
-+CDemuxMVC::CDemuxMVC()
-+{
-+  m_ioContext = nullptr;
-+  m_pFormatContext = nullptr;
-+  m_pInput = nullptr;
-+  m_nStreamIndex = -1;
-+}
-+
-+CDemuxMVC::~CDemuxMVC()
-+{
-+  Dispose();
-+}
-+
-+bool CDemuxMVC::Open(CDVDInputStream* pInput)
-+{
-+  int ret;
-+
-+  if (!pInput)
-+    return false;
-+  m_pInput = pInput;
-+
-+  int bufferSize = 4096;
-+  int blockSize = m_pInput->GetBlockSize();
-+  if (blockSize > 1)
-+    bufferSize = blockSize;
-+  unsigned char* buffer = (unsigned char*)av_malloc(bufferSize);
-+  m_ioContext = avio_alloc_context(buffer, bufferSize, 0, this, mvc_file_read, NULL, mvc_file_seek);
-+
-+  m_pFormatContext = avformat_alloc_context();
-+  m_pFormatContext->pb = m_ioContext;
-+
-+  const AVInputFormat *format = av_find_input_format("mpegts");
-+  ret = avformat_open_input(&m_pFormatContext, m_pInput->GetFileName().c_str(), format, nullptr);
-+  if (ret < 0)
-+  {
-+    CLog::Log(LOGDEBUG, "{}: Opening MVC demuxing context failed ({})", __FUNCTION__, ret);
-+    Dispose();
-+    return false;
-+  }
-+
-+  av_opt_set_int(m_pFormatContext, "analyzeduration", 500000, 0);
-+  av_opt_set_int(m_pFormatContext, "correct_ts_overflow", 0, 0);
-+
-+  // Find the streams
-+  ret = avformat_find_stream_info(m_pFormatContext, nullptr);
-+  //it always returns -1 so just ignore it
-+  //if (ret < 0)
-+  //{
-+  //  CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::OpenMVCDemuxer(): avformat_find_stream_info failed ({})", ret);
-+  //  Dispose();
-+  //  return false;
-+  //}
-+
-+  // print some extra information
-+  av_dump_format(m_pFormatContext, 0, m_pInput->GetFileName().c_str(), 0);
-+
-+  // Find and select our MVC stream
-+  CLog::Log(LOGDEBUG, "{}: MVC m2ts has {} streams", __FUNCTION__, m_pFormatContext->nb_streams);
-+  for (unsigned i = 0; i < m_pFormatContext->nb_streams; i++)
-+  {
-+    if (m_pFormatContext->streams[i]->codecpar->codec_id == AV_CODEC_ID_H264_MVC
-+      && m_pFormatContext->streams[i]->codecpar->extradata_size > 0)
-+    {
-+      m_nStreamIndex = i;
-+      break;
-+    }
-+    else
-+      m_pFormatContext->streams[i]->discard = AVDISCARD_ALL;
-+  }
-+
-+  if (m_nStreamIndex < 0)
-+  {
-+    CLog::Log(LOGDEBUG, "{}: MVC Stream not found", __FUNCTION__);
-+    Dispose();
-+    return false;
-+  }
-+
-+  return true;
-+}
-+
-+bool CDemuxMVC::Reset()
-+{
-+  CDVDInputStream* pInput = m_pInput;
-+  Dispose();
-+  Open(pInput);
-+  return true;
-+}
-+
-+void CDemuxMVC::Abort()
-+{
-+}
-+
-+void CDemuxMVC::Flush()
-+{
-+  if (m_pFormatContext)
-+  {
-+    if (m_pFormatContext->pb)
-+      avio_flush(m_pFormatContext->pb);
-+    avformat_flush(m_pFormatContext);
-+  }
-+}
-+
-+DemuxPacket* CDemuxMVC::Read()
-+{
-+  int ret;
-+  AVPacket mvcPacket = { 0 };
-+  av_init_packet(&mvcPacket);
-+
-+  while (true)
-+  {
-+    ret = av_read_frame(m_pFormatContext, &mvcPacket);
-+
-+    if (ret == AVERROR(EINTR) || ret == AVERROR(EAGAIN))
-+      continue;
-+    else if (ret == AVERROR_EOF)
-+      break;
-+    else if (mvcPacket.size <= 0 || mvcPacket.stream_index != m_nStreamIndex)
-+    {
-+      av_packet_unref(&mvcPacket);
-+      continue;
-+    }
-+    else
-+    {
-+      AVStream *stream = m_pFormatContext->streams[mvcPacket.stream_index];
-+      double dts = ConvertTimestamp(mvcPacket.dts, stream->time_base.den, stream->time_base.num);
-+      double pts = ConvertTimestamp(mvcPacket.pts, stream->time_base.den, stream->time_base.num);
-+
-+      DemuxPacket* newPkt = CDVDDemuxUtils::AllocateDemuxPacket(mvcPacket.size);
-+      if (mvcPacket.data)
-+        memcpy(newPkt->pData, mvcPacket.data, mvcPacket.size);
-+      newPkt->iSize = mvcPacket.size;
-+      newPkt->dts = dts;
-+      newPkt->pts = pts;
-+      newPkt->iStreamId = stream->id;
-+
-+      av_packet_unref(&mvcPacket);
-+      return newPkt;
-+    }
-+  }
-+
-+  return nullptr;
-+}
-+
-+bool CDemuxMVC::SeekTime(double time, bool backwards, double* startpts)
-+{
-+  if (!m_pInput)
-+    return false;
-+
-+  AVRational time_base = m_pFormatContext->streams[m_nStreamIndex]->time_base;
-+  int64_t seek_pts = av_rescale(DVD_MSEC_TO_TIME(time), time_base.den, (int64_t)time_base.num * AV_TIME_BASE);
-+  int64_t starttime = 0;
-+
-+  if (m_pFormatContext->start_time != (int64_t)AV_NOPTS_VALUE)
-+    starttime = av_rescale(m_pFormatContext->start_time, time_base.den, (int64_t)time_base.num * AV_TIME_BASE);
-+  if (starttime != 0)
-+    seek_pts += starttime;
-+  if (seek_pts < MVC_SEEK_TIME_WINDOW)
-+    seek_pts = 0;
-+  else
-+    seek_pts -= MVC_SEEK_TIME_WINDOW;
-+
-+  av_seek_frame(m_pFormatContext, m_nStreamIndex, seek_pts, backwards ? AVSEEK_FLAG_BACKWARD : 0);
-+
-+  return true;
-+}
-+
-+std::string CDemuxMVC::GetFileName()
-+{
-+  return m_pInput->GetFileName();
-+}
-+
-+AVStream* CDemuxMVC::GetAVStream()
-+{
-+  return m_pFormatContext ? m_pFormatContext->streams[m_nStreamIndex] : nullptr;
-+}
-+
-+void CDemuxMVC::Dispose()
-+{
-+  if (m_pFormatContext)
-+    avformat_close_input(&m_pFormatContext);
-+
-+  if (m_ioContext)
-+  {
-+    av_free(m_ioContext->buffer);
-+    av_free(m_ioContext);
-+  }
-+
-+  m_ioContext = nullptr;
-+  m_pFormatContext = nullptr;
-+  m_pInput = nullptr;
-+  m_nStreamIndex = -1;
-+}
-+
-+double CDemuxMVC::ConvertTimestamp(int64_t pts, int den, int num)
-+{
-+  if (pts == (int64_t)AV_NOPTS_VALUE)
-+    return DVD_NOPTS_VALUE;
-+
-+  // do calculations in floats as they can easily overflow otherwise
-+  // we don't care for having a completly exact timestamp anyway
-+  double timestamp = (double)pts * num / den;
-+  double starttime = 0.0f;
-+
-+  CDVDInputStream::IMenus *menu = dynamic_cast<CDVDInputStream::IMenus*>(m_pInput);
-+  if ((!menu || menu->GetSupportedMenuType() != MenuType::NATIVE) &&
-+      m_pFormatContext->start_time != static_cast<int64_t>(AV_NOPTS_VALUE))
-+  {
-+    starttime = static_cast<double>(m_start_time) / AV_TIME_BASE;
-+  }
-+
-+  if (timestamp > starttime)
-+    timestamp -= starttime;
-+  // allow for largest possible difference in pts and dts for a single packet
-+  else if (timestamp + 0.5f > starttime)
-+    timestamp = 0;
-+
-+  return timestamp * DVD_TIME_BASE;
-+}
-+
-+std::vector<CDemuxStream*> CDemuxMVC::GetStreams() const
-+{
-+  std::vector<CDemuxStream*> streams;
-+  return streams;
-+}
-diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h
-new file mode 100644
-index 0000000000..77ddc0ea3e
---- /dev/null
-+++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxMVC.h
-@@ -0,0 +1,61 @@
-+#pragma once
-+
-+/*
-+*      Copyright (C) 2005-2013 Team XBMC
-+*      http://xbmc.org
-+*
-+*  This Program is free software; you can redistribute it and/or modify
-+*  it under the terms of the GNU General Public License as published by
-+*  the Free Software Foundation; either version 2, or (at your option)
-+*  any later version.
-+*
-+*  This Program is distributed in the hope that it will be useful,
-+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+*  GNU General Public License for more details.
-+*
-+*  You should have received a copy of the GNU General Public License
-+*  along with XBMC; see the file COPYING.  If not, see
-+*  <http://www.gnu.org/licenses/>.
-+*
-+*/
++#include "DVDMvcStreamMuxer.h"
 +
 +#include "DVDDemux.h"
 +
-+extern "C" {
-+#include "libavformat/avformat.h"
-+}
-+
-+class CDemuxMVC : public CDVDDemux
-+{
-+public:
-+  CDemuxMVC();
-+  virtual ~CDemuxMVC();
-+  bool Open(CDVDInputStream* pInput);
-+  virtual bool Reset();
-+  virtual void Abort();
-+  virtual void Flush();
-+  virtual DemuxPacket* Read();
-+  virtual bool SeekTime(double time, bool backwords = false, double* startpts = nullptr);
-+  virtual void SetSpeed(int iSpeed) { };
-+  virtual int GetStreamLength() { return 0; };
-+  virtual CDemuxStream* GetStream(int iStreamId) const override { return nullptr; };
-+  virtual std::vector<CDemuxStream*> GetStreams() const override;
-+  virtual int GetNrOfStreams() const override { return 1; };
-+  virtual std::string GetFileName();
-+
-+  void SetStartTime(int64_t start_time) { m_start_time = start_time; }
-+  int64_t GetStartTime() const { return m_start_time; }
-+
-+  AVStream* GetAVStream();
-+  CDVDInputStream*    m_pInput;
-+
-+private:
-+  void Dispose();
-+  double ConvertTimestamp(int64_t pts, int den, int num);
-+
-+  AVIOContext        *m_ioContext = nullptr;
-+  AVFormatContext    *m_pFormatContext = nullptr;
-+  int                 m_nStreamIndex = -1;
-+  int64_t			  m_start_time = 0;
-+};
-diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.cpp
-new file mode 100644
-index 0000000000..54fb3ab967
---- /dev/null
-+++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.cpp
-@@ -0,0 +1,203 @@
-+/*
-+*      Copyright (C) 2005-2013 Team XBMC
-+*      http://xbmc.org
-+*
-+*  This Program is free software; you can redistribute it and/or modify
-+*  it under the terms of the GNU General Public License as published by
-+*  the Free Software Foundation; either version 2, or (at your option)
-+*  any later version.
-+*
-+*  This Program is distributed in the hope that it will be useful,
-+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+*  GNU General Public License for more details.
-+*
-+*  You should have received a copy of the GNU General Public License
-+*  along with XBMC; see the file COPYING.  If not, see
-+*  <http://www.gnu.org/licenses/>.
-+*
-+*/
-+
-+#include "DemuxStreamSSIF.h"
-+#include "cores/VideoPlayer/DVDDemuxers/DVDDemux.h"
-+#include "cores/VideoPlayer/Interface/TimingConstants.h"
-+#include "DVDDemuxUtils.h"
++#include "cores/VideoPlayer/Interface/DemuxPacket.h"
++#include "DVDInputStreams/DVDInputStreamBluray.h"
 +#include "utils/log.h"
 +
-+//#define DEBUG_VERBOSE
-+#define MVC_QUEUE_SIZE 100
 +
-+DemuxPacket* CDemuxStreamSSIF::AddPacket(DemuxPacket* &srcPkt)
++DVDMvcStreamMuxer::DVDMvcStreamMuxer(CDemuxStreamVideo *main, CDemuxStreamVideo *extension)
++	: DVDStreamMuxer(main, extension), m_bdInputStream(nullptr)
 +{
-+  if (srcPkt->iStreamId != m_h264StreamId &&
-+      srcPkt->iStreamId != m_mvcStreamId)
-+    return srcPkt;
++	main->extraData = mergeExtraData(main->extraData, extension->extraData);
++	main->codec_fourcc = MKTAG('A', 'M', 'V', 'C');
 +
-+  if (srcPkt->iStreamId == m_h264StreamId)
-+  {
-+    if (m_bluRay && !m_bluRay->HasExtention())
-+      return srcPkt;
-+#if defined(DEBUG_VERBOSE)
-+    CLog::Log(LOGDEBUG, ">>> MVC add h264 packet: pts: {:.3f} dts: {:.3f}", srcPkt->pts*1e-6, srcPkt->dts*1e-6);
-+#endif
-+    m_H264queue.push(srcPkt);
-+  }
-+  else if (srcPkt->iStreamId == m_mvcStreamId)
-+  {
-+    AddMVCExtPacket(srcPkt);
-+  }
++    // use lr if we don't know what the stereo mode is
++	if (main->stereo_mode.empty()) {
++		main->stereo_mode = "block_lr";
++	}
 +
-+  return GetMVCPacket();
++	extension->disabled = true;
 +}
 +
-+void CDemuxStreamSSIF::Flush()
++DVDMvcStreamMuxer::DVDMvcStreamMuxer(CDemuxStreamVideo *main, const std::shared_ptr<CDVDInputStreamBluray> &bdInputStream)
++	: DVDStreamMuxer(main, nullptr), m_bdInputStream(bdInputStream)
 +{
-+  while (!m_H264queue.empty())
-+  {
-+    CDVDDemuxUtils::FreeDemuxPacket(m_H264queue.front());
-+    m_H264queue.pop();
-+  }
-+  while (!m_MVCqueue.empty())
-+  {
-+    CDVDDemuxUtils::FreeDemuxPacket(m_MVCqueue.front());
-+    m_MVCqueue.pop();
-+  }
++	main->extraData = mergeExtraData(main->extraData, bdInputStream->GetExtensionExtraData());
++	main->codec_fourcc = MKTAG('A', 'M', 'V', 'C');
++	main->stereo_mode = bdInputStream->AreEyesFlipped() ? "block_rl" : "block_lr";
 +}
 +
-+DemuxPacket* CDemuxStreamSSIF::MergePacket(DemuxPacket* &srcPkt, DemuxPacket* &appendPkt)
++DVDMvcStreamMuxer::~DVDMvcStreamMuxer()
 +{
-+  DemuxPacket* newpkt = NULL;
-+  newpkt = CDVDDemuxUtils::AllocateDemuxPacket(srcPkt->iSize + appendPkt->iSize);
-+  newpkt->iSize = srcPkt->iSize + appendPkt->iSize;
-+
-+  newpkt->pts = srcPkt->pts;
-+  newpkt->dts = srcPkt->dts;
-+  newpkt->duration = srcPkt->duration;
-+  newpkt->iGroupId = srcPkt->iGroupId;
-+  newpkt->iStreamId = srcPkt->iStreamId;
-+  memcpy(newpkt->pData, srcPkt->pData, srcPkt->iSize);
-+  memcpy(newpkt->pData + srcPkt->iSize, appendPkt->pData, appendPkt->iSize);
-+
-+  CDVDDemuxUtils::FreeDemuxPacket(srcPkt);
-+  srcPkt = NULL;
-+  CDVDDemuxUtils::FreeDemuxPacket(appendPkt);
-+  appendPkt = NULL;
-+
-+  return newpkt;
 +}
 +
-+DemuxPacket* CDemuxStreamSSIF::GetMVCPacket()
++FFmpegExtraData DVDMvcStreamMuxer::mergeExtraData(FFmpegExtraData mainExtraData, FFmpegExtraData extensionExtraData)
 +{
-+  // if input is a bluray fill mvc queue before processing
-+  if (m_bluRay && m_MVCqueue.empty() && !m_H264queue.empty())
-+    FillMVCQueue(m_H264queue.front()->dts);
++	if (!mainExtraData && !extensionExtraData) {
++		return mainExtraData;
++	}
 +
-+  // Here, we recreate a h264 MVC packet from the base one + buffered MVC NALU's
-+  while (!m_H264queue.empty() && !m_MVCqueue.empty())
-+  {
-+    DemuxPacket* h264pkt = m_H264queue.front();
-+    double tsH264 = (h264pkt->dts != DVD_NOPTS_VALUE ? h264pkt->dts : h264pkt->pts);
-+    DemuxPacket* mvcpkt = m_MVCqueue.front();
-+    double tsMVC = (mvcpkt->dts != DVD_NOPTS_VALUE ? mvcpkt->dts : mvcpkt->pts);
++	uint8_t *ed = reinterpret_cast<uint8_t *>(av_mallocz(mainExtraData.GetSize() + extensionExtraData.GetSize() + AV_INPUT_BUFFER_PADDING_SIZE));
 +
-+    if (tsH264 == tsMVC)
-+    {
-+      m_H264queue.pop();
-+      m_MVCqueue.pop();
++	memcpy(ed, mainExtraData.GetData(), mainExtraData.GetSize());
++	memcpy(ed + mainExtraData.GetSize(), extensionExtraData.GetData(), extensionExtraData.GetSize());
 +
-+      while (!m_H264queue.empty())
-+      {
-+        DemuxPacket* pkt = m_H264queue.front();
-+        double ts = (pkt->dts != DVD_NOPTS_VALUE ? pkt->dts : pkt->pts);
-+        if (ts == DVD_NOPTS_VALUE)
-+        {
-+#if defined(DEBUG_VERBOSE)
-+          CLog::Log(LOGDEBUG, ">>> MVC merge h264 fragment: {:6}+{:6}, pts({:.3f}/{:.3f}) dts({:.3f}/{:.3f})", h264pkt->iSize, pkt->iSize, h264pkt->pts*1e-6, pkt->pts*1e-6, h264pkt->dts*1e-6, pkt->dts*1e-6);
-+#endif
-+          h264pkt = MergePacket(h264pkt, pkt);
-+          m_H264queue.pop();
-+        }
-+        else
-+          break;
-+      }
-+      while (!m_MVCqueue.empty())
-+      {
-+        DemuxPacket* pkt = m_MVCqueue.front();
-+        double ts = (pkt->dts != DVD_NOPTS_VALUE ? pkt->dts : pkt->pts);
-+        if (ts == DVD_NOPTS_VALUE)
-+        {
-+#if defined(DEBUG_VERBOSE)
-+          CLog::Log(LOGDEBUG, ">>> MVC merge mvc fragment: {:6}+{:6}, pts({:.3f}/{:.3f}) dts({:.3f}/{:.3f})", mvcpkt->iSize, pkt->iSize, mvcpkt->pts*1e-6, pkt->pts*1e-6, mvcpkt->dts*1e-6, pkt->dts*1e-6);
-+#endif
-+          mvcpkt = MergePacket(mvcpkt, pkt);
-+          m_MVCqueue.pop();
-+        }
-+        else
-+          break;
-+      }
-+
-+#if defined(DEBUG_VERBOSE)
-+      CLog::Log(LOGDEBUG, ">>> MVC merge packet: {:6}+{:6}, pts({:.3f}/{:.3f}) dts({:.3f}/{:.3f})", h264pkt->iSize, mvcpkt->iSize, h264pkt->pts*1e-6, mvcpkt->pts*1e-6, h264pkt->dts*1e-6, mvcpkt->dts*1e-6);
-+#endif
-+      return MergePacket(h264pkt, mvcpkt);
-+    }
-+    else if (tsH264 > tsMVC)
-+    {
-+#if defined(DEBUG_VERBOSE)
-+      CLog::Log(LOGDEBUG, ">>> MVC discard  mvc: {:6}, pts({:.3f}) dts({:.3f})", mvcpkt->iSize, mvcpkt->pts*1e-6, mvcpkt->dts*1e-6);
-+#endif
-+      CDVDDemuxUtils::FreeDemuxPacket(mvcpkt);
-+      m_MVCqueue.pop();
-+    }
-+    else
-+    {
-+#if defined(DEBUG_VERBOSE)
-+      CLog::Log(LOGDEBUG, ">>> MVC discard h264: {:6}, pts({:.3f}) dts({:.3f})", h264pkt->iSize, h264pkt->pts*1e-6, h264pkt->dts*1e-6);
-+#endif
-+      CDVDDemuxUtils::FreeDemuxPacket(h264pkt);
-+      m_H264queue.pop();
-+    }
-+  }
-+
-+#if defined(DEBUG_VERBOSE)
-+  CLog::Log(LOGDEBUG, ">>> MVC waiting. MVC({}) H264({})", m_MVCqueue.size(), m_H264queue.size());
-+#endif
-+  return CDVDDemuxUtils::AllocateDemuxPacket(0);
++	return FFmpegExtraData(ed, mainExtraData.GetSize() + extensionExtraData.GetSize());
 +}
 +
-+void CDemuxStreamSSIF::AddMVCExtPacket(DemuxPacket* &mvcExtPkt)
++DemuxPacket *DVDMvcStreamMuxer::addPacket(DemuxPacket *pkt)
 +{
-+#if defined(DEBUG_VERBOSE)
-+    CLog::Log(LOGDEBUG, ">>> MVC add mvc  packet: pts: {:.3f} dts: {:.3f}", mvcExtPkt->pts*1e-6, mvcExtPkt->dts*1e-6);
-+#endif
-+  m_MVCqueue.push(mvcExtPkt);
++	if (m_bdInputStream == nullptr) {
++		return DVDStreamMuxer::addPacket(pkt);
++	}
++
++	if (isMainPacket(pkt)) {
++		pushMainQueue(pkt);
++
++		while (extensionQueueSize() < 5) {
++			pkt = m_bdInputStream->ReadExtensionPacket();
++
++			if (pkt == nullptr) {
++				break;
++			}
++
++			pushExtensionQueue(pkt);
++		}
++	} else {
++		return pkt;
++	}
++
++	return getNextPacket();
 +}
-+
-+bool CDemuxStreamSSIF::FillMVCQueue(double dtsBase)
-+{
-+  if (!m_bluRay)
-+    return false;
-+
-+  CDVDDemux* demux = m_bluRay->GetExtentionDemux();
-+  DemuxPacket* mvc;
-+  while ((m_MVCqueue.size() < MVC_QUEUE_SIZE) && (mvc = demux->Read()))
-+  {
-+    if (dtsBase == DVD_NOPTS_VALUE || mvc->dts == DVD_NOPTS_VALUE)
-+    {
-+      // do nothing, can't compare timestamps when they are not set
-+    }
-+    else if (mvc->dts < dtsBase)
-+    {
-+#if defined(DEBUG_VERBOSE)
-+      CLog::Log(LOGDEBUG, ">>> MVC drop mvc: {:6}, pts({:.3f}) dts({:.3f})", mvc->iSize, mvc->pts*1e-6, mvc->dts*1e-6);
-+#endif
-+      CDVDDemuxUtils::FreeDemuxPacket(mvc);
-+      continue;
-+    }
-+    AddMVCExtPacket(mvc);
-+  };
-+  if (m_MVCqueue.size() != MVC_QUEUE_SIZE)
-+    m_bluRay->OpenNextStream();
-+
-+  return true;
-+}
-diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.h
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.h
 new file mode 100644
-index 0000000000..48007ec4ad
+index 0000000000..4eb290e8e2
 --- /dev/null
-+++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DemuxStreamSSIF.h
-@@ -0,0 +1,59 @@
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.h
+@@ -0,0 +1,30 @@
++/*
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
 +#pragma once
 +
++#include "DVDStreamMuxer.h"
++
++#include <memory>
++
++class CDVDInputStreamBluray;
++class FFmpegExtraData;
++
++class DVDMvcStreamMuxer : public DVDStreamMuxer
++{
++private:
++	std::shared_ptr<CDVDInputStreamBluray> m_bdInputStream;
++
++	FFmpegExtraData mergeExtraData(FFmpegExtraData mainExtraData, FFmpegExtraData extensionExtraData);
++
++public:
++	DVDMvcStreamMuxer(CDemuxStreamVideo *main, CDemuxStreamVideo *extension);
++	DVDMvcStreamMuxer(CDemuxStreamVideo *main, const std::shared_ptr<CDVDInputStreamBluray> &bdInputStream);
++	virtual ~DVDMvcStreamMuxer();
++
++	virtual DemuxPacket *addPacket(DemuxPacket *pkt);
++};
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDStreamMuxer.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDStreamMuxer.cpp
+new file mode 100644
+index 0000000000..9011953154
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDStreamMuxer.cpp
+@@ -0,0 +1,107 @@
 +/*
-+*      Copyright (C) 2005-2013 Team XBMC
-+*      http://xbmc.org
-+*
-+*  This Program is free software; you can redistribute it and/or modify
-+*  it under the terms of the GNU General Public License as published by
-+*  the Free Software Foundation; either version 2, or (at your option)
-+*  any later version.
-+*
-+*  This Program is distributed in the hope that it will be useful,
-+*  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+*  GNU General Public License for more details.
-+*
-+*  You should have received a copy of the GNU General Public License
-+*  along with XBMC; see the file COPYING.  If not, see
-+*  <http://www.gnu.org/licenses/>.
-+*
-+*/
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
 +
-+#if defined(HAVE_LIBBLURAY)
-+#include "DVDInputStreams/DVDInputStreamBluray.h"
-+#endif
-+#include "DVDInputStreams/DVDInputStream.h"
-+#include <queue>
++#include "DVDStreamMuxer.h"
 +
-+extern "C" {
-+#include "libavformat/avformat.h"
++#include "DVDDemux.h"
++#include "DVDDemuxUtils.h"
++
++#include "utils/log.h"
++
++
++DVDStreamMuxer::DVDStreamMuxer(CDemuxStreamVideo *main, CDemuxStreamVideo *extension)
++	: m_main(main), m_extension(extension)
++{
 +}
 +
-+class CDemuxStreamSSIF
++DVDStreamMuxer::~DVDStreamMuxer()
 +{
-+public:
-+  CDemuxStreamSSIF() {};
-+  ~CDemuxStreamSSIF() { Flush(); }
++	flush();
++}
 +
-+  DemuxPacket* AddPacket(DemuxPacket* &scrPkt);
-+  void Flush();
-+  void SetH264StreamId(int id) { m_h264StreamId = id; };
-+  void SetMVCStreamId(int id) { m_mvcStreamId = id; };
-+  int GetH264StreamId() { return m_h264StreamId; };
-+  int GetMVCStreamId() { return m_mvcStreamId; };
-+  void AddMVCExtPacket(DemuxPacket* &scrPkt);
-+  void SetBluRay(const std::shared_ptr<CDVDInputStream::IExtentionStream> &bluRay) { m_bluRay = bluRay; };
-+  bool IsBluRay() { return m_bluRay != nullptr; };
++bool DVDStreamMuxer::isMainPacket(DemuxPacket *pkt) const
++{
++	return pkt->iStreamId == m_main->uniqueId;
++}
 +
++bool DVDStreamMuxer::isExtensionPacket(DemuxPacket *pkt) const
++{
++	return pkt->iStreamId == m_extension->uniqueId;
++}
++
++DemuxPacket *DVDStreamMuxer::addPacket(DemuxPacket *pkt)
++{
++	if (isMainPacket(pkt)) {
++		pushMainQueue(pkt);
++	} else if (isExtensionPacket(pkt)) {
++		pushExtensionQueue(pkt);
++	} else {
++		// not for us
++		return pkt;
++	}
++
++	return getNextPacket();
++}
++
++DemuxPacket *DVDStreamMuxer::getNextPacket()
++{
++	while (!m_mainQueue.empty() && !m_extensionQueue.empty()) {
++		DemuxPacket *mainp = m_mainQueue.front();
++		DemuxPacket *extp = m_extensionQueue.front();
++
++		double tsM = mainp->dts != DVD_NOPTS_VALUE ? mainp->dts : mainp->pts;
++		double tsE = extp->dts != DVD_NOPTS_VALUE ? extp->dts : extp->pts;
++
++		if (tsM == tsE) {
++			m_mainQueue.pop();
++			m_extensionQueue.pop();
++
++			return mergePackets(mainp, extp);
++		} else if (tsM > tsE) {
++			CDVDDemuxUtils::FreeDemuxPacket(extp);
++			m_extensionQueue.pop();
++		} else {
++			CDVDDemuxUtils::FreeDemuxPacket(mainp);
++			m_mainQueue.pop();
++		}
++	}
++
++	return CDVDDemuxUtils::AllocateDemuxPacket(0);
++}
++
++DemuxPacket *DVDStreamMuxer::mergePackets(DemuxPacket *srcPkt, DemuxPacket *extPkt)
++{
++	DemuxPacket *newpkt = CDVDDemuxUtils::AllocateDemuxPacket(srcPkt->iSize + extPkt->iSize);
++
++	newpkt->iSize = srcPkt->iSize + extPkt->iSize;
++	newpkt->pts = srcPkt->pts;
++	newpkt->dts = srcPkt->dts;
++	newpkt->duration = srcPkt->duration;
++	newpkt->iGroupId = srcPkt->iGroupId;
++	newpkt->iStreamId = srcPkt->iStreamId;
++
++	memcpy(newpkt->pData, srcPkt->pData, srcPkt->iSize);
++	memcpy(newpkt->pData + srcPkt->iSize, extPkt->pData, extPkt->iSize);
++
++	CDVDDemuxUtils::FreeDemuxPacket(srcPkt);
++	CDVDDemuxUtils::FreeDemuxPacket(extPkt);
++
++	return newpkt;
++}
++
++void DVDStreamMuxer::flush()
++{
++	while (!m_mainQueue.empty()) {
++		CDVDDemuxUtils::FreeDemuxPacket(m_mainQueue.front());
++		m_mainQueue.pop();
++	}
++
++	while (!m_extensionQueue.empty()) {
++		CDVDDemuxUtils::FreeDemuxPacket(m_extensionQueue.front());
++		m_extensionQueue.pop();
++	}
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDStreamMuxer.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDStreamMuxer.h
+new file mode 100644
+index 0000000000..e9a75f306d
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDStreamMuxer.h
+@@ -0,0 +1,42 @@
++/*
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <queue>
++
++class DemuxPacket;
++class CDemuxStreamVideo;
++
++class DVDStreamMuxer
++{
 +private:
-+  DemuxPacket* GetMVCPacket();
-+  DemuxPacket* MergePacket(DemuxPacket* &srcPkt, DemuxPacket* &appendPkt);
-+  bool FillMVCQueue(double dtsBase);
++	CDemuxStreamVideo *m_main;
++	CDemuxStreamVideo *m_extension;
 +
-+  std::shared_ptr<CDVDInputStream::IExtentionStream> m_bluRay = nullptr;
-+  std::queue<DemuxPacket*> m_H264queue;
-+  std::queue<DemuxPacket*> m_MVCqueue;
-+  int m_h264StreamId = -1;
-+  int m_mvcStreamId = -1;
++	std::queue<DemuxPacket *> m_mainQueue;
++	std::queue<DemuxPacket *> m_extensionQueue;
++
++protected:
++	virtual DemuxPacket *mergePackets(DemuxPacket *srcPkt, DemuxPacket *extPkt);
++	virtual DemuxPacket *getNextPacket();
++
++	virtual bool isMainPacket(DemuxPacket *pkt) const;
++	virtual bool isExtensionPacket(DemuxPacket *pkt) const;
++
++	virtual inline void pushMainQueue(DemuxPacket *pkt) { m_mainQueue.push(pkt); }
++	virtual inline void pushExtensionQueue(DemuxPacket *pkt) { m_extensionQueue.push(pkt); }
++	virtual inline int mainQueueSize() { return m_mainQueue.size(); }
++	virtual inline int extensionQueueSize() { return m_extensionQueue.size(); }
++
++public:
++	DVDStreamMuxer(CDemuxStreamVideo *main, CDemuxStreamVideo *extension);
++	virtual ~DVDStreamMuxer();
++
++	virtual DemuxPacket *addPacket(DemuxPacket *pkt);
++	virtual void flush();
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDFileInfo.cpp b/xbmc/cores/VideoPlayer/DVDFileInfo.cpp
 index bd89cb4629..03989dbc22 100644
@@ -8695,8 +8351,25 @@ index bd89cb4629..03989dbc22 100644
              iDecoderState = pVideoCodec->GetPicture(&picture);
            }
  
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDInputStreams/CMakeLists.txt
+index 576ddda150..26ccf8f434 100644
+--- a/xbmc/cores/VideoPlayer/DVDInputStreams/CMakeLists.txt
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/CMakeLists.txt
+@@ -31,8 +31,10 @@ set(HEADERS BlurayStateSerializer.h
+             InputStreamPVRRecording.h)
+ 
+ if(BLURAY_FOUND)
+-  list(APPEND SOURCES DVDInputStreamBluray.cpp)
+-  list(APPEND HEADERS DVDInputStreamBluray.h)
++  list(APPEND SOURCES DVDInputStreamBluray.cpp
++                      DVDInputStreamBlurayExtension.cpp)
++  list(APPEND HEADERS DVDInputStreamBluray.h
++                      DVDInputStreamBlurayExtension.h)
+ endif()
+ 
+ core_add_library(dvdinputstreams)
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h
-index 46337576ab..763c45dec6 100644
+index 46337576ab..8f8e8b1bc6 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStream.h
 @@ -46,6 +46,7 @@ namespace XFILE
@@ -8707,38 +8380,27 @@ index 46337576ab..763c45dec6 100644
  
  class CDVDInputStream
  {
-@@ -152,6 +153,17 @@ public:
-     }
-   };
- 
-+  class IExtentionStream
-+  {
-+    public:
-+    virtual ~IExtentionStream() {}
-+    virtual bool HasExtention() = 0;
-+    virtual bool AreEyesFlipped() = 0;
-+    virtual CDVDDemux* GetExtentionDemux() = 0;
-+    virtual void DisableExtention() = 0;
-+    virtual bool OpenNextStream() = 0;
-+  };
-+
-   enum ENextStream
-   {
-     NEXTSTREAM_NONE,
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index a87888c7be..63a9429d18 100644
+index a87888c7be..9c19c25468 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-@@ -10,6 +10,8 @@
+@@ -7,6 +7,7 @@
+  */
+ 
+ #include "DVDInputStreamBluray.h"
++#include "DVDInputStreamBlurayExtension.h"
  
  #include "DVDCodecs/Overlay/DVDOverlay.h"
  #include "DVDCodecs/Overlay/DVDOverlayImage.h"
-+#include "DVDInputStreamFile.h"
-+#include "DVDDemuxers/DemuxMVC.h"
- #include "IVideoPlayer.h"
+@@ -14,6 +15,7 @@
  #include "LangInfo.h"
  #include "ServiceBroker.h"
-@@ -33,9 +35,11 @@
+ #include "URL.h"
++#include "cores/FFmpeg.h"
+ #include "filesystem/BlurayCallback.h"
+ #include "filesystem/Directory.h"
+ #include "filesystem/SpecialProtocol.h"
+@@ -33,6 +35,7 @@
  #include <memory>
  
  #include <libbluray/bluray.h>
@@ -8746,23 +8408,16 @@ index a87888c7be..63a9429d18 100644
  #include <libbluray/log_control.h>
  
  #define LIBBLURAY_BYTESEEK 0
-+#define EMPTY_QUEUE(x) { while(!x.empty()) x.pop(); }
+@@ -69,7 +72,7 @@ void  bluray_overlay_argb_cb(void *this_gen, const struct bd_argb_overlay_s * co
+ #endif
  
- using namespace XFILE;
- 
-@@ -95,10 +99,8 @@ bool CDVDInputStreamBluray::IsEOF()
- 
- BLURAY_TITLE_INFO* CDVDInputStreamBluray::GetTitleLongest()
+ CDVDInputStreamBluray::CDVDInputStreamBluray(IVideoPlayer* player, const CFileItem& fileitem) :
+-  CDVDInputStream(DVDSTREAM_TYPE_BLURAY, fileitem), m_player(player)
++  CDVDInputStream(DVDSTREAM_TYPE_BLURAY, fileitem), m_player(player), m_extension(nullptr), m_flipEyes(false)
  {
--  int titles = bd_get_titles(m_bd, TITLES_RELEVANT, 0);
--
-   BLURAY_TITLE_INFO *s = nullptr;
--  for(int i=0; i < titles; i++)
-+  for(int i=0; i < m_nTitles; i++)
-   {
-     BLURAY_TITLE_INFO *t = bd_get_title_info(m_bd, i, 0);
-     if(!t)
-@@ -179,6 +181,11 @@ bool CDVDInputStreamBluray::Open()
+   m_content = "video/x-mpegts";
+   memset(&m_event, 0, sizeof(m_event));
+@@ -179,6 +182,11 @@ bool CDVDInputStreamBluray::Open()
    }
    else if (m_item.IsDiscImage())
    {
@@ -8774,188 +8429,169 @@ index a87888c7be..63a9429d18 100644
      if (!OpenStream(m_item))
        return false;
  
-@@ -260,6 +267,7 @@ bool CDVDInputStreamBluray::Open()
- 
-   bd_get_event(m_bd, nullptr);
- 
-+  m_root = root;
-   const BLURAY_DISC_INFO *disc_info = bd_get_disc_info(m_bd);
- 
-   if (!disc_info)
 @@ -302,6 +310,7 @@ bool CDVDInputStreamBluray::Open()
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::Open - no menus (libmmbd, or profile 6 bdj)  : {}",
                disc_info->no_menu_support);
  #endif
-+    CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::Open - 3D content exist    : {}", disc_info->content_exist_3D);
++    CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::Open - 3D content exists   : {}", disc_info->content_exist_3D);
    }
    else
      CLog::Log(LOGERROR, "CDVDInputStreamBluray::Open - BluRay not detected");
-@@ -320,6 +329,7 @@ bool CDVDInputStreamBluray::Open()
-     return false;
-   }
- 
-+  m_nTitles = bd_get_titles(m_bd, TITLES_RELEVANT, 0);
-   int mode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_DISC_PLAYBACK);
- 
-   if (URIUtils::HasExtension(filename, ".mpls"))
-@@ -385,19 +395,21 @@ bool CDVDInputStreamBluray::Open()
-                 m_titleInfo->idx);
-       return false;
-     }
--    m_clip = nullptr;
-   }
- 
-   // Process any events that occurred during opening
-   while (bd_get_event(m_bd, &m_event))
-     ProcessEvent();
- 
-+  OpenNextStream();
+@@ -409,6 +418,8 @@ void CDVDInputStreamBluray::Close()
+   m_bd = nullptr;
+   m_pstream.reset();
+   m_rootPath.clear();
 +
-   return true;
++  delete m_extension, m_extension = nullptr;
  }
  
- // close file and reset everything
- void CDVDInputStreamBluray::Close()
- {
-+  CloseMVCDemux();
-   FreeTitleInfo();
+ void CDVDInputStreamBluray::FreeTitleInfo()
+@@ -420,6 +431,41 @@ void CDVDInputStreamBluray::FreeTitleInfo()
+   m_clip = nullptr;
+ }
  
-   if(m_bd)
-@@ -422,7 +434,7 @@ void CDVDInputStreamBluray::FreeTitleInfo()
- 
++void CDVDInputStreamBluray::SelectPlaylist(int item)
++{
++  m_playlist = item;
++
++  FreeTitleInfo();
++  m_titleInfo = bd_get_playlist_info(m_bd, m_playlist, m_angle);
++
++  mpls_pl *mpls = bd_get_title_mpls(m_bd);
++  if (mpls)
++  {
++    for (int i = 0; i < mpls->ext_sub_count; i++)
++    {
++      if (mpls->ext_sub_path[i].type == 8 && /* sub_path_ss_video */
++          mpls->ext_sub_path[i].sub_playitem_count == mpls->list_count)
++      {
++        CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - Enabling BD3D extension reader");
++        CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - MVC_Base_view_R_flag: {}", m_titleInfo->mvc_base_view_r_flag);
++
++        m_extension = new CDVDInputStreamBlurayExtension(m_bd, i);
++        m_flipEyes = m_titleInfo->mvc_base_view_r_flag != 0;
++        break;
++      }
++    }
++  }
++}
++
++void CDVDInputStreamBluray::SetExtensionStreamStartTime(int64_t ms)
++{
++  if (m_extension != nullptr)
++  {
++    m_extension->setStartTime(ms);
++  }
++}
++
++
  void CDVDInputStreamBluray::ProcessEvent() {
  
--  int pid = -1;
-+  int pid = -1, ret;
-   switch (m_event.event) {
- 
-    /* errors */
-@@ -537,14 +549,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
+   int pid = -1;
+@@ -536,15 +582,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
+   }
    case BD_EVENT_PLAYLIST:
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - BD_EVENT_PLAYLIST {}", m_event.param);
-     m_playlist = m_event.param;
+-    m_playlist = m_event.param;
 -    FreeTitleInfo();
 -    m_titleInfo = bd_get_playlist_info(m_bd, m_playlist, m_angle);
-+    ProcessItem(m_playlist);
++    SelectPlaylist(m_event.param);
      break;
  
    case BD_EVENT_PLAYITEM:
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - BD_EVENT_PLAYITEM {}", m_event.param);
      if (m_titleInfo && m_event.param < m_titleInfo->clip_count)
++    {
        m_clip = &m_titleInfo->clips[m_event.param];
-+    uint64_t clip_start, clip_in, bytepos;
-+    ret = bd_get_clip_infos(m_bd, m_event.param, &clip_start, &clip_in, &bytepos, nullptr);
-+    if (ret)
-+      m_clipStartTime = clip_start / 90;
++      if (m_extension)
++        m_extension->selectClip(std::stoi(m_clip->clip_id));
++    }
      break;
  
    case BD_EVENT_CHAPTER:
-@@ -627,6 +642,25 @@ void CDVDInputStreamBluray::ProcessEvent() {
- 
-   /* event has been consumed */
+@@ -629,6 +677,22 @@ void CDVDInputStreamBluray::ProcessEvent() {
    m_event.event = BD_EVENT_NONE;
-+
-+  if ( m_bMVCPlayback && m_clip
-+    && m_titleInfo
-+    && m_clip < m_titleInfo->clips + m_titleInfo->clip_count
-+    && m_nMVCClip != m_clip
-+    && (m_clipQueue.empty()
-+      || m_clip != m_titleInfo->clips + m_clipQueue.front()))
-+  {
-+    m_clipQueue.push(m_clip - m_titleInfo->clips);
-+    if (m_pMVCDemux == NULL)
-+      OpenNextStream();
-+  }
-+}
-+
-+void CDVDInputStreamBluray::DisableExtention()
-+{
-+  CloseMVCDemux();
-+  m_bMVCDisabled = true;
-+  m_bMVCPlayback = false;
  }
  
++DemuxPacket *CDVDInputStreamBluray::ReadExtensionPacket()
++{
++  if (!m_extension)
++  {
++    return nullptr;
++  }
++
++  return m_extension->read();
++}
++
++FFmpegExtraData CDVDInputStreamBluray::GetExtensionExtraData()
++{
++  return m_extension->getExtraData();
++}
++
++
  int CDVDInputStreamBluray::Read(uint8_t* buf, int buf_size)
-@@ -928,9 +962,15 @@ bool CDVDInputStreamBluray::PosTime(int ms)
+ {
+   int result = 0;
+@@ -925,12 +989,20 @@ int CDVDInputStreamBluray::GetTime()
+ 
+ bool CDVDInputStreamBluray::PosTime(int ms)
+ {
++  uint64_t oldpos = bd_tell_time(m_bd);
++
    if(bd_seek_time(m_bd, ms * 90) < 0)
      return false;
  
-+  EMPTY_QUEUE(m_clipQueue);
    while (bd_get_event(m_bd, &m_event))
      ProcessEvent();
  
-+  if (m_bMVCPlayback)
++  if (m_extension)
 +  {
-+    OpenNextStream();
-+    SeekMVCDemux(ms - m_clipStartTime);
++    bool backwards = oldpos / 90 > (uint64_t) ms;
++    return m_extension->seekTime((bd_tell_time(m_bd) - m_clip->start_time) / 90, backwards);
 +  }
++
    return true;
  }
  
-@@ -955,9 +995,15 @@ bool CDVDInputStreamBluray::SeekChapter(int ch)
+@@ -952,12 +1024,22 @@ int CDVDInputStreamBluray::GetChapter()
+ 
+ bool CDVDInputStreamBluray::SeekChapter(int ch)
+ {
++  uint64_t oldpos = bd_tell_time(m_bd);
++
    if(m_titleInfo && bd_seek_chapter(m_bd, ch-1) < 0)
      return false;
  
-+  EMPTY_QUEUE(m_clipQueue);
    while (bd_get_event(m_bd, &m_event))
      ProcessEvent();
  
-+  if (m_bMVCPlayback)
++  if (m_extension)
 +  {
-+    OpenNextStream();
-+    SeekMVCDemux(GetChapterPos(ch) * 1000 - m_clipStartTime);
++    uint64_t newpos = (bd_tell_time(m_bd) - m_clip->start_time) / 90;
++
++    bool backwards = oldpos / 90 > newpos;
++    return m_extension->seekTime(newpos, backwards);
 +  }
++
    return true;
  }
  
-@@ -1197,6 +1243,151 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
+@@ -1197,6 +1279,25 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
    return MenuType::NONE;
  }
  
-+bool CDVDInputStreamBluray::ProcessItem(int playitem)
-+{
-+  FreeTitleInfo();
-+
-+  m_titleInfo = bd_get_playlist_info(m_bd, playitem, m_angle);
-+
-+  if (!m_bMVCDisabled)
-+  {
-+    MPLS_PL * mpls = bd_get_title_mpls(m_bd);
-+    if (mpls)
-+    {
-+      for (int i = 0; i < mpls->ext_sub_count; i++)
-+      {
-+        if (mpls->ext_sub_path[i].type == 8
-+          && mpls->ext_sub_path[i].sub_playitem_count == mpls->list_count)
-+        {
-+          CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - Enabling BD3D MVC demuxing");
-+          CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - MVC_Base_view_R_flag: {}", m_titleInfo->mvc_base_view_r_flag);
-+          m_bMVCPlayback = true;
-+          m_nMVCSubPathIndex = i;
-+          m_bFlipEyes = m_titleInfo->mvc_base_view_r_flag != 0;
-+          break;
-+        }
-+      }
-+    }
-+  }
-+  CloseMVCDemux();
-+  return true;
-+}
-+
 +int CDVDInputStreamBluray::Get3dSubtitlePlane(uint16_t pid)
 +{
-+  if (!m_bMVCDisabled)
++  MPLS_PL *mpls = bd_get_title_mpls(m_bd);
++
++  if (mpls)
 +  {
-+    MPLS_PL *mpls = bd_get_title_mpls(m_bd);
-+    if (mpls)
++    for (int i = 0; i < mpls->list_count; i++)
 +    {
-+      for (int i = 0; i < mpls->list_count; i++)
++      for (int s = 0; s < mpls->play_item[i].stn.num_pg; s++)
 +      {
-+        for (int s = 0; s < mpls->play_item[i].stn.num_pg; s++)
-+        {
-+          if (mpls->play_item[i].stn.pg[s].pid == pid && mpls->play_item[i].stn.pg[s].ss_offset_sequence_id != 0xff)
-+            return mpls->play_item[i].stn.pg[s].ss_offset_sequence_id;
-+        }
++        if (mpls->play_item[i].stn.pg[s].pid == pid && mpls->play_item[i].stn.pg[s].ss_offset_sequence_id != 0xff)
++          return mpls->play_item[i].stn.pg[s].ss_offset_sequence_id;
 +      }
 +    }
 +  }
@@ -8963,184 +8599,399 @@ index a87888c7be..63a9429d18 100644
 +  return 0;
 +}
 +
-+bool CDVDInputStreamBluray::OpenNextStream()
-+{
-+  if (m_clipQueue.empty())
-+    return false;
-+
-+  int clip = m_clipQueue.front();
-+  m_clipQueue.pop();
-+
-+  CDemuxMVC *pMVCDemux = dynamic_cast<CDemuxMVC*>(m_pMVCDemux);
-+  if (!pMVCDemux) {
-+    // either it's not a CDemuxMVC or it's 2D playback
-+    CloseMVCDemux();
-+    return OpenMVCDemux(clip);
-+  }
-+
-+  // save start time for the next clip
-+  int64_t start_time = pMVCDemux->GetStartTime();
-+
-+  CloseMVCDemux();
-+
-+  bool res = OpenMVCDemux(clip);
-+  if (res) {
-+    CDemuxMVC *nextDemux = dynamic_cast<CDemuxMVC*>(m_pMVCDemux);
-+    if (nextDemux) {
-+      // set start time for next clip
-+      nextDemux->SetStartTime(start_time);
-+    }
-+  }
-+
-+  return res;
-+}
-+
-+bool CDVDInputStreamBluray::OpenMVCDemux(int playItem)
-+{
-+  MPLS_PL *pl = bd_get_title_mpls(m_bd);
-+  if (!pl)
-+    return false;
-+
-+  std::string strFileName;
-+  strFileName.append(m_root);
-+  strFileName.append("/BDMV/STREAM/");
-+  strFileName.append(pl->ext_sub_path[m_nMVCSubPathIndex].sub_play_item[playItem].clip->clip_id);
-+  strFileName.append(".m2ts");
-+
-+  CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::OpenMVCDemuxer(): Opening MVC extension stream at {}", strFileName);
-+
-+  CFileItem fileitem(CURL(strFileName), false);
-+  m_pMVCInput = new CDVDInputStreamFile(fileitem, 0);
-+
-+  // Try to open the MVC stream
-+  if (!m_pMVCInput->Open())
-+  {
-+    CloseMVCDemux();
-+    m_bMVCPlayback = false;
-+    return false;
-+  }
-+
-+  if (m_pMVCDemux)
-+    delete m_pMVCDemux;
-+
-+  CDemuxMVC* pMVCDemux = new CDemuxMVC;
-+  m_pMVCDemux = pMVCDemux;
-+
-+  if (!pMVCDemux->Open(m_pMVCInput))
-+  {
-+    CloseMVCDemux();
-+    m_bMVCPlayback = false;
-+    return false;
-+  }
-+
-+  m_nMVCClip = m_titleInfo->clips + playItem;
-+  return true;
-+}
-+
-+bool CDVDInputStreamBluray::CloseMVCDemux()
-+{
-+  if (m_pMVCDemux)
-+  {
-+    delete m_pMVCDemux;
-+    m_pMVCDemux = nullptr;
-+  }
-+
-+  delete m_pMVCInput;
-+  m_pMVCInput = nullptr;
-+  m_nMVCClip = nullptr;
-+  return true;
-+}
-+
-+void CDVDInputStreamBluray::SeekMVCDemux(int64_t time)
-+{
-+  if (m_bMVCPlayback && m_pMVCDemux)
-+    m_pMVCDemux->SeekTime(time, time < GetTime());
-+}
-+
  void CDVDInputStreamBluray::SetupPlayerSettings()
  {
    int region = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_BLURAY_PLAYERREGION);
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-index cf7cd1be79..727f08384b 100644
+index cf7cd1be79..8f104967fc 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-@@ -13,6 +13,7 @@
- 
- #include <list>
- #include <memory>
-+#include <queue>
- 
- extern "C"
- {
-@@ -42,6 +43,7 @@ extern "C"
+@@ -42,6 +42,8 @@ extern "C"
  
  class CDVDOverlayImage;
  class IVideoPlayer;
-+class CDVDDemux;
++class CDVDInputStreamBlurayExtension;
++class FFmpegExtraData;
  
  class CDVDInputStreamBluray
    : public CDVDInputStream
-@@ -49,6 +51,7 @@ class CDVDInputStreamBluray
-   , public CDVDInputStream::IChapter
-   , public CDVDInputStream::IPosTime
-   , public CDVDInputStream::IMenus
-+  , public CDVDInputStream::IExtentionStream
- {
- public:
-   CDVDInputStreamBluray() = delete;
-@@ -125,6 +128,8 @@ public:
+@@ -64,6 +66,13 @@ public:
+   int GetBlockSize() override { return 6144; }
+   ENextStream NextStream() override;
  
-   void GetStreamInfo(int pid, std::string &language);
- 
++  /* BD3D related */
 +  int Get3dSubtitlePlane(uint16_t pid);
++  inline bool AreEyesFlipped() const { return m_flipEyes; }
++  DemuxPacket *ReadExtensionPacket();
++  inline bool IsExtensionStreamFound() const { return m_extension != nullptr; }
++  FFmpegExtraData GetExtensionExtraData();
++  void SetExtensionStreamStartTime(int64_t ms);
+ 
+   /* IMenus */
+   void ActivateButton() override { UserInput(BD_VK_ENTER); }
+@@ -184,9 +193,15 @@ protected:
+     bool OpenStream(CFileItem &item);
+     void SetupPlayerSettings();
+     void FreeTitleInfo();
++    void SelectPlaylist(int item);
 +
-   void OverlayCallback(const BD_OVERLAY * const);
- #ifdef HAVE_LIBBLURAY_BDJ
-   void OverlayCallbackARGB(const struct bd_argb_overlay_s * const);
-@@ -134,6 +139,11 @@ public:
-   BLURAY_TITLE_INFO* GetTitleFile(const std::string& name);
+     std::unique_ptr<CDVDInputStreamFile> m_pstream;
+     std::string m_rootPath;
  
-   void ProcessEvent();
-+  CDVDDemux* GetExtentionDemux() override { return m_pMVCDemux; };
-+  bool HasExtention() override { return m_bMVCPlayback; }
-+  bool AreEyesFlipped() override { return m_bFlipEyes; }
-+  void DisableExtention() override;
-+  bool OpenNextStream() override;
- 
- protected:
-   struct SPlane;
-@@ -142,6 +152,11 @@ protected:
-   void OverlayClose();
-   static void OverlayClear(SPlane& plane, int x, int y, int w, int h);
-   static void OverlayInit (SPlane& plane, int w, int h);
-+  bool ProcessItem(int playitem);
+     /*! Bluray state serializer handler */
+     CBlurayStateSerializer m_blurayStateSerializer;
 +
-+  bool OpenMVCDemux(int playItem);
-+  bool CloseMVCDemux();
-+  void SeekMVCDemux(int64_t time);
- 
-   IVideoPlayer* m_player = nullptr;
-   BLURAY* m_bd = nullptr;
-@@ -155,6 +170,19 @@ protected:
-   bool m_hasOverlay = false;
-   bool m_navmode = false;
-   int m_dispTimeBeforeRead = 0;
-+  int                 m_nTitles = -1;
-+  std::string         m_root;
++    /* BD3D related things */
++    CDVDInputStreamBlurayExtension	*m_extension;
++    bool m_flipEyes;
+ };
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBlurayExtension.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBlurayExtension.cpp
+new file mode 100644
+index 0000000000..bcd421382c
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBlurayExtension.cpp
+@@ -0,0 +1,280 @@
++/*
++ *	(c) 2024 OSMC
++ *
++ *	Inspired by work from Anton Fedchin <anightik@gmail.com>
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
 +
-+  // MVC related members
-+  CDVDDemux*          m_pMVCDemux = nullptr;
-+  CDVDInputStream    *m_pMVCInput = nullptr;
-+  bool                m_bMVCPlayback = false;
-+  int                 m_nMVCSubPathIndex = 0;
-+  BLURAY_CLIP_INFO*   m_nMVCClip = nullptr;
-+  bool                m_bFlipEyes = false;
-+  bool                m_bMVCDisabled = false;
-+  uint64_t            m_clipStartTime = 0;
-+  std::queue<int>     m_clipQueue;
- 
-   typedef std::shared_ptr<CDVDOverlayImage> SOverlay;
-   typedef std::list<SOverlay> SOverlays;
++#include "DVDInputStreamBlurayExtension.h"
++
++#include <sys/types.h>
++
++#include "cores/FFmpeg.h"
++#include "cores/VideoPlayer/DVDDemuxers/DVDDemuxUtils.h"
++#include "cores/VideoPlayer/Interface/TimingConstants.h"
++#include "utils/log.h"
++
++extern "C" {
++	#include <libavformat/avformat.h>
++	#include <libavutil/opt.h>
++}
++
++const int MVC_SEEK_TIME_WINDOW = 7500;		// experimental value depends on seeking accurate
++
++static int clip_file_read(void *h, uint8_t *buf, int size);
++static int64_t clip_file_seek(void *h, int64_t pos, int whence);
++
++
++CDVDInputStreamBlurayExtension::CDVDInputStreamBlurayExtension(BLURAY *bd, int subPath)
++	: m_bd(bd), m_subPath(subPath), m_clip(-1), m_file(nullptr), m_formatContext(nullptr), m_ioContext(nullptr),
++	  m_avStreamIndex(-1), m_starttime(AV_NOPTS_VALUE)
++{
++}
++
++CDVDInputStreamBlurayExtension::~CDVDInputStreamBlurayExtension()
++{
++	dispose();
++}
++
++void CDVDInputStreamBlurayExtension::setStartTime(int64_t ms)
++{
++	m_starttime = ms;
++}
++
++bool CDVDInputStreamBlurayExtension::selectClip(int clip)
++{
++	if (m_clip == clip) {
++		return true;
++	}
++
++	dispose();
++
++	return openClip(clip);
++}
++
++bool CDVDInputStreamBlurayExtension::seekTime(double ms, bool backwards) const
++{
++	if (m_clip == -1 || !m_file) {
++		return false;
++	}
++
++	const AVRational timeBase = m_formatContext->streams[m_avStreamIndex]->time_base;
++	int64_t seek_pts = av_rescale(DVD_MSEC_TO_TIME(ms), timeBase.den, static_cast<int64_t>(timeBase.num) * AV_TIME_BASE);
++
++	if (m_formatContext->streams[m_avStreamIndex]->start_time != AV_NOPTS_VALUE) {
++		seek_pts += m_formatContext->streams[m_avStreamIndex]->start_time;
++	}
++
++	if (seek_pts < MVC_SEEK_TIME_WINDOW) {
++		seek_pts = 0;
++	} else {
++		seek_pts -= MVC_SEEK_TIME_WINDOW;
++	}
++
++	av_seek_frame(m_formatContext, m_avStreamIndex, seek_pts, backwards ? AVSEEK_FLAG_BACKWARD : 0);
++
++	return true;
++}
++
++DemuxPacket *CDVDInputStreamBlurayExtension::read()
++{
++	if (m_clip == -1 || !m_file) {
++		return nullptr;
++	}
++
++	AVPacket *extPacket = av_packet_alloc();
++
++	while (true) {
++		const int ret = av_read_frame(m_formatContext, extPacket);
++
++		if (ret == AVERROR(EINTR) || ret == AVERROR(EAGAIN)) {
++			continue;
++		}
++
++		if (ret == AVERROR_EOF) {
++			break;
++		}
++
++		if (extPacket->size <= 0 || extPacket->stream_index != m_avStreamIndex) {
++			av_packet_unref(extPacket);
++			continue;
++		}
++
++		AVStream *stream = m_formatContext->streams[extPacket->stream_index];
++		DemuxPacket *newPkt = CDVDDemuxUtils::AllocateDemuxPacket(extPacket->size);
++
++		if (extPacket->data) {
++			memcpy(newPkt->pData, extPacket->data, extPacket->size);
++		}
++
++		newPkt->iSize = extPacket->size;
++		newPkt->dts = convertTimestamp(extPacket->dts, stream->time_base.den, stream->time_base.num);
++		newPkt->pts = convertTimestamp(extPacket->pts, stream->time_base.den, stream->time_base.num);
++		newPkt->iStreamId = stream->id;
++
++		av_packet_unref(extPacket);
++
++		return newPkt;
++	}
++
++	return nullptr;
++}
++
++bool CDVDInputStreamBlurayExtension::openClip(int clip)
++{
++	MPLS_CLIP *extClip = findExtensionClip(clip);
++	if (!extClip) {
++		return false;
++	}
++
++	std::string stream = std::string(extClip->clip_id) + ".m2ts";
++	if (!openClip(stream)) {
++		dispose();
++		return false;
++	}
++
++	m_clip = clip;
++
++	return true;
++}
++
++bool CDVDInputStreamBlurayExtension::openClip(std::string &stream)
++{
++	const int bufferSize = 6144;
++
++	m_file = bd_clip_open(m_bd, stream.c_str());
++	if (!m_file) {
++		return false;
++	}
++
++	unsigned char *buffer = (unsigned char*)av_malloc(bufferSize);
++
++	m_ioContext = avio_alloc_context(buffer, bufferSize, 0, m_file, clip_file_read, nullptr, clip_file_seek);
++
++	m_formatContext = avformat_alloc_context();
++	m_formatContext->pb = m_ioContext;
++
++	const AVInputFormat *format = av_find_input_format("mpegts");
++
++	int ret = avformat_open_input(&m_formatContext, stream.c_str(), format, nullptr);
++	if (ret < 0) {
++		CLog::LogF(LOGDEBUG, "opening clip failed (ffmpeg returns: {})", ret);
++		return false;
++	}
++
++	av_opt_set_int(m_formatContext, "analyzeduration", 500000, 0);
++	av_opt_set_int(m_formatContext, "correct_ts_overflow", 0, 0);
++
++	// Find the streams, it always returns -1 so just ignore it
++	avformat_find_stream_info(m_formatContext, nullptr);
++
++	// print some extra information
++	av_dump_format(m_formatContext, 0, stream.c_str(), 0);
++
++	// Find and select our extension stream
++	CLog::LogF(LOGDEBUG, "extension clip has {} streams", m_formatContext->nb_streams);
++	for (unsigned i = 0; i < m_formatContext->nb_streams; i++) {
++		if (m_formatContext->streams[i]->codecpar->codec_id == AV_CODEC_ID_H264_MVC
++				&& m_formatContext->streams[i]->codecpar->extradata_size > 0) {
++			m_avStreamIndex = i;
++		} else {
++			m_formatContext->streams[i]->discard = AVDISCARD_ALL;
++		}
++	}
++
++	if (m_avStreamIndex < 0) {
++		CLog::LogF(LOGDEBUG, "MVC extension stream not found");
++		return false;
++	}
++
++	return true;
++}
++
++MPLS_CLIP *CDVDInputStreamBlurayExtension::findExtensionClip(int clip)
++{
++	mpls_pl *pl = bd_get_title_mpls(m_bd);
++	if (!pl) {
++		return nullptr;
++	}
++
++	for (size_t i = 0; i < pl->list_count; i++) {
++		if (clip == std::stoi(pl->play_item[i].clip->clip_id)) {
++			return pl->ext_sub_path[m_subPath].sub_play_item[i].clip;
++		}
++	}
++
++	return nullptr;
++}
++
++void CDVDInputStreamBlurayExtension::dispose()
++{
++	if (m_file) {
++		bd_clip_close(m_file);
++		m_file = nullptr;
++	}
++
++	if (m_formatContext) {
++		avformat_close_input(&m_formatContext);
++		m_formatContext = nullptr;
++	}
++
++	if (m_ioContext) {
++		av_free(m_ioContext->buffer);
++		av_free(m_ioContext);
++		m_ioContext = nullptr;
++	}
++
++	m_avStreamIndex = -1;
++	m_clip = -1;
++}
++
++double CDVDInputStreamBlurayExtension::convertTimestamp(int64_t pts, int den, int num) const
++{
++	if (pts == (int64_t) AV_NOPTS_VALUE) {
++		return DVD_NOPTS_VALUE;
++	}
++
++	// we don't care for having a completely exact timestamp anyway
++	double timestamp = (double) pts * num / den;
++	double starttime = 0.0f;
++
++	if (m_starttime != AV_NOPTS_VALUE) {
++		starttime = static_cast<double>(m_starttime) / AV_TIME_BASE;
++	}
++
++	if (timestamp > starttime) {
++		timestamp -= starttime;
++	} else if (timestamp + 0.5f > starttime) {
++		// allow for largest possible difference in pts and dts for a single packet
++	    timestamp = 0;
++	}
++
++	return timestamp * DVD_TIME_BASE;
++}
++
++FFmpegExtraData CDVDInputStreamBlurayExtension::getExtraData() const
++{
++	AVStream *mvcStream = m_formatContext->streams[m_avStreamIndex];
++
++	return FFmpegExtraData(mvcStream->codecpar->extradata, mvcStream->codecpar->extradata_size);
++}
++
++static int clip_file_read(void *h, uint8_t *buf, int size)
++{
++	int res = (int) bd_clip_read(reinterpret_cast<struct bd_file_s*>(h), buf, size);
++
++	return res == 0 ? AVERROR_EOF : res;
++}
++
++static int64_t clip_file_seek(void *h, int64_t pos, int whence)
++{
++	if (whence == AVSEEK_SIZE) {
++		return bd_clip_size(reinterpret_cast<struct bd_file_s*>(h));
++	}
++
++	const int64_t clip_block_pos = (pos / 6144) * 6144;
++
++	return bd_clip_seek(reinterpret_cast<struct bd_file_s*>(h), clip_block_pos, whence & ~AVSEEK_FORCE);
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBlurayExtension.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBlurayExtension.h
+new file mode 100644
+index 0000000000..ca4ad60a89
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBlurayExtension.h
+@@ -0,0 +1,55 @@
++/*
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <string>
++
++extern "C" {
++	#include <libbluray/bluray.h>
++	#include <libbluray/mpls_data.h>
++};
++
++typedef struct AVFormatContext AVFormatContext;
++
++class DemuxPacket;
++class FFmpegExtraData;
++
++class CDVDInputStreamBlurayExtension
++{
++private:
++	BLURAY	*m_bd;
++	int		 m_subPath;
++	int		 m_clip;
++
++	struct bd_file_s *m_file;
++
++	AVFormatContext		*m_formatContext;
++	struct AVIOContext	*m_ioContext;
++	int					 m_avStreamIndex;
++	int64_t				 m_starttime;
++
++public:
++	CDVDInputStreamBlurayExtension(BLURAY *bd, int subPath);
++	virtual ~CDVDInputStreamBlurayExtension();
++
++	virtual bool selectClip(int clip);
++	virtual void setStartTime(int64_t ms);
++	virtual bool seekTime(double ms, bool backwards) const;
++	virtual FFmpegExtraData getExtraData() const;
++
++	virtual DemuxPacket *read();
++
++private:
++	bool openClip(int clip);
++	bool openClip(std::string &stream);
++	void dispose();
++
++	MPLS_CLIP *findExtensionClip(int clip);
++
++	double convertTimestamp(int64_t pts, int den, int num) const;
++};
 diff --git a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp b/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
 index 08c1c6805d..22a564bdc9 100644
 --- a/xbmc/cores/VideoPlayer/DVDStreamInfo.cpp
@@ -9205,16 +9056,15 @@ index 7ac7ec7e71..f568a5a4d3 100644
  
    ass_set_frame_size(m_renderer, static_cast<int>(opts.frameWidth),
 diff --git a/xbmc/cores/VideoPlayer/IVideoPlayer.h b/xbmc/cores/VideoPlayer/IVideoPlayer.h
-index cf30266692..5284442a3a 100644
+index cf30266692..c8b7cbc346 100644
 --- a/xbmc/cores/VideoPlayer/IVideoPlayer.h
 +++ b/xbmc/cores/VideoPlayer/IVideoPlayer.h
-@@ -95,7 +95,8 @@ public:
+@@ -95,7 +95,7 @@ public:
    virtual std::string GetPlayerInfo() = 0;
    virtual int GetVideoBitrate() = 0;
    virtual void SetSpeed(int iSpeed) = 0;
 -  virtual bool IsEOS() { return false; }
 +  virtual bool IsEOS() { return false; };
-+  virtual bool SupportsExtention() const = 0;
  };
  
  class CDVDAudioCodec;
@@ -9232,7 +9082,7 @@ index a8ffb9807b..25f43406b0 100644
      }
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index f3d3db772c..10fc37ab66 100644
+index f3d3db772c..5b5939fa9c 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 @@ -1326,17 +1326,14 @@ void CVideoPlayer::Prepare()
@@ -9392,7 +9242,7 @@ index f3d3db772c..10fc37ab66 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3778,8 +3774,30 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3778,6 +3774,24 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -9416,14 +9266,8 @@ index f3d3db772c..10fc37ab66 100644
 +
      player->SendMessage(std::make_shared<CDVDMsgBool>(CDVDMsg::GENERAL_PAUSE, m_displayLost), 1);
  
-+    const std::shared_ptr<CDVDInputStream::IExtentionStream>  pExt = std::dynamic_pointer_cast<CDVDInputStream::IExtentionStream>(m_pInputStream);
-+    if (pExt && !static_cast<IDVDStreamPlayerVideo*>(player)->SupportsExtention())
-+      pExt->DisableExtention();
-+
      // look for any EDL files
-     m_Edl.Clear();
-     float fFramesPerSecond = 0.0f;
-@@ -3968,6 +3986,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3968,6 +3982,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -9431,7 +9275,7 @@ index f3d3db772c..10fc37ab66 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -4015,7 +4034,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -4015,7 +4030,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -9441,7 +9285,7 @@ index f3d3db772c..10fc37ab66 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
-@@ -4907,15 +4927,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4907,15 +4923,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -9525,18 +9369,6 @@ index c42f8f3dd7..21176a818a 100644
          if(pOverlay->IsOverlayType(DVDOVERLAY_TYPE_GROUP))
            overlays.insert(overlays.end(),
                            static_cast<CDVDOverlayGroup&>(*pOverlay).m_overlays.begin(),
-diff --git a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
-index d0c83172f0..b29516db12 100644
---- a/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
-+++ b/xbmc/cores/VideoPlayer/VideoPlayerVideo.h
-@@ -72,6 +72,7 @@ public:
-   std::string GetPlayerInfo() override;
-   int GetVideoBitrate() override;
-   void SetSpeed(int iSpeed) override;
-+  bool SupportsExtention() const override { return m_pVideoCodec && m_pVideoCodec->SupportsExtention(); }
- 
-   // classes
-   CDVDOverlayContainer* m_pOverlayContainer;
 diff --git a/xbmc/cores/VideoPlayer/VideoReferenceClock.cpp b/xbmc/cores/VideoPlayer/VideoReferenceClock.cpp
 index 236db07780..06d537f32a 100644
 --- a/xbmc/cores/VideoPlayer/VideoReferenceClock.cpp
