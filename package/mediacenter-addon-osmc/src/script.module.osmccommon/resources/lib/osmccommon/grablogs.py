@@ -323,7 +323,7 @@ SETS = {
                 'name': 'System Journal',
                 'key': 'MyqVXi2x',
                 'ltyp': 'cl_log',
-                'actn': '/bin/bash -c "sudo journalctl --flush && sudo journalctl -n 30000 --since -24h"',
+                'actn': '/bin/bash -c "sudo journalctl --flush && sudo journalctl -n 30000 -o short-precise --since -24h"',
             },
         ],
     },
