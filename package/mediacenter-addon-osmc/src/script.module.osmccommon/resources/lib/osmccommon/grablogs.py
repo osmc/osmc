@@ -498,6 +498,14 @@ SETS = {
                 'hwid': '!rbp',
             },
             {
+                'name': 'Dolby Cap',
+                'key': 'wR0bk595',
+                'ltyp': 'file_log',
+                'actn': '/sys/class/amhdmitx/amhdmitx0/dv_cap',
+                'hwid': '!rbp',
+            },
+
+            {
                 'name': 'Audio Cap',
                 'key': 'k3dRrf31',
                 'ltyp': 'file_log',
