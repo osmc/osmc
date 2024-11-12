@@ -498,7 +498,7 @@ SETS = {
                 'hwid': '!rbp',
             },
             {
-                'name': 'Dolby Cap',
+                'name': 'Dolby Vision Cap',
                 'key': 'wR0bk595',
                 'ltyp': 'file_log',
                 'actn': '/sys/class/amhdmitx/amhdmitx0/dv_cap',
