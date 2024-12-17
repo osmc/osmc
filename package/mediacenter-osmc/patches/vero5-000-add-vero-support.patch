@@ -2292,10 +2292,10 @@ index 3eb85be4ee..d46be3d2cf 100644
  
      overlay->iPTSStartTime = m_StartTime;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
-index 452ed873be..2cedcb4ec7 100644
+index 452ed873be..539499eb3e 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
-@@ -11,6 +11,40 @@ if(NOT ENABLE_EXTERNAL_LIBAV)
+@@ -11,6 +11,42 @@ if(NOT ENABLE_EXTERNAL_LIBAV)
    list(APPEND HEADERS DVDVideoPPFFmpeg.h)
  endif()
  
@@ -2304,6 +2304,7 @@ index 452ed873be..2cedcb4ec7 100644
 +                      amlogic/AMLDecoderInputQueueStats.cpp
 +                      amlogic/AMLInsecureVideoCodec.cpp
 +                      amlogic/AMLVideoCodec.cpp
++                      amlogic/DVCodec.cpp
 +                      amlogic/AV1Codec.cpp
 +                      amlogic/H264Codec.cpp
 +                      amlogic/HEVCCodec.cpp
@@ -2320,6 +2321,7 @@ index 452ed873be..2cedcb4ec7 100644
 +                      amlogic/AMLVideoCodecConstants.h
 +                      amlogic/AMLVideoCodecDataTypes.h
 +                      amlogic/AMLVideoCodecInfo.h
++                      amlogic/DVCodec.h
 +                      amlogic/AV1Codec.h
 +                      amlogic/H264Codec.h
 +                      amlogic/HEVCCodec.h
@@ -2986,10 +2988,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..1cc157127e
+index 0000000000..0a878f246b
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1348 @@
+@@ -0,0 +1,1352 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3142,6 +3144,8 @@ index 0000000000..1cc157127e
 +
 +bool AMLInsecureVideoCodec::openAmlVideo(const CDVDStreamInfo &hints)
 +{
++	int hdrMode, maxLum;
++
 +	PosixFilePtr amlVideoFile = std::make_shared<PosixFile>();
 +	if (!amlVideoFile->Open("/dev/video10", O_RDONLY | O_NONBLOCK)) {
 +		CLog::Log(LOGERROR, "AMLInsecureVideoCodec::openAmlVideo - cannot open V4L amlvideo device /dev/video10: {}", strerror(errno));
@@ -3154,11 +3158,12 @@ index 0000000000..1cc157127e
 +
 +	setVfmMap("default", "decoder ppmgr deinterlace amlvideo amvideo");
 +
-+	int hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
++	hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
 +
-+	SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_mode", hdrMode);
++	if (SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_mode", hdrMode))
++		CLog::Log(LOGERROR, "AMLInsecureVideoCodec: Failed to set hdr_mode");
 +
-+	int maxLum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
++	maxLum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
 +	SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxLum);
 +
 +	SysfsUtils::SetInt("/sys/class/video/freerun_mode", 3);
@@ -3171,6 +3176,7 @@ index 0000000000..1cc157127e
 +	m_amlVideoFile.reset();
 +	setVfmMap("default", m_defaultVfmMap);
 +	m_amlVideoFile = nullptr;
++	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "now");
 +}
 +
 +void AMLInsecureVideoCodec::showMainVideo(const bool show)
@@ -5455,6 +5461,153 @@ index 0000000000..f88d71e135
 +	virtual bool prepareFrame(CDVDStreamInfo &hints, uint8_t *&data, size_t &size, double dts, double pts);
 +
 +};
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
+new file mode 100644
+index 0000000000..9e80f99c3f
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
+@@ -0,0 +1,100 @@
++/*
++ *  Copyright (C) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "DVCodec.h"
++
++#include "utils/log.h"
++#include "utils/SysfsUtils.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++
++#include "OSMCSecureOS.h"
++
++using namespace amlogic;
++
++DVCodec::DVCodec(CProcessInfo &processInfo, const CDVDStreamInfo &hints)
++	: AMLInsecureVideoCodec(processInfo), m_player_supports_dv(false), m_dv_enabled(false)
++{
++	int support_info = 0;
++
++	if (!m_secureOSMC->isVeroV()
++			|| SysfsUtils::GetInt("/sys/class/amdolby_vision/support_info", support_info)
++			|| (support_info & 0x7) == 0) {
++		// no DV support
++		return;
++	}
++
++	m_player_supports_dv = true;
++
++	setupDolbyVision(hints);
++}
++
++DVCodec::~DVCodec()
++{
++}
++
++bool DVCodec::isDisplaySupportsDolbyVision() const
++{
++	std::string dv_cap;
++
++	if (SysfsUtils::GetString("/sys/devices/virtual/amhdmitx/amhdmitx0/dv_cap", dv_cap)) {
++		return false;
++	}
++
++	return dv_cap.find("DV_RGB_444_8BIT") != std::string::npos;
++}
++
++void DVCodec::setupDolbyVision(const CDVDStreamInfo &hints)
++{
++	bool isProfile4 = hints.dovi.dv_profile == 4;
++	bool isProfile8HLG = hints.dovi.dv_profile == 8
++			&& hints.dovi.dv_bl_signal_compatibility_id == 4;
++	bool isDVoutputDisabled =
++		CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) != 2;
++	int dvFlags = 5;
++
++	bool enable_dv = hints.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION && isDolbyVisionSupported()
++			&& !isProfile4 && !isProfile8HLG;
++
++	if (SysfsUtils::GetIntDec("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
++		CLog::Log(LOGERROR, "DVCodec: Failed to get DV flags");
++
++	if (!isDisplaySupportsDolbyVision() || isDVoutputDisabled) {
++		CLog::Log(LOGDEBUG, "DVCodec: DV output to HDR/SDR");
++		if (hints.dovi.dv_profile != 5)
++			enable_dv = false;
++		dvFlags |= 0x2000;
++	} else
++		dvFlags &= ~0x2000;
++
++	if (SysfsUtils::SetInt("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
++		CLog::Log(LOGERROR, "DVCodec: Failed to set DV flags to 0x{:08x}", dvFlags);
++
++	CLog::Log(LOGDEBUG, "DVCodec: Profile: {}, CCID: {}",
++			  hints.dovi.dv_profile, hints.dovi.dv_bl_signal_compatibility_id);
++	CLog::Log(LOGDEBUG, "DVCodec: stream type: {}, DV supported: {}, display supports DV: {}{}, DV enabled: {}",
++			  hints.hdrType, isDolbyVisionSupported(), isDisplaySupportsDolbyVision(), isDVoutputDisabled ? " (disabled)" : "", enable_dv);
++
++	if (SysfsUtils::SetString("/sys/module/amdolby_vision/parameters/dolby_vision_enable", enable_dv ? "Y" : "N")) {
++		CLog::Log(LOGERROR, "DVCodec: unable to enable dv support");
++		return;
++	}
++
++	if (!enable_dv) {
++		return;
++	}
++
++	CLog::Log(LOGINFO, "DVCodec: DV support enabled");
++	m_dv_enabled = true;
++}
++
++void DVCodec::setupVideoCodecParams(aml_generic_param &params) const
++{
++	AMLInsecureVideoCodec::setupVideoCodecParams(params);
++
++	params.use_dv_vpath = m_dv_enabled;
++}
+\ No newline at end of file
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h
+new file mode 100644
+index 0000000000..f62fd4a687
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h
+@@ -0,0 +1,34 @@
++/*
++ *  Copyright (C) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include "AMLInsecureVideoCodec.h"
++
++
++class amlogic::DVCodec : public amlogic::AMLInsecureVideoCodec
++{
++private:
++	bool m_player_supports_dv;
++	bool m_dv_enabled;
++
++protected:
++	virtual inline bool isDolbyVisionSupported() const {
++		return m_player_supports_dv;
++	}
++
++	virtual bool isDisplaySupportsDolbyVision() const;
++
++	void setupVideoCodecParams(aml_generic_param &params) const;
++
++private:
++	void setupDolbyVision(const CDVDStreamInfo &hints);
++
++public:
++	DVCodec(CProcessInfo &processInfo, const CDVDStreamInfo &hints);
++	virtual ~DVCodec();
++};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
 new file mode 100644
 index 0000000000..8d94b84de1
@@ -5759,10 +5912,10 @@ index 0000000000..7261cebbcb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
 new file mode 100644
-index 0000000000..c2f7b715e1
+index 0000000000..38ae2be44a
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,139 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5815,14 +5968,14 @@ index 0000000000..c2f7b715e1
 +	}
 +
 +	AMLVideoCodec *createCodec(CProcessInfo &processInfo, const CDVDStreamInfo &hints) {
-+		return new HEVCCodec(processInfo);
++		return new HEVCCodec(processInfo, hints);
 +	}
 +
 +} hevcCodecInfo;
 +
 +
-+HEVCCodec::HEVCCodec(CProcessInfo &processInfo)
-+	: AMLInsecureVideoCodec(processInfo), m_bitstream(nullptr)
++HEVCCodec::HEVCCodec(CProcessInfo &processInfo, const CDVDStreamInfo &hints)
++	: DVCodec(processInfo, hints), m_bitstream(nullptr)
 +{
 +}
 +
@@ -5850,13 +6003,15 @@ index 0000000000..c2f7b715e1
 +
 +void HEVCCodec::setupVideoCodecParams(aml_generic_param &params) const
 +{
-+	AMLInsecureVideoCodec::setupVideoCodecParams(params);
++	DVCodec::setupVideoCodecParams(params);
 +
 +	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.param = (void*) EXTERNAL_PTS;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
 +	}
++
++	CLog::Log(LOGERROR, "** t99 ** hdrtype = {}, profile = {}", m_hints.hdrType, m_hints.dovi.dv_profile);
 +}
 +
 +int HEVCCodec::pre_header_feeding(am_private_t *para, am_packet_t *pkt) const
@@ -5902,7 +6057,7 @@ index 0000000000..c2f7b715e1
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.h
 new file mode 100644
-index 0000000000..5c8655bd15
+index 0000000000..8bcabdfc92
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.h
 @@ -0,0 +1,35 @@
@@ -5916,11 +6071,11 @@ index 0000000000..5c8655bd15
 +
 +#pragma once
 +
-+#include "AMLInsecureVideoCodec.h"
++#include "DVCodec.h"
 +
 +class CBitstreamConverter;
 +
-+class amlogic::HEVCCodec : public amlogic::AMLInsecureVideoCodec
++class amlogic::HEVCCodec : public amlogic::DVCodec
 +{
 +private:
 +	CBitstreamConverter	*m_bitstream;
@@ -5934,7 +6089,7 @@ index 0000000000..5c8655bd15
 +	virtual int pre_header_feeding(am_private_t *para, am_packet_t *pkt) const;
 +
 +public:
-+	HEVCCodec(CProcessInfo &processInfo);
++	HEVCCodec(CProcessInfo &processInfo, const CDVDStreamInfo &hints);
 +	virtual ~HEVCCodec();
 +
 +	virtual std::string getFormatName() const;
@@ -7560,10 +7715,10 @@ index 0000000000..a6bf4c91a7
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h
 new file mode 100644
-index 0000000000..f27363f4a8
+index 0000000000..98f20775cc
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h
-@@ -0,0 +1,30 @@
+@@ -0,0 +1,32 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -7585,6 +7740,8 @@ index 0000000000..f27363f4a8
 +	class LibAmcodec;
 +	class PosixFile;
 +
++	class DVCodec;
++
 +	// insecure decoders
 +	class AV1Codec;
 +	class H264Codec;
@@ -7595,23 +7752,27 @@ index 0000000000..f27363f4a8
 +	class VP9Codec;
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
-index 48710f847c..2660efc321 100644
+old mode 100644
+new mode 100755
+index 48710f847c..06dc3c38f8
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/CMakeLists.txt
-@@ -7,6 +7,8 @@ set(SOURCES DemuxMultiSource.cpp
+@@ -7,6 +7,9 @@ set(SOURCES DemuxMultiSource.cpp
              DVDDemuxFFmpeg.cpp
              DVDDemuxUtils.cpp
              DVDDemuxVobsub.cpp
 +            DVDStreamMuxer.cpp
++            DVDDoviStreamMuxer.cpp
 +            DVDMvcStreamMuxer.cpp
              DVDFactoryDemuxer.cpp)
  
  set(HEADERS DemuxMultiSource.h
-@@ -18,6 +20,8 @@ set(HEADERS DemuxMultiSource.h
+@@ -18,6 +21,9 @@ set(HEADERS DemuxMultiSource.h
              DVDDemuxFFmpeg.h
              DVDDemuxUtils.h
              DVDDemuxVobsub.h
 +            DVDStreamMuxer.h
++            DVDDoviStreamMuxer.h
 +            DVDMvcStreamMuxer.h
              DVDFactoryDemuxer.h)
  
@@ -7644,18 +7805,19 @@ index 0cdf8c3864..0f82d44372 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 1aebc3dcbc..3894fe1938 100644
+index 1aebc3dcbc..1111526507 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-@@ -9,6 +9,7 @@
+@@ -9,6 +9,8 @@
  #include "DVDDemuxFFmpeg.h"
  
  #include "DVDDemuxUtils.h"
++#include "DVDDoviStreamMuxer.h"
 +#include "DVDMvcStreamMuxer.h"
  #include "DVDInputStreams/DVDInputStream.h"
  #ifdef HAVE_LIBBLURAY
  #include "DVDInputStreams/DVDInputStreamBluray.h"
-@@ -21,6 +22,7 @@
+@@ -21,6 +23,7 @@
  #include "cores/FFmpeg.h"
  #include "cores/MenuType.h"
  #include "cores/VideoPlayer/Interface/TimingConstants.h" // for DVD_TIME_BASE
@@ -7663,7 +7825,7 @@ index 1aebc3dcbc..3894fe1938 100644
  #include "filesystem/CurlFile.h"
  #include "filesystem/Directory.h"
  #include "filesystem/File.h"
-@@ -206,6 +208,7 @@ CDVDDemuxFFmpeg::CDVDDemuxFFmpeg() : CDVDDemux()
+@@ -206,6 +209,7 @@ CDVDDemuxFFmpeg::CDVDDemuxFFmpeg() : CDVDDemux()
    m_bMatroska = false;
    m_bAVI = false;
    m_bSup = false;
@@ -7671,7 +7833,7 @@ index 1aebc3dcbc..3894fe1938 100644
    m_speed = DVD_PLAYSPEED_NORMAL;
    m_program = UINT_MAX;
    m_pkt.result = -1;
-@@ -516,6 +519,10 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
+@@ -516,6 +520,10 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
    bool skipCreateStreams = false;
    bool isBluray = pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY);
  
@@ -7682,7 +7844,7 @@ index 1aebc3dcbc..3894fe1938 100644
    // this should never happen. Log it to inform about the error.
    if (m_pFormatContext->nb_streams > 0 && m_pFormatContext->streams == nullptr)
    {
-@@ -528,7 +535,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
+@@ -528,7 +536,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
        m_pFormatContext->nb_streams > 0 && m_pFormatContext->streams != nullptr &&
        m_pFormatContext->streams[0]->codecpar->codec_id != AV_CODEC_ID_HEVC)
    {
@@ -7691,7 +7853,7 @@ index 1aebc3dcbc..3894fe1938 100644
      m_checkTransportStream = true;
      skipCreateStreams = true;
    }
-@@ -659,17 +666,6 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
+@@ -659,17 +667,6 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool
    m_startTime = 0;
    m_seekStream = -1;
  
@@ -7709,7 +7871,7 @@ index 1aebc3dcbc..3894fe1938 100644
    return true;
  }
  
-@@ -678,6 +674,8 @@ void CDVDDemuxFFmpeg::Dispose()
+@@ -678,6 +675,8 @@ void CDVDDemuxFFmpeg::Dispose()
    m_pkt.result = -1;
    av_packet_unref(&m_pkt.pkt);
  
@@ -7718,7 +7880,7 @@ index 1aebc3dcbc..3894fe1938 100644
    if (m_pFormatContext)
    {
      if (m_ioContext && m_pFormatContext->pb && m_pFormatContext->pb != m_ioContext)
-@@ -727,6 +725,10 @@ void CDVDDemuxFFmpeg::Flush()
+@@ -727,6 +726,10 @@ void CDVDDemuxFFmpeg::Flush()
    m_displayTime = 0;
    m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
    m_seekToKeyFrame = false;
@@ -7729,7 +7891,7 @@ index 1aebc3dcbc..3894fe1938 100644
  }
  
  void CDVDDemuxFFmpeg::Abort()
-@@ -1086,7 +1088,7 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1086,7 +1089,7 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
  
          if (IsProgramChange())
          {
@@ -7738,7 +7900,7 @@ index 1aebc3dcbc..3894fe1938 100644
            av_dump_format(m_pFormatContext, 0, CURL::GetRedacted(m_pInput->GetFileName()).c_str(),
                           0);
  
-@@ -1225,7 +1227,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1225,7 +1228,8 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
      else if (stream->type == STREAM_VIDEO)
      {
        if (static_cast<CDemuxStreamVideo*>(stream)->iWidth != m_pFormatContext->streams[pPacket->iStreamId]->codecpar->width ||
@@ -7748,14 +7910,14 @@ index 1aebc3dcbc..3894fe1938 100644
        {
          // content has changed
          stream = AddStream(pPacket->iStreamId);
-@@ -1249,7 +1252,13 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
+@@ -1249,7 +1253,13 @@ DemuxPacket* CDVDDemuxFFmpeg::ReadInternal(bool keep)
  
  DemuxPacket* CDVDDemuxFFmpeg::Read()
  {
 -  return ReadInternal(false);
 +  DemuxPacket *p = ReadInternal(false);
 +
-+  if (m_muxer) {
++  if (m_muxer && p) {
 +	  return m_muxer->addPacket(p);
 +  }
 +
@@ -7763,7 +7925,7 @@ index 1aebc3dcbc..3894fe1938 100644
  }
  
  bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
-@@ -1306,6 +1315,7 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1306,6 +1316,7 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
        m_pkt.result = -1;
        av_packet_unref(&m_pkt.pkt);
  
@@ -7771,7 +7933,7 @@ index 1aebc3dcbc..3894fe1938 100644
        if (timer.IsTimePast())
        {
          CLog::Log(LOGERROR, "CDVDDemuxFFmpeg::{} - Timed out waiting for video to be ready",
-@@ -1380,8 +1390,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1380,8 +1391,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
    if (m_currentPts == DVD_NOPTS_VALUE)
      CLog::Log(LOGDEBUG, "{} - unknown position after seek", __FUNCTION__);
    else
@@ -7782,7 +7944,7 @@ index 1aebc3dcbc..3894fe1938 100644
  
    // in this case the start time is requested time
    if (startpts)
-@@ -1389,8 +1399,10 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+@@ -1389,8 +1400,10 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
  
    if (ret >= 0)
    {
@@ -7794,7 +7956,7 @@ index 1aebc3dcbc..3894fe1938 100644
      else
        return false;
    }
-@@ -1409,7 +1421,12 @@ bool CDVDDemuxFFmpeg::SeekByte(int64_t pos)
+@@ -1409,7 +1422,12 @@ bool CDVDDemuxFFmpeg::SeekByte(int64_t pos)
    m_pkt.result = -1;
    av_packet_unref(&m_pkt.pkt);
  
@@ -7808,7 +7970,7 @@ index 1aebc3dcbc..3894fe1938 100644
  }
  
  int CDVDDemuxFFmpeg::GetStreamLength()
-@@ -1584,6 +1601,40 @@ void CDVDDemuxFFmpeg::CreateStreams(unsigned int program)
+@@ -1584,6 +1602,49 @@ void CDVDDemuxFFmpeg::CreateStreams(unsigned int program)
      for (unsigned int i = 0; i < m_pFormatContext->nb_streams; i++)
        AddStream(i);
    }
@@ -7823,10 +7985,16 @@ index 1aebc3dcbc..3894fe1938 100644
 +  for (int i = 0; i < GetNrOfStreams(); i++) {
 +    CDemuxStream *s = GetStream(i);
 +
-+    if (s && s->type == STREAM_VIDEO) {
++    if (s && s->type == STREAM_VIDEO && avcodec_get_type(s->codec) == AVMEDIA_TYPE_VIDEO) {
 +      CDemuxStreamVideo *vs = reinterpret_cast<CDemuxStreamVideo*>(s);
 +
++      if (vs->iFpsRate == 0 || vs->disabled) {
++        continue;
++      }
++
 +      if (vs->codec == AV_CODEC_ID_H264_MVC) {
++        vext = vs;
++      } else if (vs->hdr_type == StreamHdrType::HDR_TYPE_DOLBYVISION) {
 +        vext = vs;
 +      } else if (vmain == nullptr) {
 +        vmain = vs;
@@ -7839,6 +8007,9 @@ index 1aebc3dcbc..3894fe1938 100644
 +    if (vext->codec == AV_CODEC_ID_H264_MVC) {
 +      CLog::Log(LOGINFO, "{}: creating MVC track muxer", __FUNCTION__);
 +      m_muxer = new DVDMvcStreamMuxer(vmain, vext);
++    } else {
++      CLog::Log(LOGINFO, "{}: creating DV track muxer", __FUNCTION__);
++      m_muxer = new DVDDoviStreamMuxer(vmain, vext);
 +    }
 +  } else if (m_pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY) &&
 +             std::static_pointer_cast<CDVDInputStreamBluray>(m_pInput)->IsExtensionStreamFound()) {
@@ -7849,7 +8020,7 @@ index 1aebc3dcbc..3894fe1938 100644
  }
  
  void CDVDDemuxFFmpeg::DisposeStreams()
-@@ -1595,6 +1646,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
+@@ -1595,6 +1656,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
    m_parsers.clear();
  }
  
@@ -7867,7 +8038,7 @@ index 1aebc3dcbc..3894fe1938 100644
  CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
  {
    AVStream* pStream = m_pFormatContext->streams[streamIdx];
-@@ -1650,11 +1712,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1650,11 +1722,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->bVFR = false;
  
          // never trust pts in avi files with h264.
@@ -7892,7 +8063,7 @@ index 1aebc3dcbc..3894fe1938 100644
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
-@@ -1666,6 +1740,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1666,6 +1750,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->iFpsRate = r_frame_rate.num;
            st->iFpsScale = r_frame_rate.den;
          }
@@ -7904,7 +8075,7 @@ index 1aebc3dcbc..3894fe1938 100644
          else
          {
            st->iFpsRate  = 0;
-@@ -1677,13 +1756,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1677,13 +1766,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
                           pStream->codecpar->field_order == AV_FIELD_TB ||
                           pStream->codecpar->field_order == AV_FIELD_BT;
  
@@ -7938,7 +8109,7 @@ index 1aebc3dcbc..3894fe1938 100644
          st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
          st->bitDepth = 8;
          const AVPixFmtDescriptor* desc =
-@@ -1763,6 +1861,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1763,6 +1871,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -7954,7 +8125,7 @@ index 1aebc3dcbc..3894fe1938 100644
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1788,6 +1895,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1788,6 +1905,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -7971,7 +8142,23 @@ index 1aebc3dcbc..3894fe1938 100644
            break;
          }
        }
-@@ -2101,7 +2218,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -1908,15 +2035,6 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+ #ifdef HAVE_LIBBLURAY
+     if (m_pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY))
+     {
+-      // UHD BD have a secondary video stream called by Dolby as enhancement layer.
+-      // This is not used by streaming services and devices (ATV, Nvidia Shield, XONE).
+-      if (pStream->id == 0x1015)
+-      {
+-        CLog::Log(LOGDEBUG, "CDVDDemuxFFmpeg::AddStream - discarding Dolby Vision stream");
+-        pStream->discard = AVDISCARD_ALL;
+-        delete stream;
+-        return nullptr;
+-      }
+       stream->dvdNavId = pStream->id;
+ 
+       auto it = std::find_if(m_streams.begin(), m_streams.end(),
+@@ -2101,7 +2219,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -7993,7 +8180,7 @@ index 1aebc3dcbc..3894fe1938 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2135,6 +2265,10 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
+@@ -2135,6 +2266,10 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
    if (m_program == UINT_MAX)
      return false;
  
@@ -8004,7 +8191,7 @@ index 1aebc3dcbc..3894fe1938 100644
    if (m_program == 0 && !m_pFormatContext->nb_programs)
      return false;
  
-@@ -2184,7 +2318,7 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
+@@ -2184,7 +2319,7 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
          return true;
        }
      }
@@ -8013,7 +8200,7 @@ index 1aebc3dcbc..3894fe1938 100644
          static_cast<int>(stream->extraData.GetSize()))
        return true;
    }
-@@ -2289,7 +2423,7 @@ void CDVDDemuxFFmpeg::ParsePacket(AVPacket* pkt)
+@@ -2289,7 +2424,7 @@ void CDVDDemuxFFmpeg::ParsePacket(AVPacket* pkt)
  {
    AVStream* st = m_pFormatContext->streams[pkt->stream_index];
  
@@ -8022,6 +8209,38 @@ index 1aebc3dcbc..3894fe1938 100644
    {
      auto parser = m_parsers.find(st->index);
      if (parser == m_parsers.end())
+@@ -2557,6 +2692,31 @@ StreamHdrType CDVDDemuxFFmpeg::DetermineHdrType(AVStream* pStream)
+ 
+   if (av_stream_get_side_data(pStream, AV_PKT_DATA_DOVI_CONF, nullptr)) // DoVi
+     hdrType = StreamHdrType::HDR_TYPE_DOLBYVISION;
++  else if (pStream->id == 0x1015)
++  {
++    // Poor man's Dolby Vision detector ahead
++    // Until we know it better, we suppose that a stream ID 0x1015 indicates DoVi
++    AVDOVIDecoderConfigurationRecord *dovi;
++    size_t dovi_size;
++
++    dovi = av_dovi_alloc(&dovi_size);
++    if (dovi)
++    {
++      dovi->dv_version_major = 1;
++      dovi->dv_version_minor = 0;
++      dovi->dv_profile = 7;
++      dovi->dv_level = 6;
++      dovi->rpu_present_flag = 1;
++      dovi->el_present_flag = 1;
++      dovi->bl_present_flag = 1;
++      dovi->dv_bl_signal_compatibility_id = 6;
++
++      if (av_stream_add_side_data(pStream, AV_PKT_DATA_DOVI_CONF, (uint8_t*) dovi, dovi_size) < 0)
++        av_free(dovi);
++    }
++
++    hdrType = StreamHdrType::HDR_TYPE_DOLBYVISION;
++  }
+   else if (pStream->codecpar->color_trc == AVCOL_TRC_SMPTE2084) // HDR10
+     hdrType = StreamHdrType::HDR_TYPE_HDR10;
+   else if (pStream->codecpar->color_trc == AVCOL_TRC_ARIB_STD_B67) // HLG
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
 index 03fb98552c..d559a2f1f2 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.h
@@ -8046,6 +8265,194 @@ index 03fb98552c..d559a2f1f2 100644
 +  void checkNeedMuxer();
  };
  
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDoviStreamMuxer.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDoviStreamMuxer.cpp
+new file mode 100755
+index 0000000000..2f5207d4bc
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDoviStreamMuxer.cpp
+@@ -0,0 +1,142 @@
++/*
++ *  (c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "DVDDoviStreamMuxer.h"
++
++#include "DVDDemux.h"
++#include "DVDDemuxUtils.h"
++
++#include "utils/DynamicMemory.h"
++#include "utils/log.h"
++
++static const unsigned rsvdSize = 0x1000;
++static const unsigned initialDynMemSize = 100 * 1024;
++static const uint8_t unspec63[] = { 0x7e, 0x01 };
++
++DVDDoviStreamMuxer::DVDDoviStreamMuxer(CDemuxStreamVideo *main, CDemuxStreamVideo *extension)
++	: DVDStreamMuxer(main, extension), m_dynm(nullptr), m_isHvccAtom(false)
++{
++	m_dynm = new DynamicMemory(initialDynMemSize);
++	m_isHvccAtom = extension->extraData.GetData()[0] == 0x01;
++
++	main->dovi = extension->dovi;
++	main->hdr_type = extension->hdr_type;
++}
++
++DVDDoviStreamMuxer::~DVDDoviStreamMuxer()
++{
++	if (m_dynm) {
++		delete m_dynm, m_dynm = nullptr;
++	}
++}
++
++DemuxPacket *DVDDoviStreamMuxer::mergePackets(DemuxPacket *srcPkt, DemuxPacket *extPkt)
++{
++	DemuxPacket *cvtPkt = convertPacket(extPkt);
++
++	return DVDStreamMuxer::mergePackets(srcPkt, cvtPkt);
++}
++
++DemuxPacket *DVDDoviStreamMuxer::convertPacket(DemuxPacket *srcPkt) const
++{
++	m_dynm->allocate(srcPkt->iSize + rsvdSize);
++	m_dynm->clear();
++
++	if (m_isHvccAtom) {
++		return convertHvccPacket(srcPkt);
++	}
++
++	uint8_t *oldp = srcPkt->pData;
++	uint8_t *endp = oldp + srcPkt->iSize;
++	uint8_t *newp = nullptr;
++
++	while (oldp != endp) {
++		newp = findStartCode(oldp, endp);
++
++		m_dynm->append(oldp, newp - oldp);
++
++		if (newp != endp && *newp != 0x7c) {
++			m_dynm->append((void*)unspec63, sizeof(unspec63));
++		}
++
++		oldp = newp;
++	}
++
++	return dynMemToDemuxPacket(srcPkt);
++}
++
++uint8_t *DVDDoviStreamMuxer::findStartCode(uint8_t *startp, uint8_t *endp) const
++{
++	if (startp > (endp - 4)) {
++		// there can't be any start code
++		return endp;
++	}
++
++	for (uint8_t *p = startp; p < endp - 4; p++) {
++		if (p[0] == 0 && p[1] == 0) {
++			if (p[2] == 1) {
++				return p + 3;
++			} else if (p[2] == 0 && p[3] == 1) {
++				return p + 4;
++			}
++		}
++	}
++
++	// no startcode found
++	return endp;
++}
++
++DemuxPacket *DVDDoviStreamMuxer::convertHvccPacket(DemuxPacket *srcPkt) const
++{
++	uint8_t *oldp = srcPkt->pData;
++	uint8_t *endp = oldp + srcPkt->iSize;
++	uint8_t *newp = nullptr;
++
++	uint32_t len;
++	uint8_t bytes[4];
++
++	while (oldp != endp) {
++		len = (oldp[0] << 24) | (oldp[1] << 16) | (oldp[2] << 8) | oldp[3];
++		newp = oldp + sizeof(uint32_t) + len;
++
++		if (oldp[4] == 0x7c) {
++			m_dynm->append(oldp, sizeof(uint32_t) + len);
++		} else {
++			len += sizeof(unspec63);
++
++			bytes[0] = (len >> 24) & 0xff;
++			bytes[1] = (len >> 16) & 0xff;
++			bytes[2] = (len >> 8) & 0xff;
++			bytes[3] = len & 0xff;
++
++			m_dynm->append(bytes, sizeof(uint32_t));
++			m_dynm->append((void*)unspec63, sizeof(unspec63));
++			m_dynm->append(oldp + 4, len - 2);
++		}
++
++		oldp = newp;
++	}
++
++	return dynMemToDemuxPacket(srcPkt);
++}
++
++DemuxPacket *DVDDoviStreamMuxer::dynMemToDemuxPacket(DemuxPacket *srcPkt) const
++{
++	DemuxPacket *newpkt = CDVDDemuxUtils::AllocateDemuxPacket(m_dynm->size());
++	newpkt->iSize = m_dynm->size();
++	newpkt->pts = srcPkt->pts;
++	newpkt->dts = srcPkt->dts;
++	newpkt->duration = srcPkt->duration;
++	newpkt->iGroupId = srcPkt->iGroupId;
++	newpkt->iStreamId = srcPkt->iStreamId;
++
++	memcpy(newpkt->pData, m_dynm->data(), m_dynm->size());
++
++	CDVDDemuxUtils::FreeDemuxPacket(srcPkt);
++
++	return newpkt;
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDoviStreamMuxer.h b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDoviStreamMuxer.h
+new file mode 100755
+index 0000000000..80b41c9940
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDoviStreamMuxer.h
+@@ -0,0 +1,34 @@
++/*
++ *  (c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <stdint.h>
++
++#include "DVDStreamMuxer.h"
++
++class DynamicMemory;
++
++class DVDDoviStreamMuxer : public DVDStreamMuxer
++{
++private:
++	DynamicMemory	*m_dynm;
++	bool			 m_isHvccAtom;
++
++public:
++	DVDDoviStreamMuxer(CDemuxStreamVideo *main, CDemuxStreamVideo *extension);
++	virtual ~DVDDoviStreamMuxer();
++
++protected:
++	virtual DemuxPacket *mergePackets(DemuxPacket *srcPkt, DemuxPacket *extPkt);
++	virtual DemuxPacket *convertPacket(DemuxPacket *srcPkt) const;
++	virtual DemuxPacket *convertHvccPacket(DemuxPacket *srcPkt) const;
++	virtual uint8_t *findStartCode(uint8_t *startp, uint8_t *endp) const;
++
++private:
++	DemuxPacket *dynMemToDemuxPacket(DemuxPacket *srcPkt) const;
++};
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDMvcStreamMuxer.cpp
 new file mode 100644
 index 0000000000..b9259353da
@@ -8381,7 +8788,7 @@ index 46337576ab..8f8e8b1bc6 100644
  class CDVDInputStream
  {
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index a87888c7be..9c19c25468 100644
+index a87888c7be..bcd9073cee 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 @@ -7,6 +7,7 @@
@@ -8576,6 +8983,15 @@ index a87888c7be..9c19c25468 100644
    return true;
  }
  
+@@ -1031,7 +1113,7 @@ void CDVDInputStreamBluray::GetStreamInfo(int pid, std::string &language)
+   if(!m_titleInfo || !m_clip)
+     return;
+ 
+-  if (pid == HDMV_PID_VIDEO)
++  if (HDMV_PID_VIDEO_FIRST <= pid && pid <= HDMV_PID_VIDEO_LAST)
+     find_stream(pid, m_clip->video_streams, m_clip->video_stream_count, language);
+   else if (HDMV_PID_AUDIO_FIRST <= pid && pid <= HDMV_PID_AUDIO_LAST)
+     find_stream(pid, m_clip->audio_streams, m_clip->audio_stream_count, language);
 @@ -1197,6 +1279,25 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
    return MenuType::NONE;
  }
@@ -8603,10 +9019,20 @@ index a87888c7be..9c19c25468 100644
  {
    int region = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_BLURAY_PLAYERREGION);
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-index cf7cd1be79..8f104967fc 100644
+index cf7cd1be79..70c1a9671e 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-@@ -42,6 +42,8 @@ extern "C"
+@@ -30,7 +30,8 @@ extern "C"
+ #define BD_EVENT_MENU_ERROR   -2
+ #define BD_EVENT_ENC_ERROR    -3
+ 
+-#define HDMV_PID_VIDEO            0x1011
++#define HDMV_PID_VIDEO_FIRST      0x1011
++#define HDMV_PID_VIDEO_LAST       0x1015
+ #define HDMV_PID_AUDIO_FIRST      0x1100
+ #define HDMV_PID_AUDIO_LAST       0x111f
+ #define HDMV_PID_PG_FIRST         0x1200
+@@ -42,6 +43,8 @@ extern "C"
  
  class CDVDOverlayImage;
  class IVideoPlayer;
@@ -8615,7 +9041,7 @@ index cf7cd1be79..8f104967fc 100644
  
  class CDVDInputStreamBluray
    : public CDVDInputStream
-@@ -64,6 +66,13 @@ public:
+@@ -64,6 +67,13 @@ public:
    int GetBlockSize() override { return 6144; }
    ENextStream NextStream() override;
  
@@ -8629,7 +9055,7 @@ index cf7cd1be79..8f104967fc 100644
  
    /* IMenus */
    void ActivateButton() override { UserInput(BD_VK_ENTER); }
-@@ -184,9 +193,15 @@ protected:
+@@ -184,9 +194,15 @@ protected:
      bool OpenStream(CFileItem &item);
      void SetupPlayerSettings();
      void FreeTitleInfo();
@@ -12147,10 +12573,26 @@ index 6548eae8c3..af84e8dd0d 100644
                                      uint32_t sps_pps_size,
                                      const uint8_t* in,
 diff --git a/xbmc/utils/CMakeLists.txt b/xbmc/utils/CMakeLists.txt
-index 87429d34c3..464f8cab3b 100644
+index 87429d34c3..a6b6a0bd3e 100644
 --- a/xbmc/utils/CMakeLists.txt
 +++ b/xbmc/utils/CMakeLists.txt
-@@ -250,6 +250,15 @@ if("gbm" IN_LIST CORE_PLATFORM_NAME_LC OR "wayland" IN_LIST CORE_PLATFORM_NAME_L
+@@ -19,6 +19,7 @@ set(SOURCES ActorProtocol.cpp
+             DatabaseUtils.cpp
+             Digest.cpp
+             DiscsUtils.cpp
++            DynamicMemory.cpp
+             EndianSwap.cpp
+             EmbeddedArt.cpp
+             ExecString.cpp
+@@ -102,6 +103,7 @@ set(HEADERS ActorProtocol.h
+             DatabaseUtils.h
+             Digest.h
+             DiscsUtils.h
++            DynamicMemory.h
+             EndianSwap.h
+             EventStream.h
+             EventStreamDetail.h
+@@ -250,6 +252,15 @@ if("gbm" IN_LIST CORE_PLATFORM_NAME_LC OR "wayland" IN_LIST CORE_PLATFORM_NAME_L
    endif()
  endif()
  
@@ -12166,6 +12608,115 @@ index 87429d34c3..464f8cab3b 100644
  core_add_library(utils)
  
  if(NOT CORE_SYSTEM_NAME STREQUAL windows AND NOT CORE_SYSTEM_NAME STREQUAL windowsstore)
+diff --git a/xbmc/utils/DynamicMemory.cpp b/xbmc/utils/DynamicMemory.cpp
+new file mode 100644
+index 0000000000..2332c350e7
+--- /dev/null
++++ b/xbmc/utils/DynamicMemory.cpp
+@@ -0,0 +1,58 @@
++/*
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include <string.h>
++
++#include "DynamicMemory.h"
++
++#include "utils/log.h"
++
++static const unsigned rsvdSize = 0x4000;
++
++
++DynamicMemory::DynamicMemory(unsigned size)
++	: m_data(nullptr), m_realSize(0), m_currentSize(0)
++{
++	allocate(size);
++}
++
++DynamicMemory::~DynamicMemory()
++{
++	if (m_data) {
++		delete[] m_data, m_data = nullptr;
++	}
++}
++
++void DynamicMemory::allocate(unsigned newSize)
++{
++	if (newSize <= m_realSize) {
++		return;
++	}
++
++	unsigned char *data = new unsigned char[newSize];
++
++	if (m_currentSize && m_data) {
++		memcpy(data, m_data, m_currentSize);
++	}
++
++	if (m_data) {
++		delete[] m_data;
++	}
++
++	m_data = data;
++	m_realSize = newSize;
++}
++
++void DynamicMemory::append(void *data, unsigned size)
++{
++	if (m_currentSize + size > m_realSize) {
++		allocate(m_currentSize + size + rsvdSize);
++	}
++
++	memcpy(m_data + m_currentSize, data, size);
++	m_currentSize += size;
++}
+diff --git a/xbmc/utils/DynamicMemory.h b/xbmc/utils/DynamicMemory.h
+new file mode 100644
+index 0000000000..fc5008e8ef
+--- /dev/null
++++ b/xbmc/utils/DynamicMemory.h
+@@ -0,0 +1,39 @@
++/*
++ *	(c) 2024 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++class DynamicMemory
++{
++private:
++	unsigned char	*m_data;
++	unsigned		 m_realSize;
++	unsigned		 m_currentSize;
++
++public:
++	DynamicMemory(unsigned size = 10 * 1024);
++	virtual ~DynamicMemory();
++
++	inline bool isEmpty() const {
++		return m_currentSize == 0 || m_data == nullptr;
++	}
++
++	inline void clear() {
++		m_currentSize = 0;
++	}
++
++	inline unsigned size() const {
++		return m_currentSize;
++	}
++
++	inline const unsigned char *data() const {
++		return m_data;
++	}
++
++	void allocate(unsigned newSize);
++	void append(void *data, unsigned size);
++};
 diff --git a/xbmc/utils/EGLUtils.cpp b/xbmc/utils/EGLUtils.cpp
 index 85f889dc9f..72aaf282b8 100644
 --- a/xbmc/utils/EGLUtils.cpp
@@ -12442,10 +12993,10 @@ index 0000000000..26176182a0
 +};
 diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
 new file mode 100644
-index 0000000000..29990a64da
+index 0000000000..324b5191a5
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.cpp
-@@ -0,0 +1,116 @@
+@@ -0,0 +1,136 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -12541,6 +13092,26 @@ index 0000000000..29990a64da
 +  return ret;
 +}
 +
++int SysfsUtils::GetIntDec(const std::string& path, int& val)
++{
++  int fd = open(path.c_str(), O_RDONLY);
++  int ret = 0;
++  if (fd >= 0)
++  {
++    char bcmd[16];
++    if (read(fd, bcmd, sizeof(bcmd)) < 0)
++      ret = -1;
++    else
++      val = strtol(bcmd, NULL, 10);
++
++    close(fd);
++  }
++  if (ret)
++    CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
++
++  return ret;
++}
++
 +bool SysfsUtils::Has(const std::string &path)
 +{
 +  int fd = open(path.c_str(), O_RDONLY);
@@ -12564,10 +13135,10 @@ index 0000000000..29990a64da
 +}
 diff --git a/xbmc/utils/SysfsUtils.h b/xbmc/utils/SysfsUtils.h
 new file mode 100644
-index 0000000000..b173a456bc
+index 0000000000..acb634c152
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.h
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,23 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -12587,6 +13158,7 @@ index 0000000000..b173a456bc
 +  static int GetString(const std::string& path, std::string& valstr);
 +  static int SetInt(const std::string& path, const int val);
 +  static int GetInt(const std::string& path, int& val);
++  static int GetIntDec(const std::string& path, int& val);
 +  static bool Has(const std::string& path);
 +  static bool HasRW(const std::string &path);
 +};
