@@ -1,0 +1,11 @@
+[Unit]
+Description=Dolby Vision firmware loader
+After=apploader.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 5
+ExecStart=/usr/sbin/insmod /lib/firmware/osmc/dovi.ko_enc
+
+[Install]
+WantedBy=apploader.target
