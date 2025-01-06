@@ -4809,7 +4809,7 @@ index 0000000000..0c7740448b
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp
 new file mode 100644
-index 0000000000..19a46ef1a9
+index 0000000000..fb19686a31
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp
 @@ -0,0 +1,584 @@
@@ -4903,13 +4903,13 @@ index 0000000000..19a46ef1a9
 +	}
 +
 +	AMLVideoCodec *createCodec(CProcessInfo &processInfo, const CDVDStreamInfo &hints) {
-+		return new AV1Codec(processInfo);
++		return new AV1Codec(processInfo, hints);
 +	}
 +
 +} av1CodecInfo;
 +
-+AV1Codec::AV1Codec(CProcessInfo &processInfo)
-+	: AMLInsecureVideoCodec(processInfo)
++AV1Codec::AV1Codec(CProcessInfo &processInfo, const CDVDStreamInfo &hints)
++	: DVCodec(processInfo, hints)
 +{
 +}
 +
@@ -4938,7 +4938,7 @@ index 0000000000..19a46ef1a9
 +
 +void AV1Codec::setupVideoCodecParams(aml_generic_param &params) const
 +{
-+	AMLInsecureVideoCodec::setupVideoCodecParams(params);
++	DVCodec::setupVideoCodecParams(params);
 +
 +	params.format = VIDEO_DEC_FORMAT_AV1;
 +	params.decoder_type = DECODER_TYPE_FRAME_MODE;
@@ -5399,7 +5399,7 @@ index 0000000000..19a46ef1a9
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.h
 new file mode 100644
-index 0000000000..f88d71e135
+index 0000000000..07efe40027
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.h
 @@ -0,0 +1,58 @@
@@ -5413,7 +5413,7 @@ index 0000000000..f88d71e135
 +
 +#pragma once
 +
-+#include "AMLInsecureVideoCodec.h"
++#include "DVCodec.h"
 +
 +namespace amlogic {
 +	struct read_bit_buffer;
@@ -5429,7 +5429,7 @@ index 0000000000..f88d71e135
 +	};
 +}
 +
-+class amlogic::AV1Codec : public amlogic::AMLInsecureVideoCodec
++class amlogic::AV1Codec : public amlogic::DVCodec
 +{
 +private:
 +	DataBuffer m_data_buffer;
@@ -5453,7 +5453,7 @@ index 0000000000..f88d71e135
 +	virtual void setupVideoCodecParams(aml_generic_param &params) const;
 +
 +public:
-+	AV1Codec(CProcessInfo &processInfo);
++	AV1Codec(CProcessInfo &processInfo, const CDVDStreamInfo &hints);
 +	virtual ~AV1Codec();
 +
 +	virtual std::string getFormatName() const;
@@ -5463,10 +5463,10 @@ index 0000000000..f88d71e135
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..9e80f99c3f
+index 0000000000..e92622d4d8
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
-@@ -0,0 +1,100 @@
+@@ -0,0 +1,101 @@
 +/*
 + *  Copyright (C) 2024 OSMC
 + *
@@ -5522,12 +5522,13 @@ index 0000000000..9e80f99c3f
 +	bool isProfile4 = hints.dovi.dv_profile == 4;
 +	bool isProfile8HLG = hints.dovi.dv_profile == 8
 +			&& hints.dovi.dv_bl_signal_compatibility_id == 4;
++	bool isProfile10 = hints.dovi.dv_profile == 10;
 +	bool isDVoutputDisabled =
 +		CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) != 2;
-+	int dvFlags = 5;
++	uint32_t dvFlags = 5;
 +
 +	bool enable_dv = hints.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION && isDolbyVisionSupported()
-+			&& !isProfile4 && !isProfile8HLG;
++			&& !isProfile4 && !isProfile8HLG && !isProfile10;
 +
 +	if (SysfsUtils::GetIntDec("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
 +		CLog::Log(LOGERROR, "DVCodec: Failed to get DV flags");
@@ -5540,7 +5541,7 @@ index 0000000000..9e80f99c3f
 +	} else
 +		dvFlags &= ~0x2000;
 +
-+	if (SysfsUtils::SetInt("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
++	if (SysfsUtils::SetUInt32("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
 +		CLog::Log(LOGERROR, "DVCodec: Failed to set DV flags to 0x{:08x}", dvFlags);
 +
 +	CLog::Log(LOGDEBUG, "DVCodec: Profile: {}, CCID: {}",
@@ -5912,10 +5913,10 @@ index 0000000000..7261cebbcb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
 new file mode 100644
-index 0000000000..38ae2be44a
+index 0000000000..ab420bcddc
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,137 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6010,8 +6011,6 @@ index 0000000000..38ae2be44a
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
 +	}
-+
-+	CLog::Log(LOGERROR, "** t99 ** hdrtype = {}, profile = {}", m_hints.hdrType, m_hints.dovi.dv_profile);
 +}
 +
 +int HEVCCodec::pre_header_feeding(am_private_t *para, am_packet_t *pkt) const
@@ -10651,6 +10650,33 @@ index 3aa269bca3..e281b550a7 100644
  
    return playerMode;
  }
+diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
+index 02a2d6762a..c06cb8740a 100644
+--- a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
++++ b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
+@@ -326,8 +326,20 @@ bool CSystemGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
+           types += ", HLG";
+         if (caps.SupportsHDR10Plus())
+           types += ", HDR10+";
+-        if (caps.SupportsDolbyVision())
+-          types += ", Dolby Vision";
++        if (caps.SupportsDolbyVision() || caps.SupportsDolbyVisionLL())
++        {
++          types += ", Dolby Vision (";
++          if (caps.SupportsDolbyVision())
++          {
++            types += "Std";
++            types += caps.SupportsDolbyVisionLL() ? " and " : " only)";
++          }
++          if (caps.SupportsDolbyVisionLL())
++          {
++            types += "LL";
++            types += caps.SupportsDolbyVision() ? ")" : " only)";
++          }
++        }
+ 
+         value = types;
+       }
 diff --git a/xbmc/interfaces/generic/LanguageInvokerThread.cpp b/xbmc/interfaces/generic/LanguageInvokerThread.cpp
 index 67f3d14875..d2d785ef4c 100644
 --- a/xbmc/interfaces/generic/LanguageInvokerThread.cpp
@@ -12877,6 +12903,32 @@ index 5c360300dd..ede094c649 100644
  
  namespace KODI
  {
+diff --git a/xbmc/utils/HDRCapabilities.h b/xbmc/utils/HDRCapabilities.h
+index 4802b78e0e..986881e04e 100644
+--- a/xbmc/utils/HDRCapabilities.h
++++ b/xbmc/utils/HDRCapabilities.h
+@@ -17,16 +17,18 @@ public:
+   bool SupportsHDR10() const { return m_hdr10; }
+   bool SupportsHLG() const { return m_hlg; }
+   bool SupportsHDR10Plus() const { return m_hdr10_plus; }
+-  bool SupportsDolbyVision() const { return m_dolby_vision; }
++  bool SupportsDolbyVision() const { return m_dolby_vision & 2; }
++  bool SupportsDolbyVisionLL() const { return m_dolby_vision & 1; }
+ 
+   void SetHDR10() { m_hdr10 = true; }
+   void SetHLG() { m_hlg = true; }
+   void SetHDR10Plus() { m_hdr10_plus = true; }
+-  void SetDolbyVision() { m_dolby_vision = true; }
++  void SetDolbyVision() { m_dolby_vision |= 2; }
++  void SetDolbyVisionLL() { m_dolby_vision |= 1; }
+ 
+ private:
+   bool m_hdr10 = false;
+   bool m_hlg = false;
+   bool m_hdr10_plus = false;
+-  bool m_dolby_vision = false;
++  int m_dolby_vision = 0;
+ };
 diff --git a/xbmc/utils/ScreenshotAML.cpp b/xbmc/utils/ScreenshotAML.cpp
 new file mode 100644
 index 0000000000..a46e01aead
@@ -12993,10 +13045,10 @@ index 0000000000..26176182a0
 +};
 diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
 new file mode 100644
-index 0000000000..324b5191a5
+index 0000000000..fe3d134e60
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.cpp
-@@ -0,0 +1,136 @@
+@@ -0,0 +1,154 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13072,6 +13124,24 @@ index 0000000000..324b5191a5
 +  return ret;
 +}
 +
++int SysfsUtils::SetUInt32(const std::string& path, const uint32_t val)
++{
++  int fd = open(path.c_str(), O_RDWR, 0644);
++  int ret = 0;
++  if (fd >= 0)
++  {
++    char bcmd[16];
++    sprintf(bcmd, "%u", val);
++    if (write(fd, bcmd, strlen(bcmd)) < 0)
++      ret = -1;
++    close(fd);
++  }
++  if (ret)
++    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
++
++  return ret;
++}
++
 +int SysfsUtils::GetInt(const std::string& path, int& val)
 +{
 +  int fd = open(path.c_str(), O_RDONLY);
@@ -13092,7 +13162,7 @@ index 0000000000..324b5191a5
 +  return ret;
 +}
 +
-+int SysfsUtils::GetIntDec(const std::string& path, int& val)
++int SysfsUtils::GetIntDec(const std::string& path, uint32_t& val)
 +{
 +  int fd = open(path.c_str(), O_RDONLY);
 +  int ret = 0;
@@ -13102,7 +13172,7 @@ index 0000000000..324b5191a5
 +    if (read(fd, bcmd, sizeof(bcmd)) < 0)
 +      ret = -1;
 +    else
-+      val = strtol(bcmd, NULL, 10);
++      val = strtoull(bcmd, NULL, 10);
 +
 +    close(fd);
 +  }
@@ -13135,10 +13205,10 @@ index 0000000000..324b5191a5
 +}
 diff --git a/xbmc/utils/SysfsUtils.h b/xbmc/utils/SysfsUtils.h
 new file mode 100644
-index 0000000000..acb634c152
+index 0000000000..33fed29754
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.h
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,24 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13157,8 +13227,9 @@ index 0000000000..acb634c152
 +  static int SetString(const std::string& path, const std::string& valstr);
 +  static int GetString(const std::string& path, std::string& valstr);
 +  static int SetInt(const std::string& path, const int val);
++  static int SetUInt32(const std::string& path, const uint32_t val);
 +  static int GetInt(const std::string& path, int& val);
-+  static int GetIntDec(const std::string& path, int& val);
++  static int GetIntDec(const std::string& path, uint32_t& val);
 +  static bool Has(const std::string& path);
 +  static bool HasRW(const std::string &path);
 +};
@@ -13945,10 +14016,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..233d8e4863
+index 0000000000..0f0d67aea2
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,535 @@
+@@ -0,0 +1,537 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14471,8 +14542,10 @@ index 0000000000..233d8e4863
 +      HDRcaps.SetHDR10Plus();
 +    if (hdr_caps.find("HLG") != std::string::npos)
 +      HDRcaps.SetHLG();
-+    if (hdr_caps.find("DV") != std::string::npos)
++    if (hdr_caps.find("STD") != std::string::npos)
 +      HDRcaps.SetDolbyVision();
++    if (hdr_caps.find("LL") != std::string::npos)
++      HDRcaps.SetDolbyVisionLL();
 +  }
 +  return HDRcaps;
 +}
