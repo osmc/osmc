@@ -4,7 +4,7 @@ After=apploader.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/sleep 10
 ExecStart=/usr/sbin/insmod /lib/firmware/osmc/dovi.ko_enc
 
 [Install]
