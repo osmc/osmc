@@ -2366,10 +2366,10 @@ index ca83b1a04f..8a4f019c23 100644
    int qscale_type;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..b6c99ade26
+index 0000000000..412765cd37
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -0,0 +1,305 @@
+@@ -0,0 +1,312 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2464,6 +2464,13 @@ index 0000000000..b6c99ade26
 +
 +bool CDVDVideoCodecAmlogic::Open(CDVDStreamInfo &hints, CDVDCodecOptions &options)
 +{
++  int hdrMode;
++
++  hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
++
++	if (SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_mode", hdrMode))
++		CLog::Log(LOGERROR, "AMLInsecureVideoCodec: Failed to set hdr_mode");
++
 +  if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOPLAYER_USEAMCODEC))
 +    return false;
 +  if (hints.stills || hints.width == 0)
@@ -2988,10 +2995,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..0a878f246b
+index 0000000000..0adf2a7b6e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1352 @@
+@@ -0,0 +1,1347 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3157,11 +3164,6 @@ index 0000000000..0a878f246b
 +	m_defaultVfmMap = getVfmMap("default");
 +
 +	setVfmMap("default", "decoder ppmgr deinterlace amlvideo amvideo");
-+
-+	hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
-+
-+	if (SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_mode", hdrMode))
-+		CLog::Log(LOGERROR, "AMLInsecureVideoCodec: Failed to set hdr_mode");
 +
 +	maxLum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
 +	SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxLum);
@@ -5463,7 +5465,7 @@ index 0000000000..07efe40027
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..e92622d4d8
+index 0000000000..94b0c544e4
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 @@ -0,0 +1,101 @@
@@ -5492,7 +5494,7 @@ index 0000000000..e92622d4d8
 +
 +	if (!m_secureOSMC->isVeroV()
 +			|| SysfsUtils::GetInt("/sys/class/amdolby_vision/support_info", support_info)
-+			|| (support_info & 0x7) == 0) {
++			|| (support_info & 0x7) != 7) {
 +		// no DV support
 +		return;
 +	}
