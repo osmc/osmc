@@ -173,7 +173,7 @@ index 531974f3f4..9b85a3bf92 100644
      </category>
      <category id="input">
 diff --git a/system/settings/settings.xml b/system/settings/settings.xml
-index 6e69bb9cab..020e95d6cc 100755
+index 6e69bb9cab..7438999ea4 100755
 --- a/system/settings/settings.xml
 +++ b/system/settings/settings.xml
 @@ -87,6 +87,125 @@
@@ -401,7 +401,23 @@ index 6e69bb9cab..020e95d6cc 100755
          <setting id="videoscreen.dither" type="boolean" label="36099" help="36598">
            <requirement>
              <or>
-@@ -3033,7 +3212,7 @@
+@@ -3002,6 +3181,7 @@
+           <or>
+             <condition>HAS_DX</condition>
+             <condition>HAS_MEDIACODEC</condition>
++            <condition>HAS_GLES</condition>
+           </or>
+         </requirement>
+         <dependencies>
+@@ -3010,6 +3190,7 @@
+             <or>
+               <condition on="property" name="hassystemsdrpeakluminance" operator="!is" />
+               <condition setting="videoscreen.usesystemsdrpeakluminance" operator="is">false</condition>
++              <condition>HAS_GLES</condition>
+             </or>
+           </dependency>
+         </dependencies>
+@@ -3033,7 +3214,7 @@
          </setting>
          <setting id="videoscreen.whitelistpulldown" type="boolean" parent="videoscreen.whitelist" label="14127" help="36444">
            <level>3</level>
@@ -410,7 +426,7 @@ index 6e69bb9cab..020e95d6cc 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -3041,7 +3220,7 @@
+@@ -3041,7 +3222,7 @@
          </setting>
          <setting id="videoscreen.whitelistdoublerefreshrate" type="boolean" parent="videoscreen.whitelist" label="14128" help="36445">
            <level>3</level>
@@ -419,7 +435,7 @@ index 6e69bb9cab..020e95d6cc 100755
            <dependencies>
              <dependency type="enable" setting="videoscreen.whitelist" operator="!is"></dependency>
            </dependencies>
-@@ -3123,7 +3302,7 @@
+@@ -3123,7 +3304,7 @@
          </setting>
          <setting id="audiooutput.config" type="integer" label="337" help="36361">
            <level>2</level>
@@ -428,7 +444,7 @@ index 6e69bb9cab..020e95d6cc 100755
            <constraints>
              <options>
                <option label="338">1</option>
-@@ -3168,6 +3347,18 @@
+@@ -3168,6 +3349,18 @@
              <formatlabel>36459</formatlabel>
            </control>
          </setting>
@@ -447,7 +463,7 @@ index 6e69bb9cab..020e95d6cc 100755
          <setting id="audiooutput.processquality" type="integer" label="13505" help="36169">
            <requirement>HAS_AE_QUALITY_LEVELS</requirement>
            <level>2</level>
-@@ -3213,7 +3404,7 @@
+@@ -3213,7 +3406,7 @@
          </setting>
          <setting id="audiooutput.streamsilence" type="integer" label="421" help="34111">
            <level>2</level>
@@ -456,7 +472,7 @@ index 6e69bb9cab..020e95d6cc 100755
            <constraints>
              <options>audiostreamsilence</options>
            </constraints>
-@@ -3221,7 +3412,7 @@
+@@ -3221,7 +3414,7 @@
          </setting>
          <setting id="audiooutput.streamnoise" type="boolean" label="34112" help="34113">
            <level>2</level>
@@ -9934,10 +9950,10 @@ index 8598052b41..98b41313c0 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..1d570168ce
+index 0000000000..dfaa3925a0
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,199 @@
+@@ -0,0 +1,226 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10015,6 +10031,7 @@ index 0000000000..1d570168ce
 +  ManageRenderArea();
 +
 +  m_bConfigured = true;
++  m_hdrCheckCount = m_maxChecks;
 +
 +  return true;
 +}
@@ -10112,6 +10129,7 @@ index 0000000000..1d570168ce
 +      m_buffers[reset_arr[i][0]].videoBuffer = nullptr;
 +    }
 +  }
++  CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(false);
 +}
 +
 +bool CRendererAML::Flush(bool saveBuffers)
@@ -10123,6 +10141,31 @@ index 0000000000..1d570168ce
 +void CRendererAML::RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha)
 +{
 +  ManageRenderArea();
++  /* are we outputting HDR? */
++  if (m_hdrCheckCount >= 0)
++  {
++    std::string hdmiConfig = "";
++    if (!SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/config", hdmiConfig))
++    {
++      if ((hdmiConfig.find("EOTF: SDR") == std::string::npos &&
++        hdmiConfig.find("EOTF: HDRgamma") == std::string::npos) ||
++        hdmiConfig.find("DV type DV") != std::string::npos)
++      {
++        CLog::Log(LOGDEBUG, "CRendererAML: Output is HDR ({})", m_maxChecks - m_hdrCheckCount);
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++        m_hdrCheckCount = 0;
++      }
++      else if (m_hdrCheckCount == 0)
++      {
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(false);
++        CLog::Log(LOGDEBUG, "CRendererAML: Output is SDR");
++      }
++    }
++    else
++      CLog::Log(LOGERROR, "Failed to read hdmitx config");
++
++    m_hdrCheckCount -= 1;
++  }
 +
 +  CAMLVideoBuffer *amli = dynamic_cast<CAMLVideoBuffer *>(m_buffers[index].videoBuffer);
 +  if(amli && amli->m_amlCodec)
@@ -10139,10 +10182,10 @@ index 0000000000..1d570168ce
 +}
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 new file mode 100644
-index 0000000000..be598196f8
+index 0000000000..22f5e12251
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-@@ -0,0 +1,59 @@
+@@ -0,0 +1,61 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10201,6 +10244,8 @@ index 0000000000..be598196f8
 +
 +  int m_prevVPts;
 +  bool m_bConfigured;
++  int m_hdrCheckCount;
++  const int m_maxChecks = 20;
 +};
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 index dfd4b31227..1774eba28f 100644
@@ -14018,10 +14063,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..0f0d67aea2
+index 0000000000..982056b20e
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,537 @@
+@@ -0,0 +1,545 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14559,12 +14604,20 @@ index 0000000000..0f0d67aea2
 +  return HDRcaps.SupportsHDR10();
 +}
 +
++float CWinSystemAmlogic::GetGuiSdrPeakLuminance() const
++{
++  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++  const int guiSdrPeak = settings->GetInt(CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE);
++
++  return 0.5f * guiSdrPeak / 100.0f + 0.5f;
++}
++
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
 new file mode 100644
-index 0000000000..528e82f911
+index 0000000000..09a13a911d
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
-@@ -0,0 +1,71 @@
+@@ -0,0 +1,72 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14607,6 +14660,7 @@ index 0000000000..528e82f911
 +  virtual void Unregister(IDispResource *resource);
 +  CHDRCapabilities GetDisplayHDRCapabilities() const override;
 +  bool IsHDRDisplay() override;
++  float GetGuiSdrPeakLuminance() const override;
 +  bool m_monitorEvents;
 +  std::string m_lastEdid;
 +  
