@@ -40,7 +40,7 @@ MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@op
 
 # Change to yes to enable challenge-response passwords (beware issues with
 # some PAM modules and threads)
-KbdInteractiveAuthentication no
+#KbdInteractiveAuthentication no
 
 # Change to no to disable tunnelled clear text passwords
 #PasswordAuthentication yes
@@ -79,5 +79,5 @@ Subsystem sftp /usr/lib/openssh/sftp-server
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
-UsePAM yes
+#UsePAM yes
 UseDNS no
