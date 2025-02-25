@@ -10,6 +10,7 @@
 
 import os
 import sys
+import subprocess
 import threading
 import traceback
 from io import open
@@ -67,6 +68,18 @@ class OSMCGui(xbmcgui.WindowXMLDialog):
         return self._lang(value)
 
     def onInit(self):
+
+        if os.path.isfile('/end_of_life_message'):
+            with open('/end_of_life_message', 'r', encoding='utf-8') as file_handle:
+                eol_read = file_handle.readline(1)
+                if eol_read != '1':
+                    _ = xbmcgui.Dialog().ok(self.lang(32083), self.lang(32084))
+            if eol_read != '1':
+                with open('/tmp/end_of_life_message', 'w', encoding='utf-8') as file_handle:
+                    file_handle.write('1')
+                    log('/tmp/end_of_life_message written')
+
+                subprocess.call(['sudo', 'mv', '/tmp/end_of_life_message', '/end_of_life_message'])
 
         if self.first_run:
             self.first_run = False
