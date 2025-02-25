@@ -11,6 +11,8 @@
 import os
 import subprocess
 
+import xbmcgui
+
 from osmccommon import osmc_setting
 from osmccommon.osmc_logging import StandardLogger
 
@@ -81,6 +83,8 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
 
     def run(self):
         # check if kodi_reset file is present, if it is then set the bool as true, else set as false
+        if os.path.isfile('/end_of_life_message'):
+            _ = xbmcgui.Dialog().ok(self.lang(32192), self.lang(32193))
 
         if os.path.isfile(self.reset_file):
             log('Kodi reset file found')
