@@ -7822,7 +7822,7 @@ index 0cdf8c3864..0f82d44372 100644
      m_dtsAtDisplayTime = DVD_NOPTS_VALUE;
      return m_IDemux->SeekTime(timems, backwards, startpts);
 diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
-index 1aebc3dcbc..1111526507 100644
+index 1aebc3dcbc..6ffbda9575 100644
 --- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
 @@ -9,6 +9,8 @@
@@ -7961,33 +7961,7 @@ index 1aebc3dcbc..1111526507 100644
  
    // in this case the start time is requested time
    if (startpts)
-@@ -1389,8 +1400,10 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
- 
-   if (ret >= 0)
-   {
--    if (!hitEnd)
-+    if (!hitEnd) {
-+      Flush();
-       return true;
-+    }
-     else
-       return false;
-   }
-@@ -1409,7 +1422,12 @@ bool CDVDDemuxFFmpeg::SeekByte(int64_t pos)
-   m_pkt.result = -1;
-   av_packet_unref(&m_pkt.pkt);
- 
--  return (ret >= 0);
-+  if (ret >= 0) {
-+	  Flush();
-+	  return true;
-+  }
-+
-+  return false;
- }
- 
- int CDVDDemuxFFmpeg::GetStreamLength()
-@@ -1584,6 +1602,49 @@ void CDVDDemuxFFmpeg::CreateStreams(unsigned int program)
+@@ -1584,6 +1595,49 @@ void CDVDDemuxFFmpeg::CreateStreams(unsigned int program)
      for (unsigned int i = 0; i < m_pFormatContext->nb_streams; i++)
        AddStream(i);
    }
@@ -8037,7 +8011,7 @@ index 1aebc3dcbc..1111526507 100644
  }
  
  void CDVDDemuxFFmpeg::DisposeStreams()
-@@ -1595,6 +1656,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
+@@ -1595,6 +1649,17 @@ void CDVDDemuxFFmpeg::DisposeStreams()
    m_parsers.clear();
  }
  
@@ -8055,7 +8029,7 @@ index 1aebc3dcbc..1111526507 100644
  CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
  {
    AVStream* pStream = m_pFormatContext->streams[streamIdx];
-@@ -1650,11 +1722,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1650,11 +1715,23 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->bVFR = false;
  
          // never trust pts in avi files with h264.
@@ -8080,7 +8054,7 @@ index 1aebc3dcbc..1111526507 100644
          //average fps is more accurate for mkv files
          if (m_bMatroska && pStream->avg_frame_rate.den && pStream->avg_frame_rate.num)
          {
-@@ -1666,6 +1750,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1666,6 +1743,11 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            st->iFpsRate = r_frame_rate.num;
            st->iFpsScale = r_frame_rate.den;
          }
@@ -8092,7 +8066,7 @@ index 1aebc3dcbc..1111526507 100644
          else
          {
            st->iFpsRate  = 0;
-@@ -1677,13 +1766,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1677,13 +1759,32 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
                           pStream->codecpar->field_order == AV_FIELD_TB ||
                           pStream->codecpar->field_order == AV_FIELD_BT;
  
@@ -8126,7 +8100,7 @@ index 1aebc3dcbc..1111526507 100644
          st->iBitRate = static_cast<int>(pStream->codecpar->bit_rate);
          st->bitDepth = 8;
          const AVPixFmtDescriptor* desc =
-@@ -1763,6 +1871,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1763,6 +1864,15 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
          if (av_dict_get(pStream->metadata, "title", NULL, 0))
            st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -8142,7 +8116,7 @@ index 1aebc3dcbc..1111526507 100644
          break;
        }
        case AVMEDIA_TYPE_DATA:
-@@ -1788,6 +1905,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1788,6 +1898,16 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
            if (av_dict_get(pStream->metadata, "title", NULL, 0))
              st->m_description = av_dict_get(pStream->metadata, "title", NULL, 0)->value;
  
@@ -8159,7 +8133,7 @@ index 1aebc3dcbc..1111526507 100644
            break;
          }
        }
-@@ -1908,15 +2035,6 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
+@@ -1908,15 +2028,6 @@ CDemuxStream* CDVDDemuxFFmpeg::AddStream(int streamIdx)
  #ifdef HAVE_LIBBLURAY
      if (m_pInput->IsStreamType(DVDSTREAM_TYPE_BLURAY))
      {
@@ -8175,7 +8149,7 @@ index 1aebc3dcbc..1111526507 100644
        stream->dvdNavId = pStream->id;
  
        auto it = std::find_if(m_streams.begin(), m_streams.end(),
-@@ -2101,7 +2219,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
+@@ -2101,7 +2212,20 @@ bool CDVDDemuxFFmpeg::SeekChapter(int chapter, double* startpts)
  
    AVChapter* ch = m_pFormatContext->chapters[chapter - 1];
    double dts = ConvertTimestamp(ch->start, ch->time_base.den, ch->time_base.num);
@@ -8197,7 +8171,7 @@ index 1aebc3dcbc..1111526507 100644
  }
  
  std::string CDVDDemuxFFmpeg::GetStreamCodecName(int iStreamId)
-@@ -2135,6 +2266,10 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
+@@ -2135,6 +2259,10 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
    if (m_program == UINT_MAX)
      return false;
  
@@ -8208,7 +8182,7 @@ index 1aebc3dcbc..1111526507 100644
    if (m_program == 0 && !m_pFormatContext->nb_programs)
      return false;
  
-@@ -2184,7 +2319,7 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
+@@ -2184,7 +2312,7 @@ bool CDVDDemuxFFmpeg::IsProgramChange()
          return true;
        }
      }
@@ -8217,7 +8191,7 @@ index 1aebc3dcbc..1111526507 100644
          static_cast<int>(stream->extraData.GetSize()))
        return true;
    }
-@@ -2289,7 +2424,7 @@ void CDVDDemuxFFmpeg::ParsePacket(AVPacket* pkt)
+@@ -2289,7 +2417,7 @@ void CDVDDemuxFFmpeg::ParsePacket(AVPacket* pkt)
  {
    AVStream* st = m_pFormatContext->streams[pkt->stream_index];
  
@@ -8226,7 +8200,7 @@ index 1aebc3dcbc..1111526507 100644
    {
      auto parser = m_parsers.find(st->index);
      if (parser == m_parsers.end())
-@@ -2557,6 +2692,31 @@ StreamHdrType CDVDDemuxFFmpeg::DetermineHdrType(AVStream* pStream)
+@@ -2557,6 +2685,31 @@ StreamHdrType CDVDDemuxFFmpeg::DetermineHdrType(AVStream* pStream)
  
    if (av_stream_get_side_data(pStream, AV_PKT_DATA_DOVI_CONF, nullptr)) // DoVi
      hdrType = StreamHdrType::HDR_TYPE_DOLBYVISION;
