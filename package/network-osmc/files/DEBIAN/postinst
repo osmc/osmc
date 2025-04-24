@@ -32,6 +32,8 @@ if [ "$1" = "configure" ]; then
 
 	rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_"{install,upgrade}
 
+	if [ -d /var/lib/ntp ]; then chown ntp:ntp /var/lib/ntp; fi
+
 	if ischroot; then exit 0; fi
 	if ! systemctl is-active connman.service >/dev/null
 	then
