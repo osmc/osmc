@@ -1,0 +1,41 @@
+From b7a32a95b1b94412827a274e2178e62bc33148c7 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Fri, 14 Mar 2025 15:24:13 +0100
+Subject: [PATCH] DVDDemuxFFmpeg: fix skipping issue; don't flush at the end of
+ SeekTime/SeekByte
+
+---
+ xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
+
+diff --git a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+index 1111526507d..6ffbda9575a 100644
+--- a/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
++++ b/xbmc/cores/VideoPlayer/DVDDemuxers/DVDDemuxFFmpeg.cpp
+@@ -1400,10 +1400,8 @@ bool CDVDDemuxFFmpeg::SeekTime(double time, bool backwards, double* startpts)
+ 
+   if (ret >= 0)
+   {
+-    if (!hitEnd) {
+-      Flush();
++    if (!hitEnd)
+       return true;
+-    }
+     else
+       return false;
+   }
+@@ -1422,12 +1420,7 @@ bool CDVDDemuxFFmpeg::SeekByte(int64_t pos)
+   m_pkt.result = -1;
+   av_packet_unref(&m_pkt.pkt);
+ 
+-  if (ret >= 0) {
+-	  Flush();
+-	  return true;
+-  }
+-
+-  return false;
++  return (ret >= 0);
+ }
+ 
+ int CDVDDemuxFFmpeg::GetStreamLength()
+
