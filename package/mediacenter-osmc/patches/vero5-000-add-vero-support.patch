@@ -1010,10 +1010,10 @@ index 0000000000..709d21afbe
 +}                                                                                          
 diff --git a/xbmc/OSMCSecureOS.cpp b/xbmc/OSMCSecureOS.cpp
 new file mode 100644
-index 0000000000..f9182639db
+index 0000000000..8a5b7e4da3
 --- /dev/null
 +++ b/xbmc/OSMCSecureOS.cpp
-@@ -0,0 +1,194 @@
+@@ -0,0 +1,185 @@
 +/*
 + *  Copyright (C) 2005-2020 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -1191,15 +1191,6 @@ index 0000000000..f9182639db
 +	}
 +}
 +
-+bool OSMCSecureOS::isVero4k() const
-+{
-+	if (m_dll) {
-+		return m_dll->is_Vero4k(m_osmcCtxt) == 1;
-+	}
-+
-+	return false;
-+}
-+
 +bool OSMCSecureOS::isVeroV() const
 +{
 +	if (m_dll) {
@@ -1210,10 +1201,10 @@ index 0000000000..f9182639db
 +}
 diff --git a/xbmc/OSMCSecureOS.h b/xbmc/OSMCSecureOS.h
 new file mode 100644
-index 0000000000..3edbe27ec7
+index 0000000000..c359ad742f
 --- /dev/null
 +++ b/xbmc/OSMCSecureOS.h
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,41 @@
 +/*
 + *  Copyright (C) 2005-2020 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -1253,7 +1244,6 @@ index 0000000000..3edbe27ec7
 +
 +	void parseFrame(uint32_t codecTag, uint8_t subtitlePlane, int64_t pts, const uint8_t *data, size_t size) const;
 +
-+	bool isVero4k() const;
 +	bool isVeroV() const;
 +};
 diff --git a/xbmc/addons/kodi-dev-kit/include/kodi/c-api/addon-instance/inputstream/demux_packet.h b/xbmc/addons/kodi-dev-kit/include/kodi/c-api/addon-instance/inputstream/demux_packet.h
@@ -5481,7 +5471,7 @@ index 0000000000..07efe40027
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..94b0c544e4
+index 0000000000..9bcd4a7b2e
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 @@ -0,0 +1,101 @@
@@ -5546,7 +5536,7 @@ index 0000000000..94b0c544e4
 +	uint32_t dvFlags = 5;
 +
 +	bool enable_dv = hints.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION && isDolbyVisionSupported()
-+			&& !isProfile4 && !isProfile8HLG && !isProfile10;
++			&& !isProfile4 && !isProfile8HLG;
 +
 +	if (SysfsUtils::GetIntDec("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
 +		CLog::Log(LOGERROR, "DVCodec: Failed to get DV flags");
@@ -11486,10 +11476,10 @@ index dad5da5528..4a9211342e 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..91e39cae7a
+index 0000000000..661b765b79
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,958 @@
+@@ -0,0 +1,918 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11520,6 +11510,80 @@ index 0000000000..91e39cae7a
 +#include "linux/fb.h"
 +#include <sys/ioctl.h>
 +
++static const char *sysfs_mandatory[] = {
++		"/dev/amstream_mpts",
++		"/dev/amvideo",
++		"/dev/video10",
++		"/sys/class/tsync/pts_pcrscr",
++		"/sys/class/video/axis",
++		"/sys/class/video/disable_video",
++		"/sys/class/video/freerun_mode",
++		"/sys/class/video/screen_mode",
++		nullptr
++};
++
++static const char *sysfs_ro[] = {
++		"/dev/tee0",
++		"/sys/class/amdolby_vision/support_info",
++		"/sys/class/amhdmitx/amhdmitx0/cta_cap",
++		"/sys/class/amhdmitx/amhdmitx0/disp_cap_3d",
++		"/sys/class/amhdmitx/amhdmitx0/hpd_state",
++		"/sys/class/amhdmitx/amhdmitx0/rawedid",
++		"/sys/class/amhdmitx/amhdmitx0/vesa_cap",
++		"/sys/class/amstream/vcodec_profile",
++		"/sys/class/amvecm/hdr_support",
++		"/sys/class/display/axis",
++		"/sys/class/ppmgr/ppscaler",
++		"/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq",
++		"/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq",
++		"/sys/devices/virtual/amhdmitx/amhdmitx0/dv_cap",
++		"/sys/module/am_vecm/parameters/cur_csc_type",
++		"/sys/module/am_vecm/parameters/hdr10_plus_process_mode",
++		"/sys/module/am_vecm/parameters/hdr_process_mode",
++		"/sys/module/am_vecm/parameters/hlg_process_mode",
++		nullptr
++};
++
++static const char *sysfs_rw[] = {
++		"/sys/class/amhdmitx/amhdmitx0/aspect",
++		"/sys/class/amhdmitx/amhdmitx0/attr",
++		"/sys/class/amhdmitx/amhdmitx0/aud_ch",
++		"/sys/class/amhdmitx/amhdmitx0/config",
++		"/sys/class/amhdmitx/amhdmitx0/debug",
++		"/sys/class/amhdmitx/amhdmitx0/force_hdr",
++		"/sys/class/amhdmitx/amhdmitx0/frac_rate_policy",
++		"/sys/class/amhdmitx/amhdmitx0/output_rgb",
++		"/sys/class/amhdmitx/amhdmitx0/phy",
++		"/sys/class/audiodsp/digital_codec",
++		"/sys/class/audiodsp/digital_raw",
++		"/sys/class/display/mode",
++		"/sys/class/graphics/fb0/free_scale",
++		"/sys/class/graphics/fb0/free_scale_axis",
++		"/sys/class/graphics/fb0/window_axis",
++		"/sys/class/graphics/fb1/free_scale",
++		"/sys/class/leds/standby/brightness",
++		"/sys/class/ppmgr/orientation",
++		"/sys/class/tsync/enable",
++		"/sys/class/vfm/map",
++		"/sys/class/video/blackout_policy",
++		"/sys/class/video/brightness",
++		"/sys/class/video/contrast",
++		"/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
++		"/sys/module/amdolby_vision/parameters/dolby_vision_enable",
++		"/sys/module/amdolby_vision/parameters/dolby_vision_flags",
++		"/sys/module/amvdec_h264mvc/parameters/view_mode",
++		"/sys/module/amvdec_vc1/parameters/force_frameint",
++		"/sys/module/am_vecm/parameters/customer_master_display_en",
++		"/sys/module/am_vecm/parameters/customer_master_display_param",
++		"/sys/module/am_vecm/parameters/customer_panel_lumin",
++		"/sys/module/am_vecm/parameters/hdr_mode",
++		"/sys/module/am_vecm/parameters/range_control",
++		"/sys/module/amvideo/parameters/framepacking_blank",
++		"/sys/module/amvideo/parameters/framepacking_height",
++		"/sys/module/amvideo/parameters/framepacking_support",
++		"/sys/module/amvideo/parameters/framepacking_width",
++		nullptr
++};
 +
 +bool aml_present()
 +{
@@ -11536,131 +11600,43 @@ index 0000000000..91e39cae7a
 +  return has_aml == 1;
 +}
 +
++static bool aml_check_permission(const char **table, bool readwrite)
++{
++	const char *mode = readwrite ? "rw" : "ro";
++	bool (*checkit)(const std::string&) = readwrite ? SysfsUtils::HasRW : SysfsUtils::HasRO;
++	bool permissions_ok = true;
++
++	const char **idx = table;
++
++	while (*idx) {
++		if (!checkit(*idx)) {
++			CLog::Log(LOGERROR, "AML: no {} on {}", mode, *idx);
++			permissions_ok = false;
++		}
++		idx++;
++	}
++
++	return permissions_ok;
++}
++
 +bool aml_permissions()
 +{
-+  if (!aml_present())
-+    return false;
++	if (!aml_present()) {
++		return false;
++	}
 +
-+  static int permissions_ok = -1;
-+  if (permissions_ok == -1)
-+  {
-+    permissions_ok = 1;
++	static int permissions_ok = -1;
++	if (permissions_ok != -1) {
++		// already checked
++		return permissions_ok == 1;
++	}
 +
-+    if (!SysfsUtils::HasRW("/dev/tee0"))
-+    {
-+      CLog::Log(LOGWARNING, "AML: no rw on /dev/tee0");
-+    }
-+    if (!SysfsUtils::HasRW("/dev/amvideo"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /dev/amvideo");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/dev/amstream_mpts"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /dev/amstream*");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/video/axis"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/video/axis");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/video/screen_mode"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/video/screen_mode");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/video/disable_video"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/video/disable_video");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/tsync/pts_pcrscr"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/tsync/pts_pcrscr");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/dev/video10"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /dev/video10");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/amlvideodri/parameters/freerun_mode"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amlvideodri/parameters/freerun_mode");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/video/freerun_mode"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/video/freerun_mode");
-+      permissions_ok = 0;
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/audiodsp/digital_raw"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/audiodsp/digital_raw");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/amhdmitx/amhdmitx0/config"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/amhdmitx/amhdmitx0/config");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/vfm/map"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/vfm/map");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/tsync/enable"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/tsync/enable");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor");
-+    }
-+    if (aml_has_frac_rate_policy() && !SysfsUtils::HasRW("/sys/class/amhdmitx/amhdmitx0/frac_rate_policy"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/amhdmitx/amhdmitx0/frac_rate_policy");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/di/parameters/bypass_prog"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/di/parameters/bypass_prog");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/display/mode"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/display/mode");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/class/amhdmitx/amhdmitx0/phy"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/class/amhdmitx/amhdmitx0/phy");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_support"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_support");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_width"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_width");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_height"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_height");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/amvideo/parameters/framepacking_blank"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvideo/parameters/framepacking_blank");
-+    }
-+    if (!SysfsUtils::HasRW("/sys/module/amvdec_h264mvc/parameters/view_mode"))
-+    {
-+      CLog::Log(LOGERROR, "AML: no rw on /sys/module/amvdec_h264mvc/parameters/view_mode");
-+    }
-+  }
++	permissions_ok = aml_check_permission(sysfs_mandatory, true) ? 1 : 0;
 +
-+  return permissions_ok == 1;
++	aml_check_permission(sysfs_ro, false);
++	aml_check_permission(sysfs_rw, true);
++
++	return permissions_ok == 1;
 +}
 +
 +bool aml_support_hevc()
@@ -12310,22 +12286,6 @@ index 0000000000..91e39cae7a
 +  SysfsUtils::SetInt("/sys/class/graphics/fb1/free_scale", 0);
 +}
 +
-+static bool isMaliBug()
-+{
-+  std::string model;
-+
-+  SysfsUtils::GetString("/proc/device-tree/model", model);
-+  if (model.rfind("Vero4K", 0) == 0)
-+  {
-+    std::string buggyMali;
-+
-+    SysfsUtils::GetString("/sys/firmware/devicetree/base/buggymali", buggyMali);
-+    return buggyMali.rfind("true", 0) == 0;
-+  }
-+
-+  return false;
-+}
-+
 +void aml_calc_framebuffer_resolution(const RESOLUTION_INFO &res, int &width, int &height)
 +{
 +  width = res.iWidth;
@@ -12359,16 +12319,6 @@ index 0000000000..91e39cae7a
 +      vinfo.yres = height;
 +      vinfo.xres_virtual = width;
 +      vinfo.yres_virtual = height*2;
-+
-+      if (isMaliBug())
-+      {
-+        // There seems to be a bug in libMali or the Mali driver which can't handle
-+        // virtual resolutions other than those originally set when libMali was
-+        // initialized.
-+        vinfo.xres_virtual = 4096;
-+        vinfo.yres_virtual = 4410;
-+      }
-+
 +      vinfo.bits_per_pixel = 32;
 +      vinfo.activate = FB_ACTIVATE_ALL;
 +      ioctl(fd0, FBIOPUT_VSCREENINFO, &vinfo);
@@ -13072,10 +13022,10 @@ index 0000000000..26176182a0
 +};
 diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
 new file mode 100644
-index 0000000000..fe3d134e60
+index 0000000000..1d4d92eb50
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.cpp
-@@ -0,0 +1,154 @@
+@@ -0,0 +1,165 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13230,12 +13180,23 @@ index 0000000000..fe3d134e60
 +  }
 +  return false;
 +}
++
++bool SysfsUtils::HasRO(const std::string &path)
++{
++  int fd = open(path.c_str(), O_RDONLY);
++  if (fd >= 0)
++  {
++    close(fd);
++    return true;
++  }
++  return false;
++}
 diff --git a/xbmc/utils/SysfsUtils.h b/xbmc/utils/SysfsUtils.h
 new file mode 100644
-index 0000000000..33fed29754
+index 0000000000..a4228e689d
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.h
-@@ -0,0 +1,24 @@
+@@ -0,0 +1,25 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13259,6 +13220,7 @@ index 0000000000..33fed29754
 +  static int GetIntDec(const std::string& path, uint32_t& val);
 +  static bool Has(const std::string& path);
 +  static bool HasRW(const std::string &path);
++  static bool HasRO(const std::string &path);
 +};
 diff --git a/xbmc/utils/SystemInfo.cpp b/xbmc/utils/SystemInfo.cpp
 index 4bf6f3f447..12a95c118a 100644
@@ -14043,10 +14005,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..982056b20e
+index 0000000000..eafc14bc9f
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,545 @@
+@@ -0,0 +1,535 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14269,16 +14231,6 @@ index 0000000000..982056b20e
 +
 +bool CWinSystemAmlogic::InitWindowSystem()
 +{
-+  const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-+
-+  if (!aml_support_av1()) {
-+	auto setting = settings->GetSetting(CSettings::SETTING_VIDEOPLAYER_USEAMCODECAV1);
-+	if (setting) {
-+		setting->SetVisible(false);
-+		settings->SetBool(CSettings::SETTING_VIDEOPLAYER_USEAMCODECAV1, false);
-+	}
-+  }
-+
 +  m_nativeDisplay = EGL_DEFAULT_DISPLAY;
 +
 +  CDVDVideoCodecAmlogic::Register();
@@ -14672,10 +14624,10 @@ index 0000000000..09a13a911d
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
 new file mode 100644
-index 0000000000..45985dbd3b
+index 0000000000..a773bc73d9
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
-@@ -0,0 +1,208 @@
+@@ -0,0 +1,180 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14696,8 +14648,6 @@ index 0000000000..45985dbd3b
 +#include "windowing/WindowSystemFactory.h"
 +#include "windowing/GraphicContext.h"
 +
-+#include "OSMCSecureOS.h"
-+
 +using namespace KODI;
 +using namespace KODI::WINDOWING::AML;
 +
@@ -14713,17 +14663,6 @@ index 0000000000..45985dbd3b
 +
 +bool CWinSystemAmlogicGLESContext::InitWindowSystem()
 +{
-+  m_is_vero_4k = OSMCSecureOS::getInstance().isVero4k();
-+  if (m_is_vero_4k) {
-+    std::string fb = "/dev/" + m_framebuffer_name;
-+
-+    m_fb_fd = open(fb.c_str(), O_RDWR);
-+    if (m_fb_fd < 0) {
-+      CLog::Log(LOGERROR, "CWinSystemAmlogicGLESContext: unable to open frame buffer {}", fb);
-+      return false;
-+    }
-+  }
-+
 +  if (!CWinSystemAmlogic::InitWindowSystem())
 +  {
 +    return false;
@@ -14750,15 +14689,6 @@ index 0000000000..45985dbd3b
 +  if (!m_pGLContext.CreateContext(contextAttribs))
 +  {
 +    return false;
-+  }
-+
-+  return true;
-+}
-+
-+bool CWinSystemAmlogicGLESContext::DestroyWindowSystem()
-+{
-+  if (m_is_vero_4k && m_fb_fd >= 0) {
-+    close(m_fb_fd);
 +  }
 +
 +  return true;
@@ -14838,12 +14768,6 @@ index 0000000000..45985dbd3b
 +      (*i)->OnResetDisplay();
 +  }
 +
-+  if (m_is_vero_4k) {
-+    // libMali on 4k/4k+ doesn't honor vsync
-+    unsigned int zero=0;
-+    (void) ioctl(m_fb_fd, FBIO_WAITFORVSYNC, &zero);
-+  }
-+
 +  // Ignore errors - eglSwapBuffers() sometimes fails during modeswaps on AML,
 +  // there is probably nothing we can do about it
 +  m_pGLContext.TrySwapBuffers();
@@ -14886,10 +14810,10 @@ index 0000000000..45985dbd3b
 +}
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
 new file mode 100644
-index 0000000000..b4236a7f82
+index 0000000000..dc220ddc1e
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,60 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14915,7 +14839,7 @@ index 0000000000..b4236a7f82
 +class CWinSystemAmlogicGLESContext : public CWinSystemAmlogic, public CRenderSystemGLES
 +{
 +public:
-+  CWinSystemAmlogicGLESContext() : m_is_vero_4k(false), m_fb_fd(-1) {}
++  CWinSystemAmlogicGLESContext() = default;
 +  virtual ~CWinSystemAmlogicGLESContext() = default;
 +
 +  static void Register();
@@ -14924,7 +14848,6 @@ index 0000000000..b4236a7f82
 +  // Implementation of CWinSystemBase via CWinSystemAmlogic
 +  CRenderSystemBase *GetRenderSystem() override { return this; }
 +  bool InitWindowSystem() override;
-+  bool DestroyWindowSystem() override;
 +  bool CreateNewWindow(const std::string& name,
 +                       bool fullScreen,
 +                       RESOLUTION_INFO& res) override;
@@ -14946,10 +14869,6 @@ index 0000000000..b4236a7f82
 +
 +private:
 +  CEGLContextUtils m_pGLContext;
-+
-+  bool m_is_vero_4k;
-+  int m_fb_fd;
-+
 +};
 +
 +}
