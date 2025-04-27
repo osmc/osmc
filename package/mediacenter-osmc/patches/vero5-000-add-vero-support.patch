@@ -3001,7 +3001,7 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..0adf2a7b6e
+index 0000000000..6523b5d8c1
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 @@ -0,0 +1,1347 @@
@@ -3354,7 +3354,7 @@ index 0000000000..0adf2a7b6e
 +	params.video_pid    = m_am_private->video_pid;
 +	params.video_type   = m_am_private->video_format;
 +	params.stream_type  = STREAM_TYPE_ES_VIDEO;
-+	params.decoder_type = DECODER_TYPE_SINGLE_MODE;
++	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.video_path   = FRAME_BASE_PATH_AMVIDEO;
 +	params.display_mode	= DISPLAY_MODE_AMVIDEO;
 +	params.format       = m_am_private->video_codec_type;
@@ -4817,10 +4817,10 @@ index 0000000000..0c7740448b
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp
 new file mode 100644
-index 0000000000..fb19686a31
+index 0000000000..a22fa8ec8c
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp
-@@ -0,0 +1,584 @@
+@@ -0,0 +1,583 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4949,7 +4949,6 @@ index 0000000000..fb19686a31
 +	DVCodec::setupVideoCodecParams(params);
 +
 +	params.format = VIDEO_DEC_FORMAT_AV1;
-+	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.param = (void*) EXTERNAL_PTS;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
@@ -5619,10 +5618,10 @@ index 0000000000..f62fd4a687
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
 new file mode 100644
-index 0000000000..8d94b84de1
+index 0000000000..7fa8cf3a86
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
-@@ -0,0 +1,240 @@
+@@ -0,0 +1,244 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5740,6 +5739,10 @@ index 0000000000..8d94b84de1
 +void H264Codec::setupVideoCodecParams(aml_generic_param &params) const
 +{
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
++
++	if (m_isMvc) {
++		params.decoder_type = DECODER_TYPE_SINGLE_MODE;
++	}
 +
 +	params.param = (void*) EXTERNAL_PTS;
 +	// h264 in an avi file
@@ -5921,10 +5924,10 @@ index 0000000000..7261cebbcb
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
 new file mode 100644
-index 0000000000..ab420bcddc
+index 0000000000..b2db77af9d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/HEVCCodec.cpp
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,136 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6014,7 +6017,6 @@ index 0000000000..ab420bcddc
 +{
 +	DVCodec::setupVideoCodecParams(params);
 +
-+	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.param = (void*) EXTERNAL_PTS;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
@@ -7034,10 +7036,10 @@ index 0000000000..b590b4d18e
 +
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.cpp
 new file mode 100644
-index 0000000000..9e178484a8
+index 0000000000..e21a32b65f
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VC1Codec.cpp
-@@ -0,0 +1,371 @@
+@@ -0,0 +1,372 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -7118,6 +7120,7 @@ index 0000000000..9e178484a8
 +{
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
 +
++	params.decoder_type = DECODER_TYPE_SINGLE_MODE;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) UNSTABLE_PTS;
 +	}
@@ -7459,10 +7462,10 @@ index 0000000000..19a19e3fd5
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VP9Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VP9Codec.cpp
 new file mode 100644
-index 0000000000..60b9c6cb89
+index 0000000000..ad889756d4
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/VP9Codec.cpp
-@@ -0,0 +1,222 @@
+@@ -0,0 +1,221 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -7679,7 +7682,6 @@ index 0000000000..60b9c6cb89
 +{
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
 +
-+	params.decoder_type = DECODER_TYPE_FRAME_MODE;
 +	params.param = (void*) EXTERNAL_PTS;
 +	if (m_hints.ptsinvalid) {
 +		params.param = (void*) (EXTERNAL_PTS | SYNC_OUTSIDE);
@@ -10379,7 +10381,7 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index 51bbbc514a..17224fd135 100644
+index 51bbbc514a..cc1b5aeb29 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 @@ -26,6 +26,8 @@
@@ -10485,6 +10487,15 @@ index 51bbbc514a..17224fd135 100644
  
      m_presentstep = PRESENT_FLIP;
      m_discard.push_back(m_presentsource);
+@@ -1224,7 +1216,7 @@ void CRenderManager::PrepareNextRender()
+ 
+     m_playerPort->UpdateRenderBuffers(m_queued.size(), m_discard.size(), m_free.size());
+   }
+-  else if (!combined && renderPts > (nextFramePts - frametime))
++  else if (!combined && renderPts > (nextFramePts - frametime/2.))
+   {
+     m_lateframes = 0;
+     m_presentstep = PRESENT_FLIP;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
 index 5bb02199e7..41c87b778a 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
