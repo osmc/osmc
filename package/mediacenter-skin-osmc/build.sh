@@ -20,10 +20,10 @@ then
 fi
 }
 
-REV="1b447caf4a511a3538e822af7c32b373778084c3"
-SCOPE_REV="d6b7d76e666759a528fcbe1ed84640857bdafc31"
-FOURTOTHREE_REV="5c1c2b50027c4807b97bb9ea768e1ad77e3d5826"
-TWENTYONETONINE_REV="964c69f725589d85507ee7e1978d919439bd530f"
+REV="d6a25eb3ec2fc1bf4fb1b74b7c873d3f7a585739"
+SCOPE_REV="9a7471c6681b0b014ab989da4559085b6c91864b"
+FOURTOTHREE_REV="5a7d23b17a6ca071ce4e0f778b988b19f83da83a"
+TWENTYONETONINE_REV="0b28aa279bd962678ad70401b444c41ce159e7eb"
 echo -e "Building package mediacenter-skin-osmc"
 echo -e "Downloading skin"
 pull_source "https://github.com/osmc/skin.osmc/archive/${REV}.tar.gz" "$(pwd)/src"
