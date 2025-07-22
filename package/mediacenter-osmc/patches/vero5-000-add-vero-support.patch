@@ -1263,7 +1263,7 @@ index 79686abc9b..84aa11512c 100644
      /// necessary.
      ///
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index b0ca43bfaf..be3732ff3b 100644
+index b0ca43bfaf..361b0c41b6 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
 @@ -139,6 +139,7 @@
@@ -1311,15 +1311,16 @@ index b0ca43bfaf..be3732ff3b 100644
    case TMSG_NETWORKMESSAGE:
      m_ServiceManager->GetNetwork().NetworkMessage(static_cast<CNetworkBase::EMESSAGE>(pMsg->param1),
                                                    pMsg->param2);
-@@ -2641,6 +2661,7 @@ void CApplication::PlaybackCleanup()
+@@ -2641,7 +2661,7 @@ void CApplication::PlaybackCleanup()
      else
      {
        //  resets to res_desktop or look&feel resolution (including refreshrate)
+-      CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false);
 +      SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/aspect", 2);
-       CServiceBroker::GetWinSystem()->GetGfxContext().SetFullScreenVideo(false);
      }
  #ifdef TARGET_DARWIN_EMBEDDED
-@@ -3700,7 +3721,7 @@ void CApplication::SetLoggingIn(bool switchingProfiles)
+     CDarwinUtils::SetScheduling(false);
+@@ -3700,7 +3720,7 @@ void CApplication::SetLoggingIn(bool switchingProfiles)
  void CApplication::PrintStartupLog()
  {
    CLog::Log(LOGINFO, "-----------------------------------------------------------------------");
@@ -3001,10 +3002,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..6523b5d8c1
+index 0000000000..85323e638f
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1347 @@
+@@ -0,0 +1,1346 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3184,7 +3185,6 @@ index 0000000000..6523b5d8c1
 +	m_amlVideoFile.reset();
 +	setVfmMap("default", m_defaultVfmMap);
 +	m_amlVideoFile = nullptr;
-+	SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", "now");
 +}
 +
 +void AMLInsecureVideoCodec::showMainVideo(const bool show)
@@ -5470,10 +5470,10 @@ index 0000000000..07efe40027
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..9bcd4a7b2e
+index 0000000000..3fcd0b992b
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
-@@ -0,0 +1,101 @@
+@@ -0,0 +1,103 @@
 +/*
 + *  Copyright (C) 2024 OSMC
 + *
@@ -5527,6 +5527,7 @@ index 0000000000..9bcd4a7b2e
 +void DVCodec::setupDolbyVision(const CDVDStreamInfo &hints)
 +{
 +	bool isProfile4 = hints.dovi.dv_profile == 4;
++	bool isSDR = hints.colorPrimaries == 1;
 +	bool isProfile8HLG = hints.dovi.dv_profile == 8
 +			&& hints.dovi.dv_bl_signal_compatibility_id == 4;
 +	bool isProfile10 = hints.dovi.dv_profile == 10;
@@ -5535,7 +5536,7 @@ index 0000000000..9bcd4a7b2e
 +	uint32_t dvFlags = 5;
 +
 +	bool enable_dv = hints.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION && isDolbyVisionSupported()
-+			&& !isProfile4 && !isProfile8HLG;
++			&& !isProfile4 && !isSDR && !isProfile8HLG;
 +
 +	if (SysfsUtils::GetIntDec("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
 +		CLog::Log(LOGERROR, "DVCodec: Failed to get DV flags");
@@ -5575,7 +5576,7 @@ index 0000000000..9bcd4a7b2e
 +
 +	params.use_dv_vpath = m_dv_enabled;
 +}
-\ No newline at end of file
++
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h
 new file mode 100644
 index 0000000000..f62fd4a687
@@ -9494,7 +9495,7 @@ index a8ffb9807b..25f43406b0 100644
      }
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 8d0676b819..fde4e210d3 100644
+index 8d0676b819..37476b8fdd 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 @@ -1328,17 +1328,14 @@ void CVideoPlayer::Prepare()
@@ -9654,7 +9655,7 @@ index 8d0676b819..fde4e210d3 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3780,6 +3776,24 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3780,6 +3776,29 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -9662,7 +9663,10 @@ index 8d0676b819..fde4e210d3 100644
 +    if (m_playerOptions.fullscreen && CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenRoot() &&
 +        hint.fpsrate != 0 && hint.fpsscale != 0)
 +    {
-+      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
++      bool forceDVmodeswitch = hint.dovi.dv_profile > 0 && hint.dovi.dv_profile != 4;
++
++      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF ||
++        forceDVmodeswitch)
 +      {
 +        double framerate = DVD_TIME_BASE / CDVDCodecUtils::NormalizeFrameduration((double)DVD_TIME_BASE * hint.fpsscale / hint.fpsrate);
 +
@@ -9671,7 +9675,9 @@ index 8d0676b819..fde4e210d3 100644
 +        uint32_t mode3dFlags = CServiceBroker::GetWinSystem()->GetGfxContext().ConvertRenderStereoModeToMode3dFlags(rsm);
 +
 +        RESOLUTION res = CResolutionUtils::ChooseBestResolution(static_cast<float>(framerate), hint.width, hint.height, mode3dFlags);
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
++        forceDVmodeswitch &= 
++          (res == CServiceBroker::GetWinSystem()->GetGfxContext().GetVideoResolution());
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, forceDVmodeswitch);
 +        m_renderManager.TriggerUpdateResolution(framerate, hint.width, hint.height, hint.stereo_mode);
 +      }
 +    }
@@ -9679,7 +9685,7 @@ index 8d0676b819..fde4e210d3 100644
      player->SendMessage(std::make_shared<CDVDMsgBool>(CDVDMsg::GENERAL_PAUSE, m_displayLost), 1);
  
      // look for any EDL files
-@@ -3970,6 +3984,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3970,6 +3989,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -9687,7 +9693,7 @@ index 8d0676b819..fde4e210d3 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -4017,7 +4032,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -4017,7 +4037,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -9697,7 +9703,7 @@ index 8d0676b819..fde4e210d3 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
-@@ -4909,15 +4925,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4909,15 +4930,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -13315,7 +13321,7 @@ index 35025c517b..fa8604682b 100644
                current = idx;
              idx++;
 diff --git a/xbmc/windowing/GraphicContext.cpp b/xbmc/windowing/GraphicContext.cpp
-index e3300e925c..3e179f1fb6 100644
+index e3300e925c..f417feab34 100644
 --- a/xbmc/windowing/GraphicContext.cpp
 +++ b/xbmc/windowing/GraphicContext.cpp
 @@ -14,6 +14,7 @@
@@ -13386,7 +13392,7 @@ index e3300e925c..3e179f1fb6 100644
  // call SetVideoResolutionInternal and ensure its done from mainthread
  void CGraphicContext::SetVideoResolution(RESOLUTION res, bool forceUpdate)
  {
-@@ -405,6 +443,12 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
+@@ -405,6 +443,18 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
      res = RES_DESKTOP;
    }
  
@@ -13396,10 +13402,16 @@ index e3300e925c..3e179f1fb6 100644
 +    forceUpdate = 1;
 +  }
 +
++  if (CServiceBroker::GetWinSystem()->GetCurrentBitdepth() == 8 && res == lastRes)
++  {
++    // probably finishing a DV stream
++    forceUpdate = 1;
++  }
++
    // If we are switching to the same resolution and same window/full-screen, no need to do anything
    if (!forceUpdate && res == lastRes && m_bFullScreenRoot == CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_fullScreen)
    {
-@@ -433,10 +477,19 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
+@@ -433,10 +483,19 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
    int origScreenWidth = m_iScreenWidth;
    int origScreenHeight = m_iScreenHeight;
    float origFPSOverride = m_fFPSOverride;
@@ -13419,7 +13431,7 @@ index e3300e925c..3e179f1fb6 100644
    bool switched = false;
    if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_fullScreen)
    {
-@@ -460,7 +513,7 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
+@@ -460,7 +519,7 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
      SetStereoView(RENDER_STEREO_VIEW_OFF);
  
      // update anyone that relies on sizing information
@@ -13428,7 +13440,7 @@ index e3300e925c..3e179f1fb6 100644
  
      CGUIComponent *gui = CServiceBroker::GetGUI();
      if (gui)
-@@ -472,6 +525,8 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
+@@ -472,6 +531,8 @@ void CGraphicContext::SetVideoResolutionInternal(RESOLUTION res, bool forceUpdat
      m_iScreenWidth = origScreenWidth;
      m_iScreenHeight = origScreenHeight;
      m_fFPSOverride = origFPSOverride;
@@ -13437,7 +13449,7 @@ index e3300e925c..3e179f1fb6 100644
      if (IsValidResolution(lastRes))
      {
        m_Resolution = lastRes;
-@@ -573,10 +628,18 @@ void CGraphicContext::ResetScreenParameters(RESOLUTION res)
+@@ -573,10 +634,18 @@ void CGraphicContext::ResetScreenParameters(RESOLUTION res)
  {
    RESOLUTION_INFO& info = CDisplaySettings::GetInstance().GetResolutionInfo(res);
  
@@ -13460,7 +13472,7 @@ index e3300e925c..3e179f1fb6 100644
    ResetOverscan(res, info.Overscan);
  }
  
-@@ -599,33 +662,6 @@ const RESOLUTION_INFO CGraphicContext::GetResInfo(RESOLUTION res) const
+@@ -599,33 +668,6 @@ const RESOLUTION_INFO CGraphicContext::GetResInfo(RESOLUTION res) const
  {
    RESOLUTION_INFO info = CDisplaySettings::GetInstance().GetResolutionInfo(res);
  
@@ -13494,7 +13506,7 @@ index e3300e925c..3e179f1fb6 100644
    if (res == m_Resolution && m_fFPSOverride != 0)
    {
      info.fRefreshRate = m_fFPSOverride;
-@@ -985,13 +1021,6 @@ const std::string& CGraphicContext::GetMediaDir() const
+@@ -985,13 +1027,6 @@ const std::string& CGraphicContext::GetMediaDir() const
  void CGraphicContext::Flip(bool rendered, bool videoLayer)
  {
    CServiceBroker::GetRenderSystem()->PresentRender(rendered, videoLayer);
@@ -13849,7 +13861,7 @@ index f1d40bf2f0..0ba9b62ba5 100644
  
  std::vector<RESOLUTION_WHR> CWinSystemBase::ScreenResolutions(float refreshrate)
 diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
-index 88218db9e0..e50e624e47 100644
+index 88218db9e0..d074151d19 100644
 --- a/xbmc/windowing/WinSystem.h
 +++ b/xbmc/windowing/WinSystem.h
 @@ -235,6 +235,10 @@ public:
@@ -13863,6 +13875,15 @@ index 88218db9e0..e50e624e47 100644
    /*!
     * \brief Return true when HDR display is available and enabled in settings
     *
+@@ -260,6 +264,8 @@ public:
+    */
+   std::pair<bool, int> GetDitherSettings();
+ 
++  virtual int GetCurrentBitdepth() {return 10;}
++
+ protected:
+   void UpdateDesktopResolution(RESOLUTION_INFO& newRes, const std::string &output, int width, int height, float refreshRate, uint32_t dwFlags);
+   void UpdateDesktopResolution(RESOLUTION_INFO& newRes,
 diff --git a/xbmc/windowing/amlogic/CMakeLists.txt b/xbmc/windowing/amlogic/CMakeLists.txt
 new file mode 100644
 index 0000000000..5df7176c70
@@ -14016,10 +14037,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..eafc14bc9f
+index 0000000000..550e4413fe
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,535 @@
+@@ -0,0 +1,554 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14555,12 +14576,31 @@ index 0000000000..eafc14bc9f
 +  return 0.5f * guiSdrPeak / 100.0f + 0.5f;
 +}
 +
++int CWinSystemAmlogic::GetCurrentBitdepth()
++{
++  std::string config = "";
++  char const* bdPos;
++  int bitdepth = 10;
++  std::string dv_enabled;
++
++  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/config", config);
++  SysfsUtils::GetString("/sys/module/amdolby_vision/parameters/dolby_vision_enable", dv_enabled);
++  if ((bdPos = std::strstr(config.c_str(), "-bit")) && std::strcmp(dv_enabled.c_str(), "N") == 0)
++  {
++    bitdepth = std::stoi(bdPos - 1, nullptr, 10);
++    if(bitdepth != 8)
++      bitdepth +=10;
++  }
++
++  return bitdepth;
++}
++
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
 new file mode 100644
-index 0000000000..09a13a911d
+index 0000000000..5470f97f78
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,73 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14604,6 +14644,7 @@ index 0000000000..09a13a911d
 +  CHDRCapabilities GetDisplayHDRCapabilities() const override;
 +  bool IsHDRDisplay() override;
 +  float GetGuiSdrPeakLuminance() const override;
++  int GetCurrentBitdepth() override;
 +  bool m_monitorEvents;
 +  std::string m_lastEdid;
 +  
