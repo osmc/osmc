@@ -2373,10 +2373,10 @@ index 6c4156fd42..80d74c3ada 100644
    int qscale_type;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..412765cd37
+index 0000000000..157bd43ba5
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -0,0 +1,312 @@
+@@ -0,0 +1,310 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2638,9 +2638,12 @@ index 0000000000..412765cd37
 +  {
 +    pVideoPicture->SetParams(m_videobuffer);
 +
++    if (m_codecControlFlags & DVD_CODEC_CTRL_DROP) {
++      pVideoPicture->iFlags |= DVP_FLAG_DROPPED;
++    }
++
 +    pVideoPicture->videoBuffer = m_videoBufferPool->Get();
-+    static_cast<CAMLVideoBuffer*>(pVideoPicture->videoBuffer)->Set(this, m_codec,
-+     m_codec->getOMXPts(), m_codec->getAmlDuration(), m_codec->getBufferIndex());;
++    static_cast<CAMLVideoBuffer*>(pVideoPicture->videoBuffer)->Set(this, m_codec, m_codec->getOMXPts(), m_codec->getAmlDuration(), m_codec->getBufferIndex());
 +  }
 +
 +  m_aspect_ratio = m_codec->getAspectRatio();
@@ -2673,11 +2676,6 @@ index 0000000000..412765cd37
 +  {
 +    CLog::Log(LOGDEBUG, LOGVIDEO, "{} {:x}->{:x}",  __func__, m_codecControlFlags, flags);
 +    m_codecControlFlags = flags;
-+
-+    if (flags & DVD_CODEC_CTRL_DROP)
-+      m_videobuffer.iFlags |= DVP_FLAG_DROPPED;
-+    else
-+      m_videobuffer.iFlags &= ~DVP_FLAG_DROPPED;
 +
 +    if (m_codec)
 +      m_codec->setDrain((flags & DVD_CODEC_CTRL_DRAIN) != 0);
@@ -10387,7 +10385,7 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index 51bbbc514a..cc1b5aeb29 100644
+index 51bbbc514a..17224fd135 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 @@ -26,6 +26,8 @@
@@ -10493,15 +10491,6 @@ index 51bbbc514a..cc1b5aeb29 100644
  
      m_presentstep = PRESENT_FLIP;
      m_discard.push_back(m_presentsource);
-@@ -1224,7 +1216,7 @@ void CRenderManager::PrepareNextRender()
- 
-     m_playerPort->UpdateRenderBuffers(m_queued.size(), m_discard.size(), m_free.size());
-   }
--  else if (!combined && renderPts > (nextFramePts - frametime))
-+  else if (!combined && renderPts > (nextFramePts - frametime/2.))
-   {
-     m_lateframes = 0;
-     m_presentstep = PRESENT_FLIP;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
 index 5bb02199e7..41c87b778a 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
@@ -11493,10 +11482,10 @@ index dad5da5528..4a9211342e 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..661b765b79
+index 0000000000..c06dd7b93f
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,918 @@
+@@ -0,0 +1,916 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11528,10 +11517,8 @@ index 0000000000..661b765b79
 +#include <sys/ioctl.h>
 +
 +static const char *sysfs_mandatory[] = {
-+		"/dev/amstream_mpts",
 +		"/dev/amvideo",
 +		"/dev/video10",
-+		"/sys/class/tsync/pts_pcrscr",
 +		"/sys/class/video/axis",
 +		"/sys/class/video/disable_video",
 +		"/sys/class/video/freerun_mode",
@@ -13039,10 +13026,10 @@ index 0000000000..26176182a0
 +};
 diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
 new file mode 100644
-index 0000000000..1d4d92eb50
+index 0000000000..c25960ac13
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.cpp
-@@ -0,0 +1,165 @@
+@@ -0,0 +1,142 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13061,156 +13048,133 @@ index 0000000000..1d4d92eb50
 +#include <fcntl.h>
 +#include <string.h>
 +
-+int SysfsUtils::SetString(const std::string& path, const std::string& valstr)
++
++int SysfsUtils::SetString(const std::string &path, const std::string &valstr)
 +{
 +  int fd = open(path.c_str(), O_RDWR, 0644);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    if (write(fd, valstr.c_str(), valstr.size()) < 0)
-+      ret = -1;
-+    close(fd);
-+  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
 +
-+  return ret;
++  if (fd < 0) {
++    CLog::Log(LOGERROR, "{}: error opening '{}' for writing", __FUNCTION__, path.c_str());
++    return -1;
++  }
++
++  if (write(fd, valstr.c_str(), valstr.size()) < 0) {
++    CLog::Log(LOGERROR, "{}: error writing to '{}'", __FUNCTION__, path.c_str());
++    close(fd);
++    return -1;
++  }
++
++  close(fd);
++
++  return 0;
 +}
 +
-+int SysfsUtils::GetString(const std::string& path, std::string& valstr)
++int SysfsUtils::GetString(const std::string &path, std::string &valstr)
 +{
++  valstr.clear();
++
++  int fd = open(path.c_str(), O_RDONLY);
++
++  if (fd < 0) {
++    CLog::Log(LOGERROR, "{}: error opening '{}' for reading", __FUNCTION__, path.c_str());
++    return -1;
++  }
++
 +  int len;
-+  char buf[256] = {0};
++  char buf[256] = { 0 };
 +
-+  int fd = open(path.c_str(), O_RDONLY);
-+  if (fd >= 0)
-+  {
++  while ((len = read(fd, buf, sizeof(buf))) > 0) {
++    valstr.append(buf, len);
++  }
++
++  close(fd);
++
++  if (len < 0) {
++    CLog::Log(LOGERROR, "{}: error reading from '{}'", __FUNCTION__, path.c_str());
 +    valstr.clear();
-+    while ((len = read(fd, buf, 256)) > 0)
-+      valstr.append(buf, len);
-+    close(fd);
-+
-+    StringUtils::Trim(valstr);
-+
-+    return 0;
++    return -1;
 +  }
 +
-+  CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
-+  valstr = "fail";
-+  return -1;
++  StringUtils::Trim(valstr);
++
++  return 0;
 +}
 +
-+int SysfsUtils::SetInt(const std::string& path, const int val)
++int SysfsUtils::SetInt(const std::string &path, const int val)
 +{
-+  int fd = open(path.c_str(), O_RDWR, 0644);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    sprintf(bcmd, "%d", val);
-+    if (write(fd, bcmd, strlen(bcmd)) < 0)
-+      ret = -1;
-+    close(fd);
-+  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
++  char bcmd[16];
 +
-+  return ret;
++  snprintf(bcmd, sizeof(bcmd), "%d", val);
++
++  return SetString(path, bcmd);
 +}
 +
-+int SysfsUtils::SetUInt32(const std::string& path, const uint32_t val)
++int SysfsUtils::SetUInt32(const std::string &path, const uint32_t val)
 +{
-+  int fd = open(path.c_str(), O_RDWR, 0644);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    sprintf(bcmd, "%u", val);
-+    if (write(fd, bcmd, strlen(bcmd)) < 0)
-+      ret = -1;
-+    close(fd);
-+  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
++  char bcmd[16];
 +
-+  return ret;
++  snprintf(bcmd, sizeof(bcmd), "%u", val);
++
++  return SetString(path, bcmd);
 +}
 +
-+int SysfsUtils::GetInt(const std::string& path, int& val)
++int SysfsUtils::GetInt(const std::string &path, int &val)
 +{
-+  int fd = open(path.c_str(), O_RDONLY);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    if (read(fd, bcmd, sizeof(bcmd)) < 0)
-+      ret = -1;
-+    else
-+      val = strtol(bcmd, NULL, 16);
++  std::string value;
 +
-+    close(fd);
++  if (GetString(path, value)) {
++    return -1;
 +  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
 +
-+  return ret;
++  val = strtol(value.c_str(), NULL, 16);
++
++  return 0;
 +}
 +
-+int SysfsUtils::GetIntDec(const std::string& path, uint32_t& val)
++int SysfsUtils::GetIntDec(const std::string &path, uint32_t &val)
 +{
-+  int fd = open(path.c_str(), O_RDONLY);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    if (read(fd, bcmd, sizeof(bcmd)) < 0)
-+      ret = -1;
-+    else
-+      val = strtoull(bcmd, NULL, 10);
++  std::string value;
 +
-+    close(fd);
++  if (GetString(path, value)) {
++    return -1;
 +  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
 +
-+  return ret;
++  val = strtoull(value.c_str(), NULL, 10);
++
++  return 0;
 +}
 +
 +bool SysfsUtils::Has(const std::string &path)
 +{
-+  int fd = open(path.c_str(), O_RDONLY);
-+  if (fd >= 0)
-+  {
-+    close(fd);
-+    return true;
-+  }
-+  return false;
++  return HasRO(path);
 +}
 +
 +bool SysfsUtils::HasRW(const std::string &path)
 +{
 +  int fd = open(path.c_str(), O_RDWR);
-+  if (fd >= 0)
-+  {
++
++  if (fd >= 0) {
 +    close(fd);
 +    return true;
 +  }
++
 +  return false;
 +}
 +
 +bool SysfsUtils::HasRO(const std::string &path)
 +{
 +  int fd = open(path.c_str(), O_RDONLY);
-+  if (fd >= 0)
-+  {
++
++  if (fd >= 0) {
 +    close(fd);
 +    return true;
 +  }
++
 +  return false;
 +}
 diff --git a/xbmc/utils/SysfsUtils.h b/xbmc/utils/SysfsUtils.h
 new file mode 100644
-index 0000000000..a4228e689d
+index 0000000000..3d9310c39b
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.h
 @@ -0,0 +1,25 @@
@@ -13229,13 +13193,13 @@ index 0000000000..a4228e689d
 +class SysfsUtils
 +{
 +public:
-+  static int SetString(const std::string& path, const std::string& valstr);
-+  static int GetString(const std::string& path, std::string& valstr);
-+  static int SetInt(const std::string& path, const int val);
-+  static int SetUInt32(const std::string& path, const uint32_t val);
-+  static int GetInt(const std::string& path, int& val);
-+  static int GetIntDec(const std::string& path, uint32_t& val);
-+  static bool Has(const std::string& path);
++  static int SetString(const std::string &path, const std::string &valstr);
++  static int GetString(const std::string &path, std::string &valstr);
++  static int SetInt(const std::string &path, const int val);
++  static int SetUInt32(const std::string &path, const uint32_t val);
++  static int GetInt(const std::string &path, int &val);
++  static int GetIntDec(const std::string &path, uint32_t &val);
++  static bool Has(const std::string &path);
 +  static bool HasRW(const std::string &path);
 +  static bool HasRO(const std::string &path);
 +};
