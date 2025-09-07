@@ -1,6 +1,6 @@
---- /dev/null	2024-12-12 10:25:11.437999914 +0000
-+++ b/.config	2024-12-17 15:02:58.487756483 +0000
-@@ -0,0 +1,6111 @@
+--- /dev/null	2025-09-07 00:34:10.729315351 +0100
++++ b/.config	2025-09-07 01:57:06.452041055 +0100
+@@ -0,0 +1,6116 @@
 +#
 +# Automatically generated file; DO NOT EDIT.
 +# Linux/arm64 4.9.269 Kernel Configuration
@@ -1740,7 +1740,11 @@
 +# Amlogic ATV driver
 +#
 +# CONFIG_AMLOGIC_ATV_DEMOD is not set
-+# CONFIG_AMLOGIC_DEBUG is not set
++CONFIG_AMLOGIC_DEBUG=y
++CONFIG_AMLOGIC_DEBUG_LOCKUP=y
++CONFIG_AMLOGIC_DEBUG_ATRACE=y
++CONFIG_AMLOGIC_DEBUG_FTRACE_PSTORE=y
++CONFIG_AMLOGIC_DEBUG_SCRAMBLER_RAMOOPS=y
 +
 +#
 +# Amlogic defend img file update support
@@ -5281,6 +5285,7 @@
 +CONFIG_RTL8822CS=m
 +# CONFIG_RTL8822CS_OARS_CONCUR is not set
 +CONFIG_OSMC_VIDEOENHANCEMENT=y
++CONFIG_OSMC_PANIC=m
 +
 +#
 +# Firmware Drivers
