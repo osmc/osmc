@@ -1263,7 +1263,7 @@ index 79686abc9b..84aa11512c 100644
      /// necessary.
      ///
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index b0ca43bfaf..361b0c41b6 100644
+index 1791ed607a..d0c3b10247 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
 @@ -139,6 +139,7 @@
@@ -1320,7 +1320,7 @@ index b0ca43bfaf..361b0c41b6 100644
      }
  #ifdef TARGET_DARWIN_EMBEDDED
      CDarwinUtils::SetScheduling(false);
-@@ -3700,7 +3720,7 @@ void CApplication::SetLoggingIn(bool switchingProfiles)
+@@ -3694,7 +3714,7 @@ void CApplication::SetLoggingIn(bool switchingProfiles)
  void CApplication::PrintStartupLog()
  {
    CLog::Log(LOGINFO, "-----------------------------------------------------------------------");
@@ -2338,7 +2338,7 @@ index 452ed873be..539499eb3e 100644
    list(APPEND SOURCES DXVA.cpp)
    list(APPEND HEADERS DXVA.h)
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
-index 37a9d60170..5f5632883e 100644
+index d8554d33b6..c6bad23ed8 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
 @@ -46,6 +46,8 @@ void VideoPicture::Reset()
@@ -2351,7 +2351,7 @@ index 37a9d60170..5f5632883e 100644
    qstride = 0;
    qscale_type = 0;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
-index 6c4156fd42..80d74c3ada 100644
+index adb8b51242..cdeb923753 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 @@ -60,6 +60,8 @@ public:
@@ -2993,10 +2993,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..5519c72c19
+index 0000000000..f98b50c213
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1348 @@
+@@ -0,0 +1,1353 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4067,6 +4067,11 @@ index 0000000000..5519c72c19
 +
 +	CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: {}, pts: {:0.3f}, dur:{:0.3f}ms",
 +		m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000.);
++
++	pVideoPicture->hdrType = m_hints.hdrType;
++	pVideoPicture->color_space = m_hints.colorSpace;
++	pVideoPicture->color_primaries = m_hints.colorPrimaries;
++	pVideoPicture->color_transfer = m_hints.colorTransferCharacteristic;
 +
 +	setPictureStereoMode(pVideoPicture);
 +
@@ -8769,7 +8774,7 @@ index 46337576ab..8f8e8b1bc6 100644
  class CDVDInputStream
  {
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index 832757b92e..2eb915fb57 100644
+index f554ee4f1d..96bf9ae1e8 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 @@ -7,6 +7,7 @@
@@ -8788,7 +8793,7 @@ index 832757b92e..2eb915fb57 100644
  #include "filesystem/BlurayCallback.h"
  #include "filesystem/Directory.h"
  #include "filesystem/SpecialProtocol.h"
-@@ -33,6 +35,7 @@
+@@ -34,6 +36,7 @@
  #include <memory>
  
  #include <libbluray/bluray.h>
@@ -8796,7 +8801,7 @@ index 832757b92e..2eb915fb57 100644
  #include <libbluray/log_control.h>
  
  #define LIBBLURAY_BYTESEEK 0
-@@ -62,7 +65,7 @@ void  bluray_overlay_argb_cb(void *this_gen, const struct bd_argb_overlay_s * co
+@@ -63,7 +66,7 @@ void  bluray_overlay_argb_cb(void *this_gen, const struct bd_argb_overlay_s * co
  #endif
  
  CDVDInputStreamBluray::CDVDInputStreamBluray(IVideoPlayer* player, const CFileItem& fileitem) :
@@ -8805,7 +8810,7 @@ index 832757b92e..2eb915fb57 100644
  {
    m_content = "video/x-mpegts";
    memset(&m_event, 0, sizeof(m_event));
-@@ -172,6 +175,11 @@ bool CDVDInputStreamBluray::Open()
+@@ -184,6 +187,11 @@ bool CDVDInputStreamBluray::Open()
    }
    else if (m_item.IsDiscImage())
    {
@@ -8817,7 +8822,7 @@ index 832757b92e..2eb915fb57 100644
      if (!OpenStream(m_item))
        return false;
  
-@@ -295,6 +303,7 @@ bool CDVDInputStreamBluray::Open()
+@@ -307,6 +315,7 @@ bool CDVDInputStreamBluray::Open()
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::Open - no menus (libmmbd, or profile 6 bdj)  : {}",
                disc_info->no_menu_support);
  #endif
@@ -8825,7 +8830,7 @@ index 832757b92e..2eb915fb57 100644
    }
    else
      CLog::Log(LOGERROR, "CDVDInputStreamBluray::Open - BluRay not detected");
-@@ -402,6 +411,8 @@ void CDVDInputStreamBluray::Close()
+@@ -413,6 +422,8 @@ void CDVDInputStreamBluray::Close()
    m_bd = nullptr;
    m_pstream.reset();
    m_rootPath.clear();
@@ -8834,7 +8839,7 @@ index 832757b92e..2eb915fb57 100644
  }
  
  void CDVDInputStreamBluray::FreeTitleInfo()
-@@ -413,6 +424,41 @@ void CDVDInputStreamBluray::FreeTitleInfo()
+@@ -424,6 +435,41 @@ void CDVDInputStreamBluray::FreeTitleInfo()
    m_clip = nullptr;
  }
  
@@ -8876,7 +8881,7 @@ index 832757b92e..2eb915fb57 100644
  void CDVDInputStreamBluray::ProcessEvent() {
  
    int pid = -1;
-@@ -529,15 +575,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -540,15 +586,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
    }
    case BD_EVENT_PLAYLIST:
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - BD_EVENT_PLAYLIST {}", m_event.param);
@@ -8897,7 +8902,7 @@ index 832757b92e..2eb915fb57 100644
      break;
  
    case BD_EVENT_CHAPTER:
-@@ -622,6 +670,22 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -633,6 +681,22 @@ void CDVDInputStreamBluray::ProcessEvent() {
    m_event.event = BD_EVENT_NONE;
  }
  
@@ -8920,7 +8925,7 @@ index 832757b92e..2eb915fb57 100644
  int CDVDInputStreamBluray::Read(uint8_t* buf, int buf_size)
  {
    int result = 0;
-@@ -935,12 +999,20 @@ int CDVDInputStreamBluray::GetTime()
+@@ -946,12 +1010,20 @@ int CDVDInputStreamBluray::GetTime()
  
  bool CDVDInputStreamBluray::PosTime(int ms)
  {
@@ -8941,7 +8946,7 @@ index 832757b92e..2eb915fb57 100644
    return true;
  }
  
-@@ -962,12 +1034,22 @@ int CDVDInputStreamBluray::GetChapter()
+@@ -973,12 +1045,22 @@ int CDVDInputStreamBluray::GetChapter()
  
  bool CDVDInputStreamBluray::SeekChapter(int ch)
  {
@@ -8964,7 +8969,7 @@ index 832757b92e..2eb915fb57 100644
    return true;
  }
  
-@@ -1041,7 +1123,7 @@ void CDVDInputStreamBluray::GetStreamInfo(int pid, std::string &language)
+@@ -1052,7 +1134,7 @@ void CDVDInputStreamBluray::GetStreamInfo(int pid, std::string &language)
    if(!m_titleInfo || !m_clip)
      return;
  
@@ -8973,7 +8978,7 @@ index 832757b92e..2eb915fb57 100644
      find_stream(pid, m_clip->video_streams, m_clip->video_stream_count, language);
    else if (HDMV_PID_AUDIO_FIRST <= pid && pid <= HDMV_PID_AUDIO_LAST)
      find_stream(pid, m_clip->audio_streams, m_clip->audio_stream_count, language);
-@@ -1207,6 +1289,25 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
+@@ -1218,6 +1300,25 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
    return MenuType::NONE;
  }
  
@@ -9000,7 +9005,7 @@ index 832757b92e..2eb915fb57 100644
  {
    int region = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_BLURAY_PLAYERREGION);
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-index 06539f48b2..733d5a01e4 100644
+index fc7940bbed..ab79c5fce2 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 @@ -30,7 +30,8 @@ extern "C"
@@ -9036,7 +9041,7 @@ index 06539f48b2..733d5a01e4 100644
  
    /* IMenus */
    void ActivateButton() override { UserInput(BD_VK_ENTER); }
-@@ -185,12 +195,18 @@ protected:
+@@ -186,12 +196,18 @@ protected:
      bool OpenStream(CFileItem &item);
      void SetupPlayerSettings();
      void FreeTitleInfo();
@@ -9492,10 +9497,10 @@ index a8ffb9807b..25f43406b0 100644
      }
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 8d0676b819..37476b8fdd 100644
+index 5a42065fc9..fbcc6b0e09 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -1328,17 +1328,14 @@ void CVideoPlayer::Prepare()
+@@ -1334,17 +1334,14 @@ void CVideoPlayer::Prepare()
      if (m_pDemuxer)
      {
        if (m_pDemuxer->SeekTime(starttime, true, &startpts))
@@ -9514,7 +9519,7 @@ index 8d0676b819..37476b8fdd 100644
          CLog::Log(LOGDEBUG, "{} - starting subtitle demuxer from: {}", __FUNCTION__, starttime);
        else
          CLog::Log(LOGDEBUG, "{} - failed to start subtitle demuxing from: {}", __FUNCTION__,
-@@ -1568,6 +1565,11 @@ void CVideoPlayer::Process()
+@@ -1574,6 +1571,11 @@ void CVideoPlayer::Process()
      CheckBetterStream(m_CurrentRadioRDS, pStream);
      CheckBetterStream(m_CurrentAudioID3, pStream);
  
@@ -9526,7 +9531,7 @@ index 8d0676b819..37476b8fdd 100644
      // demux video stream
      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
      {
-@@ -1728,6 +1730,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+@@ -1734,6 +1736,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
@@ -9538,7 +9543,7 @@ index 8d0676b819..37476b8fdd 100644
    m_VideoPlayerVideo->SendMessage(std::make_shared<CDVDMsgDemuxerPacket>(pPacket, drop));
  
    if (!drop)
-@@ -1872,7 +1879,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1878,7 +1885,7 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        if (cache.level < 0.0)
        {
@@ -9547,7 +9552,7 @@ index 8d0676b819..37476b8fdd 100644
          SetCaching(CACHESTATE_INIT);
        }
        // Note: Previously used cache.level >= 1 would keep video stalled
-@@ -1977,10 +1984,10 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1983,10 +1990,10 @@ void CVideoPlayer::HandlePlaySpeed()
          if (m_CurrentAudio.id >= 0)
          {
            double adjust = -1.0; // a unique value
@@ -9560,7 +9565,7 @@ index 8d0676b819..37476b8fdd 100644
              adjust = 0.0;
  
            if (adjust != -1.0)
-@@ -2020,6 +2027,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2026,6 +2033,7 @@ void CVideoPlayer::HandlePlaySpeed()
               (m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT ||
               m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_INSYNC))
      {
@@ -9568,7 +9573,16 @@ index 8d0676b819..37476b8fdd 100644
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(
-@@ -2167,17 +2175,19 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2051,7 +2059,7 @@ void CVideoPlayer::HandlePlaySpeed()
+         if (m_pInputStream->IsRealtime())
+           clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal - DVD_MSEC_TO_TIME(400);
+         else
+-          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
++          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal;
+ 
+         if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && (m_CurrentVideo.packets > 0))
+         {
+@@ -2173,17 +2181,19 @@ void CVideoPlayer::HandlePlaySpeed()
            error /= errorwin;
          }
  
@@ -9591,7 +9605,7 @@ index 8d0676b819..37476b8fdd 100644
              CDVDMsgPlayerSeek::CMode mode;
              mode.time = iTime;
              mode.backward = (m_playSpeed < 0);
-@@ -2696,14 +2706,14 @@ void CVideoPlayer::HandleMessages()
+@@ -2702,14 +2712,14 @@ void CVideoPlayer::HandleMessages()
        if (m_pInputStream->GetIPosTime() == nullptr)
          time -= m_State.time_offset/1000l;
  
@@ -9609,7 +9623,7 @@ index 8d0676b819..37476b8fdd 100644
          }
          // dts after successful seek
          if (start == DVD_NOPTS_VALUE)
-@@ -2713,6 +2723,7 @@ void CVideoPlayer::HandleMessages()
+@@ -2719,6 +2729,7 @@ void CVideoPlayer::HandleMessages()
          m_State.lastSeek = m_clock.GetAbsoluteClock();
  
          FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
@@ -9617,7 +9631,7 @@ index 8d0676b819..37476b8fdd 100644
        }
        else if (m_pDemuxer)
        {
-@@ -3085,7 +3096,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
+@@ -3091,7 +3102,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
    if(m_caching == state)
      return;
  
@@ -9628,7 +9642,7 @@ index 8d0676b819..37476b8fdd 100644
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -3750,23 +3763,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3756,23 +3769,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
    if (hint.flags & AV_DISPOSITION_ATTACHED_PIC)
      return false;
  
@@ -9652,7 +9666,7 @@ index 8d0676b819..37476b8fdd 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3780,6 +3776,29 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3786,6 +3782,29 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -9682,7 +9696,7 @@ index 8d0676b819..37476b8fdd 100644
      player->SendMessage(std::make_shared<CDVDMsgBool>(CDVDMsg::GENERAL_PAUSE, m_displayLost), 1);
  
      // look for any EDL files
-@@ -3970,6 +3989,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3976,6 +3995,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -9690,7 +9704,7 @@ index 8d0676b819..37476b8fdd 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -4017,7 +4037,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -4023,7 +4043,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -9700,7 +9714,7 @@ index 8d0676b819..37476b8fdd 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
-@@ -4909,15 +4930,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4915,15 +4936,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -9922,10 +9936,10 @@ index 8598052b41..98b41313c0 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..dfaa3925a0
+index 0000000000..e0035f064d
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,217 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10000,10 +10014,26 @@ index 0000000000..dfaa3925a0
 +  // Calculate the input frame aspect ratio.
 +  CalculateFrameAspectRatio(picture.iDisplayWidth, picture.iDisplayHeight);
 +  SetViewMode(m_videoSettings.m_ViewMode);
++
++  // Configure GUI/OSD for HDR PQ when display is in HDR PQ mode
++  if (picture.color_transfer == AVCOL_TRC_SMPTE2084)
++  {
++    if (CServiceBroker::GetWinSystem()->IsHDRDisplay())
++    {
++      CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++    }
++  }
++  else if (picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION)
++  {
++    if (CServiceBroker::GetWinSystem()->GetDisplayHDRCapabilities().SupportsDolbyVision())
++    {
++      CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++    }
++  }
++
 +  ManageRenderArea();
 +
 +  m_bConfigured = true;
-+  m_hdrCheckCount = m_maxChecks;
 +
 +  return true;
 +}
@@ -10113,31 +10143,6 @@ index 0000000000..dfaa3925a0
 +void CRendererAML::RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha)
 +{
 +  ManageRenderArea();
-+  /* are we outputting HDR? */
-+  if (m_hdrCheckCount >= 0)
-+  {
-+    std::string hdmiConfig = "";
-+    if (!SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/config", hdmiConfig))
-+    {
-+      if ((hdmiConfig.find("EOTF: SDR") == std::string::npos &&
-+        hdmiConfig.find("EOTF: HDRgamma") == std::string::npos) ||
-+        hdmiConfig.find("DV type DV") != std::string::npos)
-+      {
-+        CLog::Log(LOGDEBUG, "CRendererAML: Output is HDR ({})", m_maxChecks - m_hdrCheckCount);
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
-+        m_hdrCheckCount = 0;
-+      }
-+      else if (m_hdrCheckCount == 0)
-+      {
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(false);
-+        CLog::Log(LOGDEBUG, "CRendererAML: Output is SDR");
-+      }
-+    }
-+    else
-+      CLog::Log(LOGERROR, "Failed to read hdmitx config");
-+
-+    m_hdrCheckCount -= 1;
-+  }
 +
 +  CAMLVideoBuffer *amli = dynamic_cast<CAMLVideoBuffer *>(m_buffers[index].videoBuffer);
 +  if(amli && amli->m_amlCodec)
@@ -10154,10 +10159,10 @@ index 0000000000..dfaa3925a0
 +}
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 new file mode 100644
-index 0000000000..22f5e12251
+index 0000000000..be598196f8
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,59 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10216,8 +10221,6 @@ index 0000000000..22f5e12251
 +
 +  int m_prevVPts;
 +  bool m_bConfigured;
-+  int m_hdrCheckCount;
-+  const int m_maxChecks = 20;
 +};
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 index dfd4b31227..1774eba28f 100644
@@ -10779,10 +10782,10 @@ index 69a1513627..1dede45766 100644
    // check if we have at least one network interface to wait for
    if (!IsAvailable())
 diff --git a/xbmc/peripherals/Peripherals.cpp b/xbmc/peripherals/Peripherals.cpp
-index 1276cf52d6..ffff84f64f 100644
+index 4fdc64db0b..b51a4243a7 100644
 --- a/xbmc/peripherals/Peripherals.cpp
 +++ b/xbmc/peripherals/Peripherals.cpp
-@@ -1003,6 +1003,10 @@ void CPeripherals::OnApplicationMessage(MESSAGING::ThreadMessage* pMsg)
+@@ -1042,6 +1042,10 @@ void CPeripherals::OnApplicationMessage(MESSAGING::ThreadMessage* pMsg)
        ToggleDeviceState(STATE_ACTIVATE_SOURCE);
        break;
  
@@ -10794,7 +10797,7 @@ index 1276cf52d6..ffff84f64f 100644
        ToggleDeviceState(STATE_STANDBY);
        break;
 diff --git a/xbmc/peripherals/devices/Peripheral.h b/xbmc/peripherals/devices/Peripheral.h
-index 4977cb65eb..5a530894ad 100644
+index 4c6d3c54b3..4c7fd2da6e 100644
 --- a/xbmc/peripherals/devices/Peripheral.h
 +++ b/xbmc/peripherals/devices/Peripheral.h
 @@ -62,7 +62,8 @@ typedef enum
@@ -14125,10 +14128,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..e2922ef099
+index 0000000000..a521cbaac2
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,489 @@
+@@ -0,0 +1,499 @@
 +/*
 + *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14618,12 +14621,22 @@ index 0000000000..e2922ef099
 +
 +  return bitdepth;
 +}
++
++float CWinSystemAmlogic::GetDisplayLatency()
++{
++  if (m_fRefreshRate == 0.) {
++    // default display latency
++    return CWinSystemBase::GetDisplayLatency();
++  }
++
++  return 2000. / m_fRefreshRate;
++}
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
 new file mode 100644
-index 0000000000..86240f6699
+index 0000000000..1a077750b5
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,82 @@
 +/*
 + *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14692,6 +14705,8 @@ index 0000000000..86240f6699
 +  bool DestroyWindow() override;
 +
 +  void UpdateResolutions() override;
++
++  float GetDisplayLatency() override;
 +
 +  bool Hide() override;
 +  bool Show(bool show = true) override;
