@@ -9936,10 +9936,10 @@ index 8598052b41..98b41313c0 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..e0035f064d
+index 0000000000..73ed403b84
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,217 @@
+@@ -0,0 +1,225 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -9960,6 +9960,9 @@ index 0000000000..e0035f064d
 +#include "cores/VideoPlayer/VideoRenderers/RenderFlags.h"
 +#include "settings/AdvancedSettings.h"
 +#include "settings/DisplaySettings.h"
++#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
++#include "settings/SettingsComponent.h"
 +
 +#include "windowing/GraphicContext.h"
 +#include "ServiceBroker.h"
@@ -10006,6 +10009,9 @@ index 0000000000..e0035f064d
 +  m_sourceHeight = picture.iHeight;
 +  m_renderOrientation = orientation;
 +
++  bool forceSDRoutput = 
++    CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) & 1;
++
 +  m_iFlags = GetFlagsChromaPosition(picture.chroma_position) |
 +             GetFlagsColorMatrix(picture.color_space, picture.iWidth, picture.iHeight) |
 +             GetFlagsColorPrimaries(picture.color_primaries) |
@@ -10016,18 +10022,20 @@ index 0000000000..e0035f064d
 +  SetViewMode(m_videoSettings.m_ViewMode);
 +
 +  // Configure GUI/OSD for HDR PQ when display is in HDR PQ mode
-+  if (picture.color_transfer == AVCOL_TRC_SMPTE2084)
-+  {
-+    if (CServiceBroker::GetWinSystem()->IsHDRDisplay())
++  if (!forceSDRoutput) {
++    if (picture.color_transfer == AVCOL_TRC_SMPTE2084)
 +    {
-+      CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++      if (CServiceBroker::GetWinSystem()->IsHDRDisplay())
++      {
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++      }
 +    }
-+  }
-+  else if (picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION)
-+  {
-+    if (CServiceBroker::GetWinSystem()->GetDisplayHDRCapabilities().SupportsDolbyVision())
++    else if (picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION)
 +    {
-+      CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++      if (CServiceBroker::GetWinSystem()->GetDisplayHDRCapabilities().SupportsDolbyVision())
++      {
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++      }
 +    }
 +  }
 +
