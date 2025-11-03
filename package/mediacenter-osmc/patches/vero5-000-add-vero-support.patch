@@ -6537,10 +6537,10 @@ index 0000000000..00b8e6e8f6
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
 new file mode 100644
-index 0000000000..5f0a71c35b
+index 0000000000..939a1b273c
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,152 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6686,12 +6686,19 @@ index 0000000000..5f0a71c35b
 +	extradata = nullptr;
 +	extrasize = 0;
 +}
++
++void MPEG12Codec::setupVideoCodecParams(aml_generic_param &params) const
++{
++	AMLInsecureVideoCodec::setupVideoCodecParams(params);
++
++	params.decoder_type = DECODER_TYPE_SINGLE_MODE;
++}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h
 new file mode 100644
-index 0000000000..b7408f0d4e
+index 0000000000..f53fc4e4c5
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,43 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6717,6 +6724,8 @@ index 0000000000..b7408f0d4e
 +protected:
 +	virtual vformat_t getVideoFormat(const CDVDStreamInfo &hints) const;
 +	virtual vdec_type_t getVideoCodecType(const CDVDStreamInfo &hints) const;
++
++	virtual void setupVideoCodecParams(aml_generic_param &params) const;
 +
 +	virtual void getExtradata(const CDVDStreamInfo &hints, uint8_t *&extradata, unsigned int &extrasize) const;
 +
