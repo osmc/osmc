@@ -1,4 +1,4 @@
-From 4ea00c60c29526fb1892a485605df07a4168b30e Mon Sep 17 00:00:00 2001
+From 9d473039b09bcd7cb653e26825fcc55c4731cfd9 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 2 Jun 2015 22:56:15 +0100
 Subject: [PATCH 01/24] Fix UPower capability detection on Vero
@@ -27,7 +27,7 @@ index bd04197a51..7cb68a19b4 100644
 2.34.1
 
 
-From 9d6f66b8c3a919125ab17a71544dbdcbfa73e63a Mon Sep 17 00:00:00 2001
+From bf954ad8ccb77073db31f617902f0af68a57da45 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Thu, 21 Dec 2017 11:38:02 +0000
 Subject: [PATCH 02/24] Add OSMC Helper routines to improve Kodi integration
@@ -152,7 +152,7 @@ index 0000000000..709d21afbe
 2.34.1
 
 
-From 79d655936208330a6266f89453ff0d0ba1394764 Mon Sep 17 00:00:00 2001
+From 7c28d494bfe47aff8f9489b4d2f57eba9702b6c3 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Sat, 6 Mar 2021 18:29:22 +0000
 Subject: [PATCH 03/24] Enable DRM-PRIME for Raspberry Pi
@@ -194,7 +194,7 @@ index 531974f3f4..89b91db23b 100644
 2.34.1
 
 
-From e16d627bd25324d6cafc19a5c982b31c035ce9a9 Mon Sep 17 00:00:00 2001
+From ebe85abab2d25d077d83a28320869bfbef71b519 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Mon, 20 Jan 2020 16:53:52 +0000
 Subject: [PATCH 04/24] ffmpeg: Add v4l2 support
@@ -23956,7 +23956,7 @@ index 0bbc23540a..1bf9f53499 100644
 2.34.1
 
 
-From b4adec77d8c9b6b933648d022caadd61cbb149cf Mon Sep 17 00:00:00 2001
+From da66b06351de6b4c1bec408ed4f92324a58822e0 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Thu, 14 Jan 2021 18:36:57 +0000
 Subject: [PATCH 05/24] DVDVideoCodecDRMPRIME: Discard corrupt frames
@@ -23983,7 +23983,7 @@ index eb2943bb8c..d8827e8296 100644
 2.34.1
 
 
-From 0f5cf63bd145ed052d53cd58b4e81789f44f1f81 Mon Sep 17 00:00:00 2001
+From 4d514629e749706bc11715814d76cc68ba6378fe Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 3 Dec 2021 16:00:50 +0000
 Subject: [PATCH 06/24] gbm: Set max bpc for high bit depth videos
@@ -24029,7 +24029,7 @@ index 34d1ab6235..f1e73ee364 100644
 2.34.1
 
 
-From 2ea1746e87fafb478b6b486378a24808a10b38ea Mon Sep 17 00:00:00 2001
+From 39ef74ba9b531bb2f140613b04fefd8d9af7da80 Mon Sep 17 00:00:00 2001
 From: Jonas Karlman <jonas@kwiboo.se>
 Date: Sun, 20 Oct 2019 17:10:07 +0000
 Subject: [PATCH 07/24] WIP: DVDVideoCodecDRMPRIME: add support for filters
@@ -24169,7 +24169,7 @@ index db49d165e7..b5cacf1a3c 100644
 2.34.1
 
 
-From 75003f5016459ee73ff4a79fa4f7e5dff9c1ffae Mon Sep 17 00:00:00 2001
+From 727ae43a6e140a569ba7bc5dc96d85757b80095c Mon Sep 17 00:00:00 2001
 From: Jernej Skrabec <jernej.skrabec@siol.net>
 Date: Thu, 26 Dec 2019 11:01:51 +0100
 Subject: [PATCH 08/24] WIP: DRMPRIME deinterlace filter
@@ -24691,7 +24691,7 @@ index b5cacf1a3c..fab3431d40 100644
 2.34.1
 
 
-From 8f86d5e3879968c1e9917ca956acd95a63f8ec06 Mon Sep 17 00:00:00 2001
+From 86cbacc9ec8128eb7666daa4baa41959eee585b6 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 24 Nov 2021 20:22:41 +0000
 Subject: [PATCH 09/24] CDVDVideoCodecDRMPRIME: Fix Format calls and some
@@ -24729,7 +24729,7 @@ index 8476a3981d..ef8819c72b 100644
 2.34.1
 
 
-From d5af79cbbf8ead74343b87b3fddcf44e97c3ad8e Mon Sep 17 00:00:00 2001
+From be0de681dc66e58ead9a82b3a6d3506da5409bc3 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 27 Aug 2021 20:29:50 +0100
 Subject: [PATCH 10/24] DVDVideoCodecDRMPRIME: Avoid exception with
@@ -24756,7 +24756,7 @@ index ef8819c72b..98b0830488 100644
 2.34.1
 
 
-From b890a8cbeaadaf4c9f5905c1255f469417c210d1 Mon Sep 17 00:00:00 2001
+From e2afec1c841601c7d4c8519457f092a5a2e4dd86 Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Sat, 11 Sep 2021 14:03:05 +0100
 Subject: [PATCH 11/24] CDVDVideoCodecDRMPRIME: Also support YUV420 buffers
@@ -24811,7 +24811,7 @@ index 98b0830488..72064b8310 100644
 2.34.1
 
 
-From 0be724dc9baa92a0016241f181d1c19e41f64509 Mon Sep 17 00:00:00 2001
+From 386e71be65e3b2b6e69f519403dfa5f2ab91596f Mon Sep 17 00:00:00 2001
 From: popcornmix <popcornmix@gmail.com>
 Date: Fri, 17 Sep 2021 15:23:16 +0100
 Subject: [PATCH 12/24] DVDVideoCodecDRMPRIME: Leave deinterlace filter active
@@ -24845,7 +24845,7 @@ index 72064b8310..76f9ad49cd 100644
 2.34.1
 
 
-From f7141d650006d867519d848eb506513420c1240f Mon Sep 17 00:00:00 2001
+From c9eb67af4dab45fd8a430cda27d247ca550b695d Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Tue, 30 Nov 2021 16:05:06 +0000
 Subject: [PATCH 13/24] SetVideoInterlaced: Set and unset deinterlace method
@@ -24887,7 +24887,7 @@ index 76f9ad49cd..a49418bc0e 100644
 2.34.1
 
 
-From 1446538b12cae717864c53d7ef73db3cbd03e004 Mon Sep 17 00:00:00 2001
+From 55e93232d2fe0a5f79f18ff76037a1e082be2a66 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 24 Nov 2021 20:21:28 +0000
 Subject: [PATCH 14/24] DVDVideoCodecDRMPRIME: Close deinterlace filter on
@@ -24962,7 +24962,7 @@ index a49418bc0e..fa7c4b28e5 100644
 2.34.1
 
 
-From 7c350dd9584535f0c733582739d40a22eec05a62 Mon Sep 17 00:00:00 2001
+From e612b243171993b5c8b433d720895d18a049b8ef Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 18 Jan 2023 16:41:00 +0000
 Subject: [PATCH 15/24] CDVDVideoCodecDRMPRIME: Adjust av formats to match
@@ -25013,7 +25013,7 @@ index fa7c4b28e5..ced0ebac8d 100644
 2.34.1
 
 
-From e4d9c7294d51e770914802ea44dfd39e19b10091 Mon Sep 17 00:00:00 2001
+From cfab96ee9ef7536761a57aecde302140f09485de Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Mon, 6 Feb 2023 15:19:51 +0000
 Subject: [PATCH 16/24] DVDVideoCodecDRMPRIME: Add support for arbitrary output
@@ -25346,7 +25346,7 @@ index fab3431d40..bb88fde1f9 100644
 2.34.1
 
 
-From d78b29cb61e83e72ada7de04710120f2f1aa09a5 Mon Sep 17 00:00:00 2001
+From ade22ac2a9c74a0a051d51532573c73b30fc4582 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 14 Apr 2023 19:59:42 +0100
 Subject: [PATCH 17/24] DVDVideoCodecDRMPRIME: Remove obsolete
@@ -25372,7 +25372,7 @@ index 62fc0cf822..3ed59af9f7 100644
 2.34.1
 
 
-From 7650e4c0390b2766361c33876d1e57029e3c23ee Mon Sep 17 00:00:00 2001
+From 91747d592bc2dd3d3fae570e36c84417e1fecd41 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Mon, 15 May 2023 12:50:16 +0100
 Subject: [PATCH 18/24] DVDVideoCodecDRMPRIME: Fix missing flush after eof
@@ -25405,7 +25405,7 @@ index 3ed59af9f7..c9ea5d52d5 100644
 2.34.1
 
 
-From f5747b691e19f9a27c99d15ef2da58aaedb1d1be Mon Sep 17 00:00:00 2001
+From 3ada3f75baf16c47561412a48b2ea754ac8def58 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 31 May 2023 19:40:37 +0100
 Subject: [PATCH 19/24] DVDVideoCodecDRMPRIME: Clear m_pFilterGraph
@@ -25430,7 +25430,7 @@ index c9ea5d52d5..a3eecf0aed 100644
 2.34.1
 
 
-From 4fe0dd6e8092bcc8627798277ad788b74383681a Mon Sep 17 00:00:00 2001
+From f6e35dfe026932f30d8dc3bd177b00123637f2e7 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Fri, 2 Jun 2023 11:34:22 +0100
 Subject: [PATCH 20/24] DVDVideoCodecDRMPRIME: Move FilterTest from open to
@@ -25501,7 +25501,7 @@ index bb88fde1f9..df17f89b96 100644
 2.34.1
 
 
-From c0fee9e545745eff9077d986dfcbd4ca9641624a Mon Sep 17 00:00:00 2001
+From bda15dba46ee632fa72888dc867daf8433bc5285 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 31 May 2023 14:19:20 +0100
 Subject: [PATCH 21/24] DVDVideoCodecDRMPRIME: Rework filtering code to handle
@@ -25779,7 +25779,7 @@ index df17f89b96..55675c3c2e 100644
 2.34.1
 
 
-From cf94a887e5401ade8a2d1a3a69bb838ab102c55e Mon Sep 17 00:00:00 2001
+From 80997b0b1c00f5891172c224a946c1136ca100af Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Tue, 20 Jun 2023 15:13:09 +0100
 Subject: [PATCH 22/24] CDVDVideoCodecDRMPRIME: Support decoding to DRMPRIME
@@ -25835,7 +25835,7 @@ index 521a4c174b..326d33e8a0 100644
 2.34.1
 
 
-From cecf7a6be19fa00649454243a7ee673090fa93ba Mon Sep 17 00:00:00 2001
+From ee890867c9fb14141e01807f8ffbe449a7764770 Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Tue, 20 Jun 2023 15:14:02 +0100
 Subject: [PATCH 23/24] DVDVideoCodecDRMPRIME: Request v4l2 buffers be
@@ -25866,7 +25866,7 @@ index 326d33e8a0..8c0d37bf59 100644
 2.34.1
 
 
-From 183e6973d0ba638482d203a17ed9e6066ed397fd Mon Sep 17 00:00:00 2001
+From 26a1c6791d57f23db50d0acc20046b1680415e3c Mon Sep 17 00:00:00 2001
 From: Dom Cobley <popcornmix@gmail.com>
 Date: Wed, 21 Jun 2023 13:16:01 +0100
 Subject: [PATCH 24/24] DVDVideoCodecDRMPRIME: Add setting to enable hw
@@ -25882,10 +25882,10 @@ so allow user to choose appropriate setting.
  4 files changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/addons/resource.language.en_gb/resources/strings.po b/addons/resource.language.en_gb/resources/strings.po
-index e7817e5dbc..11466b6653 100644
+index 98eb7f64b7..148a631527 100644
 --- a/addons/resource.language.en_gb/resources/strings.po
 +++ b/addons/resource.language.en_gb/resources/strings.po
-@@ -7417,6 +7417,11 @@ msgctxt "#13438"
+@@ -7416,6 +7416,11 @@ msgctxt "#13438"
  msgid "Allow hardware acceleration with DRM PRIME"
  msgstr ""
  
@@ -25897,7 +25897,7 @@ index e7817e5dbc..11466b6653 100644
  #: system/settings/settings.xml
  msgctxt "#13439"
  msgid "Allow hardware acceleration - MediaCodec"
-@@ -19603,6 +19608,12 @@ msgctxt "#36172"
+@@ -19602,6 +19607,12 @@ msgctxt "#36172"
  msgid "Enable PRIME decoding of video files"
  msgstr ""
  

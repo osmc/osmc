@@ -1263,7 +1263,7 @@ index 79686abc9b..84aa11512c 100644
      /// necessary.
      ///
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index b0ca43bfaf..361b0c41b6 100644
+index 1791ed607a..d0c3b10247 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
 @@ -139,6 +139,7 @@
@@ -1320,7 +1320,7 @@ index b0ca43bfaf..361b0c41b6 100644
      }
  #ifdef TARGET_DARWIN_EMBEDDED
      CDarwinUtils::SetScheduling(false);
-@@ -3700,7 +3720,7 @@ void CApplication::SetLoggingIn(bool switchingProfiles)
+@@ -3694,7 +3714,7 @@ void CApplication::SetLoggingIn(bool switchingProfiles)
  void CApplication::PrintStartupLog()
  {
    CLog::Log(LOGINFO, "-----------------------------------------------------------------------");
@@ -1354,7 +1354,7 @@ index ed36a27e18..2b4ae95884 100644
    CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
  }
 diff --git a/xbmc/application/ApplicationPowerHandling.cpp b/xbmc/application/ApplicationPowerHandling.cpp
-index 8000a7ee9e..c6d7aef793 100644
+index 8000a7ee9e..6278a7a671 100644
 --- a/xbmc/application/ApplicationPowerHandling.cpp
 +++ b/xbmc/application/ApplicationPowerHandling.cpp
 @@ -16,6 +16,7 @@
@@ -1365,7 +1365,11 @@ index 8000a7ee9e..c6d7aef793 100644
  #include "guilib/GUIComponent.h"
  #include "guilib/GUIMessage.h"
  #include "guilib/GUIWindowManager.h"
-@@ -35,8 +36,14 @@
+@@ -32,11 +33,18 @@
+ #include "pvr/guilib/PVRGUIActionsChannels.h"
+ #include "pvr/guilib/PVRGUIActionsPowerManagement.h"
+ #include "settings/Settings.h"
++#include "settings/VeroSettings.h"
  #include "settings/SettingsComponent.h"
  #include "utils/AlarmClock.h"
  #include "utils/log.h"
@@ -1380,7 +1384,7 @@ index 8000a7ee9e..c6d7aef793 100644
  
  void CApplicationPowerHandling::ResetScreenSaver()
  {
-@@ -144,6 +151,8 @@ bool CApplicationPowerHandling::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPresse
+@@ -144,6 +152,8 @@ bool CApplicationPowerHandling::WakeUpScreenSaverAndDPMS(bool bPowerOffKeyPresse
  
  bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* = false */)
  {
@@ -1389,7 +1393,7 @@ index 8000a7ee9e..c6d7aef793 100644
    if (m_iScreenSaveLock == 2)
      return false;
  
-@@ -222,6 +231,57 @@ bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* =
+@@ -222,6 +232,57 @@ bool CApplicationPowerHandling::WakeUpScreenSaver(bool bPowerOffKeyPressed /* =
      return false;
  }
  
@@ -1418,7 +1422,7 @@ index 8000a7ee9e..c6d7aef793 100644
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- Toggle LED brightness to {}", sysfs_toggle);
 +  SysfsUtils::SetInt("/sys/class/leds/standby/brightness", ! sysfs_toggle);
 +  std::string hpdlock = "hpd_lock1";
-+  if (m_bVeroStandby && ! CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD))
++  if (m_bVeroStandby && ! CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(VeroSettings::SETTING_VIDEOSCREEN_LOCKHPD))
 +	hpdlock = "hpd_lock0";
 +  CLog::Log(LOGINFO, "CApplication::ToggleStandby -- HPD locking will now be {}", hpdlock);
 +  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", hpdlock);
@@ -1480,19 +1484,6 @@ index 9d78c6e36d..12310a029e 100644
  
    bool m_dpmsIsActive = false;
    bool m_dpmsIsManual = false;
-diff --git a/xbmc/application/ApplicationSettingsHandling.cpp b/xbmc/application/ApplicationSettingsHandling.cpp
-index 0a2c1b1c2f..953674933c 100644
---- a/xbmc/application/ApplicationSettingsHandling.cpp
-+++ b/xbmc/application/ApplicationSettingsHandling.cpp
-@@ -64,6 +64,8 @@ void CApplicationSettingsHandling::RegisterSettings()
-                                        CSettings::SETTING_AUDIOCDS_SETTINGS,
-                                        CSettings::SETTING_VIDEOSCREEN_GUICALIBRATION,
-                                        CSettings::SETTING_VIDEOSCREEN_TESTPATTERN,
-+                                       CSettings::SETTING_VIDEOPLAYER_USEAMCODEC,
-+                                       CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS,
-                                        CSettings::SETTING_VIDEOPLAYER_USEMEDIACODEC,
-                                        CSettings::SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE,
-                                        CSettings::SETTING_AUDIOOUTPUT_VOLUMESTEPS,
 diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
 index 6aee94c6d3..dcbae016ef 100644
 --- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
@@ -1520,10 +1511,10 @@ index 6aee94c6d3..dcbae016ef 100644
    // tell resampler to clamp float values
    // not required for sink stage (remapLayout == true)
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index d861faacca..eee82d529a 100644
+index d861faacca..3dada19c7f 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -20,6 +20,14 @@
+@@ -20,6 +20,15 @@
  #include "utils/XTimeUtils.h"
  #include "utils/log.h"
  
@@ -1531,6 +1522,7 @@ index d861faacca..eee82d529a 100644
 +#include "utils/AMLUtils.h"
 +#include "utils/SysfsUtils.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "ServiceBroker.h"
 +#include "settings/SettingsComponent.h"
 +#endif
@@ -1538,7 +1530,7 @@ index d861faacca..eee82d529a 100644
  #include <algorithm>
  #include <limits.h>
  #include <set>
-@@ -86,6 +94,8 @@ inline std::unique_ptr<snd_config_t, SndConfigDeleter> SndConfigCopy(snd_config_
+@@ -86,6 +95,8 @@ inline std::unique_ptr<snd_config_t, SndConfigDeleter> SndConfigCopy(snd_config_
  }
  } // namespace
  
@@ -1547,7 +1539,7 @@ index d861faacca..eee82d529a 100644
  CAESinkALSA::CAESinkALSA() :
    m_pcm(NULL)
  {
-@@ -198,7 +208,7 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+@@ -198,7 +209,7 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
    {
      /* ask for the actual map */
      snd_pcm_chmap_t* actualMap = snd_pcm_get_chmap(m_pcm);
@@ -1556,7 +1548,7 @@ index d861faacca..eee82d529a 100644
      {
        alsaMapStr = ALSAchmapToString(actualMap);
  
-@@ -235,8 +245,8 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+@@ -235,8 +246,8 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
              format.m_channelLayout.Count(), info.Count());
    CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: {}",
              std::string(format.m_channelLayout));
@@ -1567,7 +1559,7 @@ index d861faacca..eee82d529a 100644
  
    return info;
  }
-@@ -417,8 +427,12 @@ snd_pcm_chmap_t* CAESinkALSA::SelectALSAChannelMap(const CAEChannelInfo& info)
+@@ -417,8 +428,12 @@ snd_pcm_chmap_t* CAESinkALSA::SelectALSAChannelMap(const CAEChannelInfo& info)
    for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++];
         supportedMap; supportedMap = supportedMaps[i++])
    {
@@ -1582,7 +1574,7 @@ index d861faacca..eee82d529a 100644
        CAEChannelInfo candidate = ALSAchmapToAEChannelMap(&supportedMap->map);
        const CAEChannelInfo* selectedInfo = &info;
  
-@@ -508,6 +522,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -508,6 +523,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    inconfig.format = format.m_dataFormat;
    inconfig.sampleRate = format.m_sampleRate;
  
@@ -1591,7 +1583,7 @@ index d861faacca..eee82d529a 100644
    /*
     * We can't use the better GetChannelLayout() at this point as the device
     * is not opened yet, and we need inconfig.channels to select the correct
-@@ -527,12 +543,61 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -527,12 +544,61 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      m_passthrough   = false;
    }
  
@@ -1641,7 +1633,7 @@ index d861faacca..eee82d529a 100644
      return false;
    }
  
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
++  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(VeroSettings::SETTING_VIDEOSCREEN_MUTEHDMI)) {
 +      CLog::Log(LOGDEBUG, "CAESinkALSA::Initialize -- muting HDMI");
 +      SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/config", "audio_off");
 +  }
@@ -1653,7 +1645,7 @@ index d861faacca..eee82d529a 100644
    AEDeviceType devType = AEDeviceTypeFromName(device);
  
    std::string AESParams;
-@@ -548,15 +613,10 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -548,15 +614,10 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
  
    if (!OpenPCMDevice(device, AESParams, inconfig.channels, &m_pcm, config.get()))
    {
@@ -1670,7 +1662,7 @@ index d861faacca..eee82d529a 100644
  
    snd_pcm_chmap_t* selectedChmap = NULL;
    if (!m_passthrough)
-@@ -564,24 +624,65 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -564,24 +625,65 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      selectedChmap = SelectALSAChannelMap(format.m_channelLayout);
      if (selectedChmap)
      {
@@ -1738,7 +1730,7 @@ index d861faacca..eee82d529a 100644
    // we want it blocking
    snd_pcm_nonblock(m_pcm, 0);
    snd_pcm_prepare (m_pcm);
-@@ -880,7 +981,7 @@ void CAESinkALSA::Stop()
+@@ -880,7 +982,7 @@ void CAESinkALSA::Stop()
  {
    if (!m_pcm)
      return;
@@ -1747,7 +1739,7 @@ index d861faacca..eee82d529a 100644
  }
  
  void CAESinkALSA::GetDelay(AEDelayStatus& status)
-@@ -1196,11 +1297,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+@@ -1196,11 +1298,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
         * "plughw", "dsnoop"). */
  
        else if (baseName != "default"
@@ -1761,7 +1753,7 @@ index d861faacca..eee82d529a 100644
              && baseName != "hw"
              && baseName != "dmix"
              && baseName != "plughw"
-@@ -1485,6 +1583,10 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1485,6 +1584,10 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
        info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_512);
        info.m_dataFormats.push_back(AE_FMT_RAW);
      }
@@ -1772,7 +1764,7 @@ index d861faacca..eee82d529a 100644
      else if (info.m_displayNameExtra.empty())
      {
        /* for USB audio, it gets a bit confusing as there is
-@@ -1499,7 +1601,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1499,7 +1602,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
      if (device == "@" || device == "default")
      {
        /* Make it "Default (whatever)" */
@@ -2346,7 +2338,7 @@ index 452ed873be..539499eb3e 100644
    list(APPEND SOURCES DXVA.cpp)
    list(APPEND HEADERS DXVA.h)
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
-index 37a9d60170..5f5632883e 100644
+index d8554d33b6..c6bad23ed8 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.cpp
 @@ -46,6 +46,8 @@ void VideoPicture::Reset()
@@ -2359,7 +2351,7 @@ index 37a9d60170..5f5632883e 100644
    qstride = 0;
    qscale_type = 0;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
-index 6c4156fd42..80d74c3ada 100644
+index adb8b51242..cdeb923753 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodec.h
 @@ -60,6 +60,8 @@ public:
@@ -2373,10 +2365,10 @@ index 6c4156fd42..80d74c3ada 100644
    int qscale_type;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..412765cd37
+index 0000000000..61d777e494
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
-@@ -0,0 +1,312 @@
+@@ -0,0 +1,311 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2398,6 +2390,7 @@ index 0000000000..412765cd37
 +#include "utils/SysfsUtils.h"
 +#include "settings/AdvancedSettings.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "settings/SettingsComponent.h"
 +#include "threads/Thread.h"
 +
@@ -2473,12 +2466,12 @@ index 0000000000..412765cd37
 +{
 +  int hdrMode;
 +
-+  hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
++  hdrMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_HDR_PROCESS);
 +
 +	if (SysfsUtils::SetInt("/sys/module/am_vecm/parameters/hdr_mode", hdrMode))
 +		CLog::Log(LOGERROR, "AMLInsecureVideoCodec: Failed to set hdr_mode");
 +
-+  if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOPLAYER_USEAMCODEC))
++  if (!CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(VeroSettings::SETTING_VIDEOPLAYER_USEAMCODEC))
 +    return false;
 +  if (hints.stills || hints.width == 0)
 +    return false;
@@ -2638,9 +2631,12 @@ index 0000000000..412765cd37
 +  {
 +    pVideoPicture->SetParams(m_videobuffer);
 +
++    if (m_codecControlFlags & DVD_CODEC_CTRL_DROP) {
++      pVideoPicture->iFlags |= DVP_FLAG_DROPPED;
++    }
++
 +    pVideoPicture->videoBuffer = m_videoBufferPool->Get();
-+    static_cast<CAMLVideoBuffer*>(pVideoPicture->videoBuffer)->Set(this, m_codec,
-+     m_codec->getOMXPts(), m_codec->getAmlDuration(), m_codec->getBufferIndex());;
++    static_cast<CAMLVideoBuffer*>(pVideoPicture->videoBuffer)->Set(this, m_codec, m_codec->getOMXPts(), m_codec->getAmlDuration(), m_codec->getBufferIndex());
 +  }
 +
 +  m_aspect_ratio = m_codec->getAspectRatio();
@@ -2673,11 +2669,6 @@ index 0000000000..412765cd37
 +  {
 +    CLog::Log(LOGDEBUG, LOGVIDEO, "{} {:x}->{:x}",  __func__, m_codecControlFlags, flags);
 +    m_codecControlFlags = flags;
-+
-+    if (flags & DVD_CODEC_CTRL_DROP)
-+      m_videobuffer.iFlags |= DVP_FLAG_DROPPED;
-+    else
-+      m_videobuffer.iFlags &= ~DVP_FLAG_DROPPED;
 +
 +    if (m_codec)
 +      m_codec->setDrain((flags & DVD_CODEC_CTRL_DRAIN) != 0);
@@ -3002,10 +2993,10 @@ index 0000000000..a71daa354e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
 new file mode 100644
-index 0000000000..85323e638f
+index 0000000000..f98b50c213
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AMLInsecureVideoCodec.cpp
-@@ -0,0 +1,1346 @@
+@@ -0,0 +1,1353 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -3033,6 +3024,7 @@ index 0000000000..85323e638f
 +#include "settings/Settings.h"
 +#include "settings/DisplaySettings.h"
 +#include "settings/SettingsComponent.h"
++#include "settings/VeroSettings.h"
 +#include "windowing/GraphicContext.h"
 +#include "windowing/Resolution.h"
 +#include "guilib/GUIComponent.h"
@@ -3089,7 +3081,8 @@ index 0000000000..85323e638f
 +
 +AMLInsecureVideoCodec::AMLInsecureVideoCodec(CProcessInfo &processInfo)
 +	: AMLVideoCodec(processInfo), m_opened(false), m_speed(DVD_PLAYSPEED_NORMAL), m_cur_pts(DVD_NOPTS_VALUE),
-+	  m_last_pts(DVD_NOPTS_VALUE), m_bufferIndex(-1), m_state(0), m_filling(true), m_secureOSMC(&OSMCSecureOS::getInstance())
++	  m_last_pts(DVD_NOPTS_VALUE), m_bufferIndex(-1), m_state(0), m_filling(true), m_drainRepeatCount(drainRepeatCount),
++	  m_secureOSMC(&OSMCSecureOS::getInstance())
 +{
 +	m_am_private = new am_private_t;
 +	memset(m_am_private, 0, sizeof(am_private_t));
@@ -3158,7 +3151,7 @@ index 0000000000..85323e638f
 +
 +bool AMLInsecureVideoCodec::openAmlVideo(const CDVDStreamInfo &hints)
 +{
-+	int hdrMode, maxLum;
++	int maxLum;
 +
 +	PosixFilePtr amlVideoFile = std::make_shared<PosixFile>();
 +	if (!amlVideoFile->Open("/dev/video10", O_RDONLY | O_NONBLOCK)) {
@@ -3172,7 +3165,7 @@ index 0000000000..85323e638f
 +
 +	setVfmMap("default", "decoder ppmgr deinterlace amlvideo amvideo");
 +
-+	maxLum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
++	maxLum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOSCREEN_MAXLUM);
 +	SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxLum);
 +
 +	SysfsUtils::SetInt("/sys/class/video/freerun_mode", 3);
@@ -4075,6 +4068,11 @@ index 0000000000..85323e638f
 +	CLog::Log(LOGDEBUG, LOGVIDEO, "AMLInsecureVideoCodec::getPicture: index: {}, pts: {:0.3f}, dur:{:0.3f}ms",
 +		m_bufferIndex, pVideoPicture->pts / DVD_TIME_BASE, pVideoPicture->iDuration / 1000.);
 +
++	pVideoPicture->hdrType = m_hints.hdrType;
++	pVideoPicture->color_space = m_hints.colorSpace;
++	pVideoPicture->color_primaries = m_hints.colorPrimaries;
++	pVideoPicture->color_transfer = m_hints.colorTransferCharacteristic;
++
 +	setPictureStereoMode(pVideoPicture);
 +
 +	m_input_queue_length++;
@@ -4817,10 +4815,10 @@ index 0000000000..0c7740448b
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp
 new file mode 100644
-index 0000000000..a22fa8ec8c
+index 0000000000..5b9bb5fa05
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/AV1Codec.cpp
-@@ -0,0 +1,583 @@
+@@ -0,0 +1,584 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -4839,6 +4837,7 @@ index 0000000000..a22fa8ec8c
 +#include "utils/AMLUtils.h"
 +#include "utils/log.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "ServiceBroker.h"
 +#include "settings/SettingsComponent.h"
 +
@@ -4902,7 +4901,7 @@ index 0000000000..a22fa8ec8c
 +			return false;
 +		}
 +
-+		if (!aml_support_av1() || CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_USEAMCODECAV1)) {
++		if (!aml_support_av1() || CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_USEAMCODECAV1)) {
 +			// AV1 playback is either not supported or intentionally deactivated
 +			return false;
 +		}
@@ -5470,7 +5469,7 @@ index 0000000000..07efe40027
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..3fcd0b992b
+index 0000000000..a25d3a9fea
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 @@ -0,0 +1,103 @@
@@ -5486,6 +5485,7 @@ index 0000000000..3fcd0b992b
 +#include "utils/log.h"
 +#include "utils/SysfsUtils.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "settings/SettingsComponent.h"
 +
 +#include "OSMCSecureOS.h"
@@ -5532,7 +5532,7 @@ index 0000000000..3fcd0b992b
 +			&& hints.dovi.dv_bl_signal_compatibility_id == 4;
 +	bool isProfile10 = hints.dovi.dv_profile == 10;
 +	bool isDVoutputDisabled =
-+		CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) != 2;
++		CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) != 2;
 +	uint32_t dvFlags = 5;
 +
 +	bool enable_dv = hints.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION && isDolbyVisionSupported()
@@ -5576,7 +5576,6 @@ index 0000000000..3fcd0b992b
 +
 +	params.use_dv_vpath = m_dv_enabled;
 +}
-+
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h
 new file mode 100644
 index 0000000000..f62fd4a687
@@ -5619,10 +5618,10 @@ index 0000000000..f62fd4a687
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
 new file mode 100644
-index 0000000000..7fa8cf3a86
+index 0000000000..09e9342ca9
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
-@@ -0,0 +1,244 @@
+@@ -0,0 +1,245 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5643,6 +5642,7 @@ index 0000000000..7fa8cf3a86
 +#include "utils/BitstreamConverter.h"
 +#include "utils/log.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "ServiceBroker.h"
 +#include "settings/SettingsComponent.h"
 +
@@ -5670,7 +5670,7 @@ index 0000000000..7fa8cf3a86
 +			return false;
 +		}
 +
-+		int resolutionLimit = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_USEAMCODECH264);
++		int resolutionLimit = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_USEAMCODECH264);
 +		if (hints.width <= resolutionLimit) {
 +			CLog::Log(LOGDEBUG, "H264CodecInfo: size check failed {}", resolutionLimit);
 +			return false;
@@ -6537,10 +6537,10 @@ index 0000000000..00b8e6e8f6
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
 new file mode 100644
-index 0000000000..9a8192756a
+index 0000000000..939a1b273c
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.cpp
-@@ -0,0 +1,144 @@
+@@ -0,0 +1,152 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6557,6 +6557,7 @@ index 0000000000..9a8192756a
 +
 +#include "utils/BitstreamConverter.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "ServiceBroker.h"
 +#include "settings/SettingsComponent.h"
 +
@@ -6578,7 +6579,7 @@ index 0000000000..9a8192756a
 +			return false;
 +		}
 +
-+		if (hints.width <= CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG2)) {
++		if (hints.width <= CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG2)) {
 +			return false;
 +		}
 +
@@ -6685,12 +6686,19 @@ index 0000000000..9a8192756a
 +	extradata = nullptr;
 +	extrasize = 0;
 +}
++
++void MPEG12Codec::setupVideoCodecParams(aml_generic_param &params) const
++{
++	AMLInsecureVideoCodec::setupVideoCodecParams(params);
++
++	params.decoder_type = DECODER_TYPE_SINGLE_MODE;
++}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h
 new file mode 100644
-index 0000000000..b7408f0d4e
+index 0000000000..f53fc4e4c5
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG12Codec.h
-@@ -0,0 +1,41 @@
+@@ -0,0 +1,43 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6717,6 +6725,8 @@ index 0000000000..b7408f0d4e
 +	virtual vformat_t getVideoFormat(const CDVDStreamInfo &hints) const;
 +	virtual vdec_type_t getVideoCodecType(const CDVDStreamInfo &hints) const;
 +
++	virtual void setupVideoCodecParams(aml_generic_param &params) const;
++
 +	virtual void getExtradata(const CDVDStreamInfo &hints, uint8_t *&extradata, unsigned int &extrasize) const;
 +
 +public:
@@ -6734,10 +6744,10 @@ index 0000000000..b7408f0d4e
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.cpp
 new file mode 100644
-index 0000000000..211e8644eb
+index 0000000000..1717b28500
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MPEG4Codec.cpp
-@@ -0,0 +1,208 @@
+@@ -0,0 +1,209 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -6754,6 +6764,7 @@ index 0000000000..211e8644eb
 +
 +#include "utils/log.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "ServiceBroker.h"
 +#include "settings/SettingsComponent.h"
 +
@@ -6776,7 +6787,7 @@ index 0000000000..211e8644eb
 +			return false;
 +		}
 +
-+		if (hints.width <= CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG4)) {
++		if (hints.width <= CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_USEAMCODECMPEG4)) {
 +			return false;
 +		}
 +
@@ -8772,7 +8783,7 @@ index 46337576ab..8f8e8b1bc6 100644
  class CDVDInputStream
  {
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
-index 832757b92e..2eb915fb57 100644
+index f554ee4f1d..96bf9ae1e8 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.cpp
 @@ -7,6 +7,7 @@
@@ -8791,7 +8802,7 @@ index 832757b92e..2eb915fb57 100644
  #include "filesystem/BlurayCallback.h"
  #include "filesystem/Directory.h"
  #include "filesystem/SpecialProtocol.h"
-@@ -33,6 +35,7 @@
+@@ -34,6 +36,7 @@
  #include <memory>
  
  #include <libbluray/bluray.h>
@@ -8799,7 +8810,7 @@ index 832757b92e..2eb915fb57 100644
  #include <libbluray/log_control.h>
  
  #define LIBBLURAY_BYTESEEK 0
-@@ -62,7 +65,7 @@ void  bluray_overlay_argb_cb(void *this_gen, const struct bd_argb_overlay_s * co
+@@ -63,7 +66,7 @@ void  bluray_overlay_argb_cb(void *this_gen, const struct bd_argb_overlay_s * co
  #endif
  
  CDVDInputStreamBluray::CDVDInputStreamBluray(IVideoPlayer* player, const CFileItem& fileitem) :
@@ -8808,7 +8819,7 @@ index 832757b92e..2eb915fb57 100644
  {
    m_content = "video/x-mpegts";
    memset(&m_event, 0, sizeof(m_event));
-@@ -172,6 +175,11 @@ bool CDVDInputStreamBluray::Open()
+@@ -184,6 +187,11 @@ bool CDVDInputStreamBluray::Open()
    }
    else if (m_item.IsDiscImage())
    {
@@ -8820,7 +8831,7 @@ index 832757b92e..2eb915fb57 100644
      if (!OpenStream(m_item))
        return false;
  
-@@ -295,6 +303,7 @@ bool CDVDInputStreamBluray::Open()
+@@ -307,6 +315,7 @@ bool CDVDInputStreamBluray::Open()
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray::Open - no menus (libmmbd, or profile 6 bdj)  : {}",
                disc_info->no_menu_support);
  #endif
@@ -8828,7 +8839,7 @@ index 832757b92e..2eb915fb57 100644
    }
    else
      CLog::Log(LOGERROR, "CDVDInputStreamBluray::Open - BluRay not detected");
-@@ -402,6 +411,8 @@ void CDVDInputStreamBluray::Close()
+@@ -413,6 +422,8 @@ void CDVDInputStreamBluray::Close()
    m_bd = nullptr;
    m_pstream.reset();
    m_rootPath.clear();
@@ -8837,7 +8848,7 @@ index 832757b92e..2eb915fb57 100644
  }
  
  void CDVDInputStreamBluray::FreeTitleInfo()
-@@ -413,6 +424,41 @@ void CDVDInputStreamBluray::FreeTitleInfo()
+@@ -424,6 +435,41 @@ void CDVDInputStreamBluray::FreeTitleInfo()
    m_clip = nullptr;
  }
  
@@ -8879,7 +8890,7 @@ index 832757b92e..2eb915fb57 100644
  void CDVDInputStreamBluray::ProcessEvent() {
  
    int pid = -1;
-@@ -529,15 +575,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -540,15 +586,17 @@ void CDVDInputStreamBluray::ProcessEvent() {
    }
    case BD_EVENT_PLAYLIST:
      CLog::Log(LOGDEBUG, "CDVDInputStreamBluray - BD_EVENT_PLAYLIST {}", m_event.param);
@@ -8900,7 +8911,7 @@ index 832757b92e..2eb915fb57 100644
      break;
  
    case BD_EVENT_CHAPTER:
-@@ -622,6 +670,22 @@ void CDVDInputStreamBluray::ProcessEvent() {
+@@ -633,6 +681,22 @@ void CDVDInputStreamBluray::ProcessEvent() {
    m_event.event = BD_EVENT_NONE;
  }
  
@@ -8923,7 +8934,7 @@ index 832757b92e..2eb915fb57 100644
  int CDVDInputStreamBluray::Read(uint8_t* buf, int buf_size)
  {
    int result = 0;
-@@ -935,12 +999,20 @@ int CDVDInputStreamBluray::GetTime()
+@@ -946,12 +1010,20 @@ int CDVDInputStreamBluray::GetTime()
  
  bool CDVDInputStreamBluray::PosTime(int ms)
  {
@@ -8944,7 +8955,7 @@ index 832757b92e..2eb915fb57 100644
    return true;
  }
  
-@@ -962,12 +1034,22 @@ int CDVDInputStreamBluray::GetChapter()
+@@ -973,12 +1045,22 @@ int CDVDInputStreamBluray::GetChapter()
  
  bool CDVDInputStreamBluray::SeekChapter(int ch)
  {
@@ -8967,7 +8978,7 @@ index 832757b92e..2eb915fb57 100644
    return true;
  }
  
-@@ -1041,7 +1123,7 @@ void CDVDInputStreamBluray::GetStreamInfo(int pid, std::string &language)
+@@ -1052,7 +1134,7 @@ void CDVDInputStreamBluray::GetStreamInfo(int pid, std::string &language)
    if(!m_titleInfo || !m_clip)
      return;
  
@@ -8976,7 +8987,7 @@ index 832757b92e..2eb915fb57 100644
      find_stream(pid, m_clip->video_streams, m_clip->video_stream_count, language);
    else if (HDMV_PID_AUDIO_FIRST <= pid && pid <= HDMV_PID_AUDIO_LAST)
      find_stream(pid, m_clip->audio_streams, m_clip->audio_stream_count, language);
-@@ -1207,6 +1289,25 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
+@@ -1218,6 +1300,25 @@ MenuType CDVDInputStreamBluray::GetSupportedMenuType()
    return MenuType::NONE;
  }
  
@@ -9003,7 +9014,7 @@ index 832757b92e..2eb915fb57 100644
  {
    int region = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_BLURAY_PLAYERREGION);
 diff --git a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
-index 06539f48b2..733d5a01e4 100644
+index fc7940bbed..ab79c5fce2 100644
 --- a/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 +++ b/xbmc/cores/VideoPlayer/DVDInputStreams/DVDInputStreamBluray.h
 @@ -30,7 +30,8 @@ extern "C"
@@ -9039,7 +9050,7 @@ index 06539f48b2..733d5a01e4 100644
  
    /* IMenus */
    void ActivateButton() override { UserInput(BD_VK_ENTER); }
-@@ -185,12 +195,18 @@ protected:
+@@ -186,12 +196,18 @@ protected:
      bool OpenStream(CFileItem &item);
      void SetupPlayerSettings();
      void FreeTitleInfo();
@@ -9495,10 +9506,10 @@ index a8ffb9807b..25f43406b0 100644
      }
  
 diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-index 8d0676b819..37476b8fdd 100644
+index 5a42065fc9..fbcc6b0e09 100644
 --- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
-@@ -1328,17 +1328,14 @@ void CVideoPlayer::Prepare()
+@@ -1334,17 +1334,14 @@ void CVideoPlayer::Prepare()
      if (m_pDemuxer)
      {
        if (m_pDemuxer->SeekTime(starttime, true, &startpts))
@@ -9517,7 +9528,7 @@ index 8d0676b819..37476b8fdd 100644
          CLog::Log(LOGDEBUG, "{} - starting subtitle demuxer from: {}", __FUNCTION__, starttime);
        else
          CLog::Log(LOGDEBUG, "{} - failed to start subtitle demuxing from: {}", __FUNCTION__,
-@@ -1568,6 +1565,11 @@ void CVideoPlayer::Process()
+@@ -1574,6 +1571,11 @@ void CVideoPlayer::Process()
      CheckBetterStream(m_CurrentRadioRDS, pStream);
      CheckBetterStream(m_CurrentAudioID3, pStream);
  
@@ -9529,7 +9540,7 @@ index 8d0676b819..37476b8fdd 100644
      // demux video stream
      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_SUBTITLES_PARSECAPTIONS) && CheckIsCurrent(m_CurrentVideo, pStream, pPacket))
      {
-@@ -1728,6 +1730,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
+@@ -1734,6 +1736,11 @@ void CVideoPlayer::ProcessVideoData(CDemuxStream* pStream, DemuxPacket* pPacket)
    if (CheckSceneSkip(m_CurrentVideo))
      drop = true;
  
@@ -9541,7 +9552,7 @@ index 8d0676b819..37476b8fdd 100644
    m_VideoPlayerVideo->SendMessage(std::make_shared<CDVDMsgDemuxerPacket>(pPacket, drop));
  
    if (!drop)
-@@ -1872,7 +1879,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1878,7 +1885,7 @@ void CVideoPlayer::HandlePlaySpeed()
      {
        if (cache.level < 0.0)
        {
@@ -9550,7 +9561,7 @@ index 8d0676b819..37476b8fdd 100644
          SetCaching(CACHESTATE_INIT);
        }
        // Note: Previously used cache.level >= 1 would keep video stalled
-@@ -1977,10 +1984,10 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -1983,10 +1990,10 @@ void CVideoPlayer::HandlePlaySpeed()
          if (m_CurrentAudio.id >= 0)
          {
            double adjust = -1.0; // a unique value
@@ -9563,7 +9574,7 @@ index 8d0676b819..37476b8fdd 100644
              adjust = 0.0;
  
            if (adjust != -1.0)
-@@ -2020,6 +2027,7 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2026,6 +2033,7 @@ void CVideoPlayer::HandlePlaySpeed()
               (m_CurrentVideo.avsync == CCurrentStream::AV_SYNC_CONT ||
               m_CurrentAudio.syncState == IDVDStreamPlayer::SYNC_INSYNC))
      {
@@ -9571,7 +9582,16 @@ index 8d0676b819..37476b8fdd 100644
        m_CurrentVideo.syncState = IDVDStreamPlayer::SYNC_INSYNC;
        m_CurrentVideo.avsync = CCurrentStream::AV_SYNC_NONE;
        m_VideoPlayerVideo->SendMessage(
-@@ -2167,17 +2175,19 @@ void CVideoPlayer::HandlePlaySpeed()
+@@ -2051,7 +2059,7 @@ void CVideoPlayer::HandlePlaySpeed()
+         if (m_pInputStream->IsRealtime())
+           clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal - DVD_MSEC_TO_TIME(400);
+         else
+-          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetime;
++          clock = m_CurrentAudio.starttime - m_CurrentAudio.cachetotal;
+ 
+         if (m_CurrentVideo.starttime != DVD_NOPTS_VALUE && (m_CurrentVideo.packets > 0))
+         {
+@@ -2173,17 +2181,19 @@ void CVideoPlayer::HandlePlaySpeed()
            error /= errorwin;
          }
  
@@ -9594,7 +9614,7 @@ index 8d0676b819..37476b8fdd 100644
              CDVDMsgPlayerSeek::CMode mode;
              mode.time = iTime;
              mode.backward = (m_playSpeed < 0);
-@@ -2696,14 +2706,14 @@ void CVideoPlayer::HandleMessages()
+@@ -2702,14 +2712,14 @@ void CVideoPlayer::HandleMessages()
        if (m_pInputStream->GetIPosTime() == nullptr)
          time -= m_State.time_offset/1000l;
  
@@ -9612,7 +9632,7 @@ index 8d0676b819..37476b8fdd 100644
          }
          // dts after successful seek
          if (start == DVD_NOPTS_VALUE)
-@@ -2713,6 +2723,7 @@ void CVideoPlayer::HandleMessages()
+@@ -2719,6 +2729,7 @@ void CVideoPlayer::HandleMessages()
          m_State.lastSeek = m_clock.GetAbsoluteClock();
  
          FlushBuffers(start, msg.GetAccurate(), msg.GetSync());
@@ -9620,7 +9640,7 @@ index 8d0676b819..37476b8fdd 100644
        }
        else if (m_pDemuxer)
        {
-@@ -3085,7 +3096,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
+@@ -3091,7 +3102,9 @@ void CVideoPlayer::SetCaching(ECacheState state)
    if(m_caching == state)
      return;
  
@@ -9631,7 +9651,7 @@ index 8d0676b819..37476b8fdd 100644
    if (state == CACHESTATE_FULL ||
        state == CACHESTATE_INIT)
    {
-@@ -3750,23 +3763,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3756,23 +3769,6 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
    if (hint.flags & AV_DISPOSITION_ATTACHED_PIC)
      return false;
  
@@ -9655,7 +9675,7 @@ index 8d0676b819..37476b8fdd 100644
    IDVDStreamPlayer* player = GetStreamPlayer(m_CurrentVideo.player);
    if(player == nullptr)
      return false;
-@@ -3780,6 +3776,29 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+@@ -3786,6 +3782,29 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
      if (!player->OpenStream(hint))
        return false;
  
@@ -9685,7 +9705,7 @@ index 8d0676b819..37476b8fdd 100644
      player->SendMessage(std::make_shared<CDVDMsgBool>(CDVDMsg::GENERAL_PAUSE, m_displayLost), 1);
  
      // look for any EDL files
-@@ -3970,6 +3989,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -3976,6 +3995,7 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    m_CurrentVideo.dts         = DVD_NOPTS_VALUE;
    m_CurrentVideo.startpts    = startpts;
    m_CurrentVideo.packets = 0;
@@ -9693,7 +9713,7 @@ index 8d0676b819..37476b8fdd 100644
  
    m_CurrentSubtitle.dts      = DVD_NOPTS_VALUE;
    m_CurrentSubtitle.startpts = startpts;
-@@ -4017,7 +4037,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
+@@ -4023,7 +4043,8 @@ void CVideoPlayer::FlushBuffers(double pts, bool accurate, bool sync)
    }
  
    if(pts != DVD_NOPTS_VALUE && sync)
@@ -9703,7 +9723,7 @@ index 8d0676b819..37476b8fdd 100644
    UpdatePlayState(0);
  
    m_demuxerSpeed = DVD_PLAYSPEED_NORMAL;
-@@ -4909,15 +4930,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
+@@ -4915,15 +4936,7 @@ void CVideoPlayer::UpdatePlayState(double timeout)
  
      bool realtime = m_pInputStream->IsRealtime();
  
@@ -9925,10 +9945,10 @@ index 8598052b41..98b41313c0 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..dfaa3925a0
+index 0000000000..73ed403b84
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,226 @@
+@@ -0,0 +1,225 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -9949,6 +9969,9 @@ index 0000000000..dfaa3925a0
 +#include "cores/VideoPlayer/VideoRenderers/RenderFlags.h"
 +#include "settings/AdvancedSettings.h"
 +#include "settings/DisplaySettings.h"
++#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
++#include "settings/SettingsComponent.h"
 +
 +#include "windowing/GraphicContext.h"
 +#include "ServiceBroker.h"
@@ -9995,6 +10018,9 @@ index 0000000000..dfaa3925a0
 +  m_sourceHeight = picture.iHeight;
 +  m_renderOrientation = orientation;
 +
++  bool forceSDRoutput = 
++    CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) & 1;
++
 +  m_iFlags = GetFlagsChromaPosition(picture.chroma_position) |
 +             GetFlagsColorMatrix(picture.color_space, picture.iWidth, picture.iHeight) |
 +             GetFlagsColorPrimaries(picture.color_primaries) |
@@ -10003,10 +10029,28 @@ index 0000000000..dfaa3925a0
 +  // Calculate the input frame aspect ratio.
 +  CalculateFrameAspectRatio(picture.iDisplayWidth, picture.iDisplayHeight);
 +  SetViewMode(m_videoSettings.m_ViewMode);
++
++  // Configure GUI/OSD for HDR PQ when display is in HDR PQ mode
++  if (!forceSDRoutput) {
++    if (picture.color_transfer == AVCOL_TRC_SMPTE2084)
++    {
++      if (CServiceBroker::GetWinSystem()->IsHDRDisplay())
++      {
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++      }
++    }
++    else if (picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION)
++    {
++      if (CServiceBroker::GetWinSystem()->GetDisplayHDRCapabilities().SupportsDolbyVision())
++      {
++        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
++      }
++    }
++  }
++
 +  ManageRenderArea();
 +
 +  m_bConfigured = true;
-+  m_hdrCheckCount = m_maxChecks;
 +
 +  return true;
 +}
@@ -10116,31 +10160,6 @@ index 0000000000..dfaa3925a0
 +void CRendererAML::RenderUpdate(int index, int index2, bool clear, unsigned int flags, unsigned int alpha)
 +{
 +  ManageRenderArea();
-+  /* are we outputting HDR? */
-+  if (m_hdrCheckCount >= 0)
-+  {
-+    std::string hdmiConfig = "";
-+    if (!SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/config", hdmiConfig))
-+    {
-+      if ((hdmiConfig.find("EOTF: SDR") == std::string::npos &&
-+        hdmiConfig.find("EOTF: HDRgamma") == std::string::npos) ||
-+        hdmiConfig.find("DV type DV") != std::string::npos)
-+      {
-+        CLog::Log(LOGDEBUG, "CRendererAML: Output is HDR ({})", m_maxChecks - m_hdrCheckCount);
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
-+        m_hdrCheckCount = 0;
-+      }
-+      else if (m_hdrCheckCount == 0)
-+      {
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(false);
-+        CLog::Log(LOGDEBUG, "CRendererAML: Output is SDR");
-+      }
-+    }
-+    else
-+      CLog::Log(LOGERROR, "Failed to read hdmitx config");
-+
-+    m_hdrCheckCount -= 1;
-+  }
 +
 +  CAMLVideoBuffer *amli = dynamic_cast<CAMLVideoBuffer *>(m_buffers[index].videoBuffer);
 +  if(amli && amli->m_amlCodec)
@@ -10157,10 +10176,10 @@ index 0000000000..dfaa3925a0
 +}
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
 new file mode 100644
-index 0000000000..22f5e12251
+index 0000000000..be598196f8
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h
-@@ -0,0 +1,61 @@
+@@ -0,0 +1,59 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10219,8 +10238,6 @@ index 0000000000..22f5e12251
 +
 +  int m_prevVPts;
 +  bool m_bConfigured;
-+  int m_hdrCheckCount;
-+  const int m_maxChecks = 20;
 +};
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 index dfd4b31227..1774eba28f 100644
@@ -10387,7 +10404,7 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index 51bbbc514a..cc1b5aeb29 100644
+index 51bbbc514a..17224fd135 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 @@ -26,6 +26,8 @@
@@ -10493,15 +10510,6 @@ index 51bbbc514a..cc1b5aeb29 100644
  
      m_presentstep = PRESENT_FLIP;
      m_discard.push_back(m_presentsource);
-@@ -1224,7 +1216,7 @@ void CRenderManager::PrepareNextRender()
- 
-     m_playerPort->UpdateRenderBuffers(m_queued.size(), m_discard.size(), m_free.size());
-   }
--  else if (!combined && renderPts > (nextFramePts - frametime))
-+  else if (!combined && renderPts > (nextFramePts - frametime/2.))
-   {
-     m_lateframes = 0;
-     m_presentstep = PRESENT_FLIP;
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
 index 5bb02199e7..41c87b778a 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
@@ -10528,6 +10536,166 @@ index a7135da5d8..aeedf893cd 100644
  };
  
  class CVideoSettings
+diff --git a/xbmc/guilib/GUITextLayout.cpp b/xbmc/guilib/GUITextLayout.cpp
+index 11c671b110..7259e00206 100644
+--- a/xbmc/guilib/GUITextLayout.cpp
++++ b/xbmc/guilib/GUITextLayout.cpp
+@@ -580,63 +580,117 @@ void CGUITextLayout::WrapText(const vecText &text, float maxWidth)
+       continue;
+     }
+ 
+-    vecText::const_iterator pos = line.m_text.begin();
+-    vecText::const_iterator lastBeginPos = line.m_text.begin();
+-    vecText::const_iterator lastSpacePos = line.m_text.end();
+-    vecText curLine;
++    std::vector<character_t> tmp;
++    tmp.reserve(line.m_text.size());
++    auto widthOf = [&](const std::vector<character_t>::const_iterator start,
++                       const std::vector<character_t>::const_iterator end) -> float
++    {
++      if (start == end)
++        return 0.0f;
++      tmp.assign(start, end);
++      return m_font->GetTextWidth(tmp);
++    };
+ 
+-    while (pos < line.m_text.end())
++    auto skipLeadingSpaces = [&](vecText::const_iterator& it)
+     {
+-      // Get the current letter in the string
+-      const character_t& letter = *pos;
++      while (it != line.m_text.end() && CanWrapAtLetter(*it))
++        ++it;
++    };
++
++    auto current = line.m_text.begin();
++    skipLeadingSpaces(current);
+ 
+-      if (CanWrapAtLetter(letter)) // Check for a space char
+-        lastSpacePos = pos;
++    float currentWidth = 0.0f;
++    std::vector<character_t>::const_iterator currentStart = current;
++    // track end without trailing spaces
++    std::vector<character_t>::const_iterator lastNonSpaceInLine = currentStart;
+ 
+-      curLine.emplace_back(letter);
++    while (current != line.m_text.end())
++    {
++      // Find next candidate wrap position
++      std::vector<character_t>::const_iterator wordEnd = current;
++      while (wordEnd != line.m_text.end() && !CanWrapAtLetter(*wordEnd))
++        ++wordEnd;
+ 
+-      const float currWidth = m_font->GetTextWidth(curLine);
++      const bool hasSpace = (wordEnd != line.m_text.end());
++      const float wordWidth = widthOf(current, wordEnd);
++      const float spaceWidth = hasSpace ? widthOf(wordEnd, wordEnd + 1) : 0.0f;
+ 
+-      if (currWidth > maxWidth)
++      // Try to include word + trailing space
++      if (currentWidth + wordWidth + spaceWidth <= maxWidth)
+       {
+-        if (lastSpacePos > pos) // No space char where split the line, so split by char
+-        {
+-          // If the pos is equal to lastBeginPos, maxWidth is not large enough to contain 1 character
+-          // Push a line with the single character and move on to the next character.
+-          if (pos == lastBeginPos)
+-            ++pos;
+-
+-          CGUIString linePart{lastBeginPos, pos, false};
+-          m_lines.emplace_back(linePart);
+-        }
+-        else
+-        {
+-          CGUIString linePart{lastBeginPos, lastSpacePos, false};
+-          m_lines.emplace_back(linePart);
++        currentWidth += wordWidth + spaceWidth;
++        lastNonSpaceInLine = wordEnd; // exclude trailing space
++        current = wordEnd;
++        if (hasSpace)
++          ++current;
++        continue;
++      }
+ 
+-          pos = lastSpacePos + 1;
+-          lastSpacePos = line.m_text.end();
+-        }
++      // Try to include word without trailing space
++      if (currentWidth + wordWidth <= maxWidth)
++      {
++        m_lines.emplace_back(currentStart, wordEnd, false);
++        if (m_lines.size() >= nMaxLines)
++          return;
+ 
+-        curLine.clear();
+-        lastBeginPos = pos;
++        current = hasSpace ? (wordEnd + 1) : wordEnd;
++        skipLeadingSpaces(current);
++        currentStart = current;
++        currentWidth = 0.0f;
++        lastNonSpaceInLine = currentStart;
++        continue;
++      }
+ 
++      // word itself doesn't fit after existing content: wrap before it (trim trailing spaces)
++      if (currentWidth > 0.0f)
++      {
++        const std::vector<character_t>::const_iterator emitEnd =
++            lastNonSpaceInLine > currentStart ? lastNonSpaceInLine : wordEnd;
++        m_lines.emplace_back(currentStart, emitEnd, false);
+         if (m_lines.size() >= nMaxLines)
+           return;
+ 
++        // Start a new line; keep pos at start of the overflowing word
++        skipLeadingSpaces(current);
++        currentStart = current;
++        currentWidth = 0.0f;
++        lastNonSpaceInLine = currentStart;
+         continue;
+       }
+ 
+-      ++pos;
+-    }
++      if (current == wordEnd)
++        break;
+ 
+-    // Add the remaining text part
+-    if (!curLine.empty())
+-    {
+-      CGUIString linePart{curLine.begin(), curLine.end(), false};
+-      m_lines.emplace_back(linePart);
++      // current line is empty and word is too long: split by character using a safe linear scan.
++      // Do not assume monotonic width because shaping/kerning can make width shrink or grow non-linearly.
++      tmp.clear();
++      size_t bestCount = 0;
++      for (auto it = current; it != wordEnd; ++it)
++      {
++        tmp.push_back(*it);
++        if (m_font->GetTextWidth(tmp) <= maxWidth)
++          bestCount = tmp.size();
++      }
++      if (bestCount == 0)
++        bestCount = 1; // ensure progress even if a single glyph is wider than maxWidth
++
++      const auto cut = current + static_cast<ptrdiff_t>(bestCount);
++      m_lines.emplace_back(current, cut, false);
++      if (m_lines.size() >= nMaxLines)
++        return;
++
++      current = cut;
++      skipLeadingSpaces(current);
++      currentStart = current;
++      currentWidth = 0.0f;
++      lastNonSpaceInLine = currentStart;
+     }
+ 
++    // Add remaining text part of this paragraph line
++    if (currentStart < line.m_text.end())
++      m_lines.emplace_back(currentStart, line.m_text.end(), false);
++
+     // Restore carriage return marker for the end of paragraph
+     if (!m_lines.empty())
+       m_lines.back().m_carriageReturn = line.m_carriageReturn;
 diff --git a/xbmc/guilib/StereoscopicsManager.cpp b/xbmc/guilib/StereoscopicsManager.cpp
 index 3aa269bca3..e281b550a7 100644
 --- a/xbmc/guilib/StereoscopicsManager.cpp
@@ -10791,10 +10959,10 @@ index 69a1513627..1dede45766 100644
    // check if we have at least one network interface to wait for
    if (!IsAvailable())
 diff --git a/xbmc/peripherals/Peripherals.cpp b/xbmc/peripherals/Peripherals.cpp
-index 1276cf52d6..ffff84f64f 100644
+index 4fdc64db0b..b51a4243a7 100644
 --- a/xbmc/peripherals/Peripherals.cpp
 +++ b/xbmc/peripherals/Peripherals.cpp
-@@ -1003,6 +1003,10 @@ void CPeripherals::OnApplicationMessage(MESSAGING::ThreadMessage* pMsg)
+@@ -1042,6 +1042,10 @@ void CPeripherals::OnApplicationMessage(MESSAGING::ThreadMessage* pMsg)
        ToggleDeviceState(STATE_ACTIVATE_SOURCE);
        break;
  
@@ -10806,7 +10974,7 @@ index 1276cf52d6..ffff84f64f 100644
        ToggleDeviceState(STATE_STANDBY);
        break;
 diff --git a/xbmc/peripherals/devices/Peripheral.h b/xbmc/peripherals/devices/Peripheral.h
-index 4977cb65eb..5a530894ad 100644
+index 4c6d3c54b3..4c7fd2da6e 100644
 --- a/xbmc/peripherals/devices/Peripheral.h
 +++ b/xbmc/peripherals/devices/Peripheral.h
 @@ -62,7 +62,8 @@ typedef enum
@@ -11106,21 +11274,37 @@ index 5abbed2486..76d7c2b863 100644
  
      bool m_openGlDebugging;
  
+diff --git a/xbmc/settings/CMakeLists.txt b/xbmc/settings/CMakeLists.txt
+index d477f51d5d..fb703ddb1e 100644
+--- a/xbmc/settings/CMakeLists.txt
++++ b/xbmc/settings/CMakeLists.txt
+@@ -18,7 +18,8 @@ set(SOURCES AdvancedSettings.cpp
+             SettingUtils.cpp
+             SkinSettings.cpp
+             SettingsComponent.cpp
+-            SubtitlesSettings.cpp)
++            SubtitlesSettings.cpp
++            VeroSettings.cpp)
+ 
+ set(HEADERS AdvancedSettings.h
+             DiscSettings.h
+@@ -42,7 +43,8 @@ set(HEADERS AdvancedSettings.h
+             SettingUtils.h
+             SkinSettings.h
+             SettingsComponent.h
+-            SubtitlesSettings.h)
++            SubtitlesSettings.h
++            VeroSettings.h)
+ 
+ if(BLURAY_FOUND)
+   list(APPEND SOURCES DiscSettings.cpp)
 diff --git a/xbmc/settings/DisplaySettings.cpp b/xbmc/settings/DisplaySettings.cpp
 old mode 100644
 new mode 100755
-index 75ce481a6c..14af860578
+index 75ce481a6c..8725779be0
 --- a/xbmc/settings/DisplaySettings.cpp
 +++ b/xbmc/settings/DisplaySettings.cpp
-@@ -23,6 +23,7 @@
- #include "settings/lib/SettingDefinitions.h"
- #include "storage/MediaManager.h"
- #include "utils/StringUtils.h"
-+#include "utils/SysfsUtils.h"
- #include "utils/Variant.h"
- #include "utils/XMLUtils.h"
- #include "utils/log.h"
-@@ -73,6 +74,8 @@ static std::string ModeFlagsToString(unsigned int flags, bool identifier)
+@@ -73,6 +73,8 @@ static std::string ModeFlagsToString(unsigned int flags, bool identifier)
      res += "sbs";
    else if(flags & D3DPRESENTFLAG_MODE3DTB)
      res += "tab";
@@ -11129,7 +11313,7 @@ index 75ce481a6c..14af860578
    else if(identifier)
      res += "std";
    return res;
-@@ -251,7 +254,6 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
+@@ -251,7 +253,6 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
  {
    if (setting == NULL)
      return false;
@@ -11137,7 +11321,7 @@ index 75ce481a6c..14af860578
    const std::string &settingId = setting->GetId();
    if (settingId == CSettings::SETTING_VIDEOSCREEN_RESOLUTION ||
        settingId == CSettings::SETTING_VIDEOSCREEN_SCREEN)
-@@ -288,10 +290,21 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
+@@ -288,10 +289,21 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
      // in which case we don't show any prompt to the user
      if (oldRes != RES_WINDOW && newRes != RES_WINDOW && oldRes != newRes)
      {
@@ -11163,66 +11347,7 @@ index 75ce481a6c..14af860578
          {
            m_resolutionChangeAborted = true;
            return false;
-@@ -338,6 +351,58 @@ bool CDisplaySettings::OnSettingChanging(const std::shared_ptr<const CSetting>&
-     return true;
- #endif
-   }
-+  else if (settingId == CSettings::SETTING_VIDEOSCREEN_FORCE422){
-+    std::string attr = "";
-+    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
-+
-+    if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
-+      if (attr.find("444") != std::string::npos ||
-+          attr.find("422") != std::string::npos ||
-+          attr.find("420") != std::string::npos)
-+        attr.replace(attr.find("4"),3,"422").append("now");
-+      else
-+        attr.append("422now");
-+    }
-+    else {
-+      if (attr.find("422") != std::string::npos)
-+        attr.erase(attr.find("4"),3);
-+      attr.append("now");
-+    }
-+    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting 422 output, attr = {}", attr);
-+    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
-+  }
-+  else if (settingId == CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)
-+  {
-+    int range_control;
-+    std::string attr = "";
-+
-+    SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
-+    if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)) 
-+      range_control &= 1;
-+    else
-+      range_control |= 2;
-+    CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting quantization range to {}", range_control & 2 ? "full" : "limited");
-+    SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
-+    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
-+    attr.append("now");
-+    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
-+  }
-+  else if (settingId == CSettings::SETTING_VIDEOSCREEN_MAXLUM)
-+  {
-+     int maxlum = 100;
-+
-+     maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
-+     CLog::Log(LOGDEBUG, "CDisplaySettings::OnSettingChanging -- setting max lum to {}", maxlum);
-+     SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
-+  }
-+  else if (settingId == CSettings::SETTING_VIDEOSCREEN_HDRCAPS)
-+  {
-+    int hdr_caps = 0;
-+    std::string attr = "";
-+
-+    hdr_caps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
-+    SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/force_hdr", hdr_caps);
-+  }
- #if defined(HAVE_X11) || defined(TARGET_WINDOWS_DESKTOP) || defined(TARGET_DARWIN_OSX)
-   else if (settingId == CSettings::SETTING_VIDEOSCREEN_BLANKDISPLAYS)
-   {
-@@ -497,24 +562,6 @@ void CDisplaySettings::AddResolutionInfo(const RESOLUTION_INFO &resolution)
+@@ -497,24 +509,6 @@ void CDisplaySettings::AddResolutionInfo(const RESOLUTION_INFO &resolution)
    std::unique_lock<CCriticalSection> lock(m_critical);
    RESOLUTION_INFO res(resolution);
  
@@ -11247,7 +11372,7 @@ index 75ce481a6c..14af860578
    m_resolutions.push_back(res);
  }
  
-@@ -527,7 +574,14 @@ void CDisplaySettings::ApplyCalibrations()
+@@ -527,7 +521,14 @@ void CDisplaySettings::ApplyCalibrations()
      // find resolutions
      for (size_t res = RES_DESKTOP; res < m_resolutions.size(); ++res)
      {
@@ -11263,7 +11388,7 @@ index 75ce481a6c..14af860578
        {
          // overscan
          m_resolutions[res].Overscan.left = itCal->Overscan.left;
-@@ -565,7 +619,6 @@ void CDisplaySettings::ApplyCalibrations()
+@@ -565,7 +566,6 @@ void CDisplaySettings::ApplyCalibrations()
            m_resolutions[res].fPixelRatio = 0.5f;
          if (m_resolutions[res].fPixelRatio > 2.0f)
            m_resolutions[res].fPixelRatio = 2.0f;
@@ -11271,7 +11396,7 @@ index 75ce481a6c..14af860578
        }
      }
    }
-@@ -595,6 +648,8 @@ void CDisplaySettings::UpdateCalibrations()
+@@ -595,6 +595,8 @@ void CDisplaySettings::UpdateCalibrations()
        cal = *res;
      }
    }
@@ -11280,7 +11405,7 @@ index 75ce481a6c..14af860578
  }
  
  void CDisplaySettings::ClearCalibrations()
-@@ -661,6 +716,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -661,6 +663,8 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
        flags |= D3DPRESENTFLAG_MODE3DSBS;
      else if(StringUtils::Mid(strResolution, 20,3) == "tab")
        flags |= D3DPRESENTFLAG_MODE3DTB;
@@ -11289,7 +11414,7 @@ index 75ce481a6c..14af860578
  
      std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;
      for (size_t resolution = RES_DESKTOP; resolution < CDisplaySettings::GetInstance().ResolutionInfoSize(); resolution++)
-@@ -672,6 +729,37 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
+@@ -672,6 +676,37 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
    return RES_DESKTOP;
  }
  
@@ -11327,7 +11452,7 @@ index 75ce481a6c..14af860578
  std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, float refreshrate /* = 0.0f */)
  {
    if (resolution == RES_WINDOW)
-@@ -680,13 +768,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
+@@ -680,13 +715,9 @@ std::string CDisplaySettings::GetStringFromResolution(RESOLUTION resolution, flo
    if (resolution >= RES_DESKTOP && resolution < (RESOLUTION)CDisplaySettings::GetInstance().ResolutionInfoSize())
    {
      const RESOLUTION_INFO &info = CDisplaySettings::GetInstance().GetResolutionInfo(resolution);
@@ -11344,7 +11469,7 @@ index 75ce481a6c..14af860578
    }
  
    return "DESKTOP";
-@@ -716,14 +800,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
+@@ -716,14 +747,8 @@ void CDisplaySettings::SettingOptionsModesFiller(const std::shared_ptr<const CSe
      const auto mode = CDisplaySettings::GetInstance().GetResolutionInfo(index);
  
      if (mode.dwFlags ^ D3DPRESENTFLAG_INTERLACED)
@@ -11361,7 +11486,7 @@ index 75ce481a6c..14af860578
    }
  
    std::sort(list.begin(), list.end(), ModeSort);
-@@ -795,15 +873,8 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
+@@ -795,15 +820,8 @@ void CDisplaySettings::SettingOptionsResolutionsFiller(const SettingConstPtr& se
      std::vector<RESOLUTION_WHR> resolutions = CServiceBroker::GetWinSystem()->ScreenResolutions(info.fRefreshRate);
      for (std::vector<RESOLUTION_WHR>::const_iterator resolution = resolutions.begin(); resolution != resolutions.end(); ++resolution)
      {
@@ -11416,67 +11541,235 @@ index 1f11a4995e..9aeb539c4f 100644
  #if defined(TARGET_WINDOWS)
    m_simpleConditions.emplace("has_dx");
    m_simpleConditions.emplace("hasdxva2");
-diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
-index b93293c620..644706960e 100644
---- a/xbmc/settings/Settings.cpp
-+++ b/xbmc/settings/Settings.cpp
-@@ -608,6 +608,10 @@ void CSettings::InitializeISettingCallbacks()
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREEN);
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_RESOLUTION);
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
-+  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_FORCE422);
-+  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML);
-+  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
-+  settingSet.insert(CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_MONITOR);
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE);
-   settingSet.insert(CSettings::SETTING_VIDEOSCREEN_3DLUT);
 diff --git a/xbmc/settings/Settings.h b/xbmc/settings/Settings.h
-index bfc5e6072c..9f3cec52df 100644
+index bfc5e6072c..b9ef34e2be 100644
 --- a/xbmc/settings/Settings.h
 +++ b/xbmc/settings/Settings.h
-@@ -121,6 +121,11 @@ public:
-   static constexpr auto SETTING_VIDEOPLAYER_USESUPERRESOLUTION = "videoplayer.usesuperresolution";
-   static constexpr auto SETTING_VIDEOPLAYER_HIGHPRECISIONPROCESSING = "videoplayer.highprecision";
-   static constexpr auto SETTING_VIDEOPLAYER_USEMEDIACODEC = "videoplayer.usemediacodec";
-+  static constexpr auto SETTING_VIDEOPLAYER_USEAMCODEC = "videoplayer.useamcodec";
-+  static constexpr auto SETTING_VIDEOPLAYER_USEAMCODECMPEG2 = "videoplayer.useamcodecmpeg2";
-+  static constexpr auto SETTING_VIDEOPLAYER_USEAMCODECMPEG4 = "videoplayer.useamcodecmpeg4";
-+  static constexpr auto SETTING_VIDEOPLAYER_USEAMCODECH264 = "videoplayer.useamcodech264";
-+  static constexpr auto SETTING_VIDEOPLAYER_USEAMCODECAV1 = "videoplayer.useamcodecav1";
-   static constexpr auto SETTING_VIDEOPLAYER_USEMEDIACODECSURFACE =
-       "videoplayer.usemediacodecsurface";
-   static constexpr auto SETTING_VIDEOPLAYER_USEVDPAU = "videoplayer.usevdpau";
-@@ -131,6 +136,7 @@ public:
-   static constexpr auto SETTING_VIDEOPLAYER_USEDXVA2 = "videoplayer.usedxva2";
-   static constexpr auto SETTING_VIDEOPLAYER_USEVTB = "videoplayer.usevtb";
-   static constexpr auto SETTING_VIDEOPLAYER_USEPRIMEDECODER = "videoplayer.useprimedecoder";
-+  static constexpr auto SETTING_VIDEOPLAYER_HDR_PROCESS = "videoplayer.amlhdrmodes";
-   static constexpr auto SETTING_VIDEOPLAYER_USESTAGEFRIGHT = "videoplayer.usestagefright";
-   static constexpr auto SETTING_VIDEOPLAYER_LIMITGUIUPDATE = "videoplayer.limitguiupdate";
-   static constexpr auto SETTING_VIDEOPLAYER_SUPPORTMVC = "videoplayer.supportmvc";
-@@ -367,6 +373,12 @@ public:
-   static constexpr auto SETTING_VIDEOSCREEN_SCREENMODE = "videoscreen.screenmode";
-   static constexpr auto SETTING_VIDEOSCREEN_FAKEFULLSCREEN = "videoscreen.fakefullscreen";
-   static constexpr auto SETTING_VIDEOSCREEN_BLANKDISPLAYS = "videoscreen.blankdisplays";
-+  static constexpr auto SETTING_VIDEOSCREEN_FORCERGB = "videoscreen.forcergb";
-+  static constexpr auto SETTING_VIDEOSCREEN_LOCKHPD = "videoscreen.lockhpd";
-+  static constexpr auto SETTING_VIDEOSCREEN_MUTEHDMI = "videoscreen.mutehdmi";
-+  static constexpr auto SETTING_VIDEOSCREEN_FORCE422 = "videoscreen.force422";
-+  static constexpr auto SETTING_VIDEOSCREEN_MAXLUM = "videoscreen.maxlum";
-+  static constexpr auto SETTING_VIDEOSCREEN_HDRCAPS = "videoscreen.hdrcaps";
-   static constexpr auto SETTING_VIDEOSCREEN_STEREOSCOPICMODE = "videoscreen.stereoscopicmode";
-   static constexpr auto SETTING_VIDEOSCREEN_PREFEREDSTEREOSCOPICMODE =
-       "videoscreen.preferedstereoscopicmode";
-@@ -375,7 +387,7 @@ public:
+@@ -375,7 +375,6 @@ public:
    static constexpr auto SETTING_VIDEOSCREEN_DISPLAYPROFILE = "videoscreen.displayprofile";
    static constexpr auto SETTING_VIDEOSCREEN_GUICALIBRATION = "videoscreen.guicalibration";
    static constexpr auto SETTING_VIDEOSCREEN_TESTPATTERN = "videoscreen.testpattern";
 -  static constexpr auto SETTING_VIDEOSCREEN_LIMITEDRANGE = "videoscreen.limitedrange";
-+  static constexpr auto SETTING_VIDEOSCREEN_LIMITEDRANGEAML = "videoscreen.limitedrangeaml";
    static constexpr auto SETTING_VIDEOSCREEN_FRAMEPACKING = "videoscreen.framepacking";
    static constexpr auto SETTING_VIDEOSCREEN_10BITSURFACES = "videoscreen.10bitsurfaces";
    static constexpr auto SETTING_VIDEOSCREEN_USESYSTEMSDRPEAKLUMINANCE =
+diff --git a/xbmc/settings/VeroSettings.cpp b/xbmc/settings/VeroSettings.cpp
+new file mode 100644
+index 0000000000..7398564b5f
+--- /dev/null
++++ b/xbmc/settings/VeroSettings.cpp
+@@ -0,0 +1,154 @@
++/*
++ *  (c) 2025 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "VeroSettings.h"
++
++#include <set>
++#include <string>
++#include <ranges>
++
++#include "ServiceBroker.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++#include "settings/lib/SettingsManager.h"
++#include "utils/log.h"
++#include "utils/SysfsUtils.h"
++
++
++VeroSettings::VeroSettings()
++{
++  m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++
++  m_settingsMap.insert(std::make_pair(SETTING_VIDEOSCREEN_FORCE422, &VeroSettings::OnForce422Changed));
++  m_settingsMap.insert(std::make_pair(SETTING_VIDEOSCREEN_LIMITEDRANGEAML, &VeroSettings::OnLimitedRangeChanged));
++  m_settingsMap.insert(std::make_pair(SETTING_VIDEOSCREEN_MAXLUM, &VeroSettings::OnMaxLumChanged));
++  m_settingsMap.insert(std::make_pair(SETTING_VIDEOSCREEN_HDRCAPS, &VeroSettings::OnHdrCapsChanged));
++  m_settingsMap.insert(std::make_pair(SETTING_VIDEOSCREEN_FORCERGB, &VeroSettings::OnForceRgbChanged));
++  m_settingsMap.insert(std::make_pair(SETTING_VIDEOSCREEN_LOCKHPD, &VeroSettings::OnLockHpdChanged));
++
++  std::set<std::string> settingSet;
++
++  for (auto e : m_settingsMap) {
++    settingSet.insert(e.first);
++    std::invoke(e.second, this);
++  }
++
++  m_settings->GetSettingsManager()->RegisterCallback(this, settingSet);
++}
++
++VeroSettings::~VeroSettings()
++{
++  m_settings->GetSettingsManager()->UnregisterCallback(this);
++}
++
++bool VeroSettings::OnSettingChanging(const std::shared_ptr<const CSetting> &setting)
++{
++  const std::string &settingId = setting->GetId();
++  std::map<const std::string, bool (VeroSettings::*)()>::iterator iter = m_settingsMap.find(settingId);
++
++  if (iter == m_settingsMap.end()) {
++    // setting not handled
++    CLog::Log(LOGWARNING, "VeroSettings::OnSettingChanging -- unable to handle unknown setting '{}'", settingId);
++    return false;
++  }
++
++  bool res = std::invoke((*iter).second, this);
++  if (res && settingId == SETTING_VIDEOSCREEN_LIMITEDRANGEAML) {
++    // some special treatment for SETTING_VIDEOSCREEN_LIMITEDRANGEAML
++    std::string attr = "";
++
++    SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++    attr.append("now");
++    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++  }
++
++  return res;
++}
++
++bool VeroSettings::OnLimitedRangeChanged()
++{
++  int range_control;
++
++  SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++  if (m_settings->GetBool(VeroSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML)) {
++    range_control &= 1;
++  } else {
++    range_control |= 2;
++  }
++
++  CLog::Log(LOGDEBUG, "VeroSettings::OnLimitedRangeChanged -- setting quantization range to {}", range_control & 2 ? "full" : "limited");
++  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
++
++  return true;
++}
++
++bool VeroSettings::OnForce422Changed()
++{
++  std::string attr = "";
++
++  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
++
++  if (m_settings->GetBool(SETTING_VIDEOSCREEN_FORCE422)) {
++    if (attr.find("444") != std::string::npos ||
++        attr.find("422") != std::string::npos ||
++        attr.find("420") != std::string::npos) {
++      attr.replace(attr.find("4"), 3, "422").append("now");
++    } else {
++      attr.append("422now");
++    }
++  } else {
++    if (attr.find("422") != std::string::npos) {
++      attr.erase(attr.find("4"), 3);
++    }
++    attr.append("now");
++  }
++
++  CLog::Log(LOGDEBUG, "VeroSettings::OnForce422Changed -- setting 422 output, attr = {}", attr);
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
++
++  return true;
++}
++
++bool VeroSettings::OnMaxLumChanged()
++{
++  int maxlum = m_settings->GetInt(SETTING_VIDEOSCREEN_MAXLUM);
++
++  CLog::Log(LOGDEBUG, "VeroSettings::OnMaxLumChanged -- setting max lum to {}", maxlum);
++  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
++
++  return true;
++}
++
++bool VeroSettings::OnHdrCapsChanged()
++{
++  int hdr_caps = m_settings->GetInt(SETTING_VIDEOSCREEN_HDRCAPS);
++
++  CLog::Log(LOGDEBUG, "VeroSettings::OnHdrCapsChanged -- setting HDR caps to {}", hdr_caps);
++  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/force_hdr", hdr_caps);
++
++  return true;
++}
++
++bool VeroSettings::OnForceRgbChanged()
++{
++  bool force = m_settings->GetBool(VeroSettings::SETTING_VIDEOSCREEN_FORCERGB);
++
++  CLog::Log(LOGDEBUG, "VeroSettings::OnForceRgbChanged -- {}forcing RGB", force ? "" : "not ");
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", force ? "1" : "0");
++
++  return true;
++}
++
++bool VeroSettings::OnLockHpdChanged()
++{
++  bool lockHpd = m_settings->GetBool(VeroSettings::SETTING_VIDEOSCREEN_LOCKHPD);
++
++  CLog::Log(LOGDEBUG, "VeroSettings::OnLockHpdChanged -- forcing HPD to be {}locked", lockHpd ? "" : "un");
++  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", lockHpd ? "hpd_lock1" : "hpd_lock0");
++
++  return true;
++}
+diff --git a/xbmc/settings/VeroSettings.h b/xbmc/settings/VeroSettings.h
+new file mode 100644
+index 0000000000..d710f7594e
+--- /dev/null
++++ b/xbmc/settings/VeroSettings.h
+@@ -0,0 +1,51 @@
++/*
++ *  (c) 2025 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include "settings/lib/ISettingCallback.h"
++
++#include <map>
++#include <string>
++
++class CSettings;
++
++class VeroSettings : public ISettingCallback
++{
++public:
++  static constexpr const char *SETTING_VIDEOSCREEN_FORCERGB        = "videoscreen.forcergb";
++  static constexpr const char *SETTING_VIDEOSCREEN_LOCKHPD         = "videoscreen.lockhpd";
++  static constexpr const char *SETTING_VIDEOSCREEN_MUTEHDMI        = "videoscreen.mutehdmi";
++  static constexpr const char *SETTING_VIDEOSCREEN_FORCE422        = "videoscreen.force422";
++  static constexpr const char *SETTING_VIDEOSCREEN_MAXLUM          = "videoscreen.maxlum";
++  static constexpr const char *SETTING_VIDEOSCREEN_LIMITEDRANGEAML = "videoscreen.limitedrangeaml";
++  static constexpr const char *SETTING_VIDEOSCREEN_HDRCAPS         = "videoscreen.hdrcaps";
++
++  static constexpr const char *SETTING_VIDEOPLAYER_HDR_PROCESS     = "videoplayer.amlhdrmodes";
++  static constexpr const char *SETTING_VIDEOPLAYER_USEAMCODEC      = "videoplayer.useamcodec";
++  static constexpr const char *SETTING_VIDEOPLAYER_USEAMCODECMPEG2 = "videoplayer.useamcodecmpeg2";
++  static constexpr const char *SETTING_VIDEOPLAYER_USEAMCODECMPEG4 = "videoplayer.useamcodecmpeg4";
++  static constexpr const char *SETTING_VIDEOPLAYER_USEAMCODECH264  = "videoplayer.useamcodech264";
++  static constexpr const char *SETTING_VIDEOPLAYER_USEAMCODECAV1   = "videoplayer.useamcodecav1";
++
++private:
++  std::shared_ptr<CSettings> m_settings;
++  std::map<const std::string, bool (VeroSettings::*)()> m_settingsMap;
++
++  bool OnLimitedRangeChanged();
++  bool OnForce422Changed();
++  bool OnForceRgbChanged();
++  bool OnLockHpdChanged();
++  bool OnMaxLumChanged();
++  bool OnHdrCapsChanged();
++
++  bool OnSettingChanging(const std::shared_ptr<const CSetting> &setting) override;
++
++public:
++  VeroSettings();
++  virtual ~VeroSettings();
++};
 diff --git a/xbmc/storage/MediaManager.cpp b/xbmc/storage/MediaManager.cpp
 index dad5da5528..4a9211342e 100644
 --- a/xbmc/storage/MediaManager.cpp
@@ -11493,10 +11786,10 @@ index dad5da5528..4a9211342e 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..661b765b79
+index 0000000000..c06dd7b93f
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,918 @@
+@@ -0,0 +1,916 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11528,10 +11821,8 @@ index 0000000000..661b765b79
 +#include <sys/ioctl.h>
 +
 +static const char *sysfs_mandatory[] = {
-+		"/dev/amstream_mpts",
 +		"/dev/amvideo",
 +		"/dev/video10",
-+		"/sys/class/tsync/pts_pcrscr",
 +		"/sys/class/video/axis",
 +		"/sys/class/video/disable_video",
 +		"/sys/class/video/freerun_mode",
@@ -13039,10 +13330,10 @@ index 0000000000..26176182a0
 +};
 diff --git a/xbmc/utils/SysfsUtils.cpp b/xbmc/utils/SysfsUtils.cpp
 new file mode 100644
-index 0000000000..1d4d92eb50
+index 0000000000..c25960ac13
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.cpp
-@@ -0,0 +1,165 @@
+@@ -0,0 +1,142 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -13061,156 +13352,133 @@ index 0000000000..1d4d92eb50
 +#include <fcntl.h>
 +#include <string.h>
 +
-+int SysfsUtils::SetString(const std::string& path, const std::string& valstr)
++
++int SysfsUtils::SetString(const std::string &path, const std::string &valstr)
 +{
 +  int fd = open(path.c_str(), O_RDWR, 0644);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    if (write(fd, valstr.c_str(), valstr.size()) < 0)
-+      ret = -1;
-+    close(fd);
-+  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
 +
-+  return ret;
++  if (fd < 0) {
++    CLog::Log(LOGERROR, "{}: error opening '{}' for writing", __FUNCTION__, path.c_str());
++    return -1;
++  }
++
++  if (write(fd, valstr.c_str(), valstr.size()) < 0) {
++    CLog::Log(LOGERROR, "{}: error writing to '{}'", __FUNCTION__, path.c_str());
++    close(fd);
++    return -1;
++  }
++
++  close(fd);
++
++  return 0;
 +}
 +
-+int SysfsUtils::GetString(const std::string& path, std::string& valstr)
++int SysfsUtils::GetString(const std::string &path, std::string &valstr)
 +{
++  valstr.clear();
++
++  int fd = open(path.c_str(), O_RDONLY);
++
++  if (fd < 0) {
++    CLog::Log(LOGERROR, "{}: error opening '{}' for reading", __FUNCTION__, path.c_str());
++    return -1;
++  }
++
 +  int len;
-+  char buf[256] = {0};
++  char buf[256] = { 0 };
 +
-+  int fd = open(path.c_str(), O_RDONLY);
-+  if (fd >= 0)
-+  {
++  while ((len = read(fd, buf, sizeof(buf))) > 0) {
++    valstr.append(buf, len);
++  }
++
++  close(fd);
++
++  if (len < 0) {
++    CLog::Log(LOGERROR, "{}: error reading from '{}'", __FUNCTION__, path.c_str());
 +    valstr.clear();
-+    while ((len = read(fd, buf, 256)) > 0)
-+      valstr.append(buf, len);
-+    close(fd);
-+
-+    StringUtils::Trim(valstr);
-+
-+    return 0;
++    return -1;
 +  }
 +
-+  CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
-+  valstr = "fail";
-+  return -1;
++  StringUtils::Trim(valstr);
++
++  return 0;
 +}
 +
-+int SysfsUtils::SetInt(const std::string& path, const int val)
++int SysfsUtils::SetInt(const std::string &path, const int val)
 +{
-+  int fd = open(path.c_str(), O_RDWR, 0644);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    sprintf(bcmd, "%d", val);
-+    if (write(fd, bcmd, strlen(bcmd)) < 0)
-+      ret = -1;
-+    close(fd);
-+  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
++  char bcmd[16];
 +
-+  return ret;
++  snprintf(bcmd, sizeof(bcmd), "%d", val);
++
++  return SetString(path, bcmd);
 +}
 +
-+int SysfsUtils::SetUInt32(const std::string& path, const uint32_t val)
++int SysfsUtils::SetUInt32(const std::string &path, const uint32_t val)
 +{
-+  int fd = open(path.c_str(), O_RDWR, 0644);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    sprintf(bcmd, "%u", val);
-+    if (write(fd, bcmd, strlen(bcmd)) < 0)
-+      ret = -1;
-+    close(fd);
-+  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error writing {}",__FUNCTION__, path.c_str());
++  char bcmd[16];
 +
-+  return ret;
++  snprintf(bcmd, sizeof(bcmd), "%u", val);
++
++  return SetString(path, bcmd);
 +}
 +
-+int SysfsUtils::GetInt(const std::string& path, int& val)
++int SysfsUtils::GetInt(const std::string &path, int &val)
 +{
-+  int fd = open(path.c_str(), O_RDONLY);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    if (read(fd, bcmd, sizeof(bcmd)) < 0)
-+      ret = -1;
-+    else
-+      val = strtol(bcmd, NULL, 16);
++  std::string value;
 +
-+    close(fd);
++  if (GetString(path, value)) {
++    return -1;
 +  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
 +
-+  return ret;
++  val = strtol(value.c_str(), NULL, 16);
++
++  return 0;
 +}
 +
-+int SysfsUtils::GetIntDec(const std::string& path, uint32_t& val)
++int SysfsUtils::GetIntDec(const std::string &path, uint32_t &val)
 +{
-+  int fd = open(path.c_str(), O_RDONLY);
-+  int ret = 0;
-+  if (fd >= 0)
-+  {
-+    char bcmd[16];
-+    if (read(fd, bcmd, sizeof(bcmd)) < 0)
-+      ret = -1;
-+    else
-+      val = strtoull(bcmd, NULL, 10);
++  std::string value;
 +
-+    close(fd);
++  if (GetString(path, value)) {
++    return -1;
 +  }
-+  if (ret)
-+    CLog::Log(LOGERROR, "{}: error reading {}",__FUNCTION__, path.c_str());
 +
-+  return ret;
++  val = strtoull(value.c_str(), NULL, 10);
++
++  return 0;
 +}
 +
 +bool SysfsUtils::Has(const std::string &path)
 +{
-+  int fd = open(path.c_str(), O_RDONLY);
-+  if (fd >= 0)
-+  {
-+    close(fd);
-+    return true;
-+  }
-+  return false;
++  return HasRO(path);
 +}
 +
 +bool SysfsUtils::HasRW(const std::string &path)
 +{
 +  int fd = open(path.c_str(), O_RDWR);
-+  if (fd >= 0)
-+  {
++
++  if (fd >= 0) {
 +    close(fd);
 +    return true;
 +  }
++
 +  return false;
 +}
 +
 +bool SysfsUtils::HasRO(const std::string &path)
 +{
 +  int fd = open(path.c_str(), O_RDONLY);
-+  if (fd >= 0)
-+  {
++
++  if (fd >= 0) {
 +    close(fd);
 +    return true;
 +  }
++
 +  return false;
 +}
 diff --git a/xbmc/utils/SysfsUtils.h b/xbmc/utils/SysfsUtils.h
 new file mode 100644
-index 0000000000..a4228e689d
+index 0000000000..3d9310c39b
 --- /dev/null
 +++ b/xbmc/utils/SysfsUtils.h
 @@ -0,0 +1,25 @@
@@ -13229,13 +13497,13 @@ index 0000000000..a4228e689d
 +class SysfsUtils
 +{
 +public:
-+  static int SetString(const std::string& path, const std::string& valstr);
-+  static int GetString(const std::string& path, std::string& valstr);
-+  static int SetInt(const std::string& path, const int val);
-+  static int SetUInt32(const std::string& path, const uint32_t val);
-+  static int GetInt(const std::string& path, int& val);
-+  static int GetIntDec(const std::string& path, uint32_t& val);
-+  static bool Has(const std::string& path);
++  static int SetString(const std::string &path, const std::string &valstr);
++  static int GetString(const std::string &path, std::string &valstr);
++  static int SetInt(const std::string &path, const int val);
++  static int SetUInt32(const std::string &path, const uint32_t val);
++  static int GetInt(const std::string &path, int &val);
++  static int GetIntDec(const std::string &path, uint32_t &val);
++  static bool Has(const std::string &path);
 +  static bool HasRW(const std::string &path);
 +  static bool HasRO(const std::string &path);
 +};
@@ -14037,12 +14305,12 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..550e4413fe
+index 0000000000..a521cbaac2
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,554 @@
+@@ -0,0 +1,499 @@
 +/*
-+ *  Copyright (C) 2005-2018 Team Kodi
++ *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
 + *
 + *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -14051,64 +14319,48 @@ index 0000000000..550e4413fe
 +
 +#include "WinSystemAmlogic.h"
 +
-+#include <string.h>
-+#include <float.h>
++#include <string>
 +
 +#include "ServiceBroker.h"
++#include "cores/AudioEngine/AESinkFactory.h"
++#include "cores/AudioEngine/Sinks/AESinkALSA.h"
 +#include "cores/RetroPlayer/process/amlogic/RPProcessInfoAmlogic.h"
 +#include "cores/RetroPlayer/rendering/VideoRenderers/RPRendererOpenGLES.h"
 +#include "cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h"
 +#include "cores/VideoPlayer/VideoRenderers/LinuxRendererGLES.h"
 +#include "cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.h"
-+#include "cores/AudioEngine/AESinkFactory.h"
-+#include "cores/AudioEngine/Sinks/AESinkALSA.h"
-+#include "windowing/GraphicContext.h"
-+#include "windowing/Resolution.h"
-+#include "platform/linux/powermanagement/LinuxPowerSyscall.h"
++#include "messaging/ApplicationMessenger.h"
 +#include "platform/linux/ScreenshotSurfaceAML.h"
 +#include "settings/DisplaySettings.h"
 +#include "settings/Settings.h"
++#include "settings/VeroSettings.h"
 +#include "settings/SettingsComponent.h"
-+#include "settings/AdvancedSettings.h"
 +#include "settings/SettingPath.h"
-+#include "settings/windows/GUIControlSettings.h"
-+#include "guilib/DispResource.h"
-+#include "utils/AMLUtils.h"
++#include "settings/VeroSettings.h"
 +#include "utils/log.h"
-+#include "utils/SysfsUtils.h"
++#include "utils/AMLUtils.h"
 +#include "utils/StringUtils.h"
-+#include "threads/SingleLock.h"
-+#include "messaging/ApplicationMessenger.h"
-+#include <libudev.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <locale.h>
-+#include <unistd.h>
++#include "utils/SysfsUtils.h"
++#include "windowing/GraphicContext.h"
++#include "windowing/Resolution.h"
 +
-+using namespace KODI::MESSAGING;
-+
-+#include <linux/fb.h>
-+
-+#include "system_egl.h"
 +
 +using namespace KODI;
++using namespace KODI::MESSAGING;
 +
-+CWinSystemAmlogic::CWinSystemAmlogic() :
-+  m_libinput(new CLibInputHandler)
++
++CWinSystemAmlogic::CWinSystemAmlogic()
++    : m_libinput(new CLibInputHandler)
 +{
 +  const char *env_framebuffer = getenv("FRAMEBUFFER");
 +
 +  // default to framebuffer 0
 +  m_framebuffer_name = "fb0";
-+  if (env_framebuffer)
-+  {
++  if (env_framebuffer) {
 +    std::string framebuffer(env_framebuffer);
 +    std::string::size_type start = framebuffer.find("fb");
 +    m_framebuffer_name = framebuffer.substr(start);
 +  }
-+
-+  m_nativeDisplay = EGL_NO_DISPLAY;
-+  m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
 +
 +  m_displayWidth = 0;
 +  m_displayHeight = 0;
@@ -14119,57 +14371,13 @@ index 0000000000..550e4413fe
 +  aml_permissions();
 +  aml_disable_freeScale();
 +
++  m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++
 +  /* Take in to account custom OSMC parameters */
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCERGB)) {
-+    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- forcing RGB");
-+    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/output_rgb", "1");
-+  }
-+
-+  int range_control;
-+  SysfsUtils::GetInt("/sys/module/am_vecm/parameters/range_control", range_control);
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LIMITEDRANGEAML))
-+    range_control &= 1;
-+  else
-+    range_control |= 2;
-+  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- setting quantization range to {}",
-+      range_control & 2 ? "full" : "limited");
-+  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/range_control", range_control);
-+
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_LOCKHPD)) {
-+    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- forcing HPD to be locked");
-+    SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/debug", "hpd_lock1");
-+  }
-+
-+  std::string attr = "";
-+  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/attr", attr);
-+
-+  if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_VIDEOSCREEN_FORCE422)) {
-+    if (attr.find("444") != std::string::npos ||
-+        attr.find("422") != std::string::npos ||
-+        attr.find("420") != std::string::npos)
-+      attr.replace(attr.find("4"),3,"422").append("now");
-+    else
-+      attr.append("422now");
-+  }
-+  else {
-+    if (attr.find("422") != std::string::npos) {
-+      attr.erase(attr.find("4"),3);
-+    }
-+    attr.append("now");
-+  }
-+  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- setting 422 output, attr = {}", attr);
-+  SysfsUtils::SetString("/sys/class/amhdmitx/amhdmitx0/attr", attr.c_str());
-+
-+  int maxlum = 100;
-+  maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_MAXLUM);
-+  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::Initialize -- setting max lum to {}", maxlum);
-+  SysfsUtils::SetInt("/sys/module/am_vecm/parameters/customer_panel_lumin", maxlum);
-+
-+  int hdr_caps = 0;
-+  hdr_caps = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_HDRCAPS);
-+  SysfsUtils::SetInt("/sys/class/amhdmitx/amhdmitx0/force_hdr", hdr_caps);
++  m_veroSettings = new VeroSettings();
 +
 +  SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", m_lastEdid);
++
 +  StartMonitorHWEvent();
 +
 +  // Register sink
@@ -14181,90 +14389,85 @@ index 0000000000..550e4413fe
 +CWinSystemAmlogic::~CWinSystemAmlogic()
 +{
 +  StopMonitorHWEvent();
++  delete m_veroSettings;
++}
 +
-+  if(m_nativeWindow)
-+  {
-+    m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
++void CWinSystemAmlogic::hwMonitorThread()
++{
++  struct udev *udev;
++  struct udev_device *dev;
++
++  struct udev_monitor *mon;
++  int fd;
++
++  /* Create the udev object */
++  udev = udev_new();
++  if (!udev) {
++    return;
++  }
++
++  mon = udev_monitor_new_from_netlink(udev, "udev");
++  udev_monitor_filter_add_match_subsystem_devtype(mon, "extcon", NULL);
++  udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
++
++  udev_monitor_enable_receiving(mon);
++  fd = udev_monitor_get_fd(mon);
++
++  /* Poll for events */
++  while (m_monitorEvents) {
++    fd_set fds;
++    struct timeval tv;
++    int ret;
++
++    FD_ZERO(&fds);
++    FD_SET(fd, &fds);
++    tv.tv_sec = 0;
++    tv.tv_usec = 0;
++
++    ret = select(fd + 1, &fds, NULL, NULL, &tv);
++
++    /* Check if FD has received data */
++
++    if (ret > 0 && FD_ISSET(fd, &fds)) {
++      dev = udev_monitor_receive_device(mon);
++      if (dev) {
++        CLog::Log(LOGDEBUG, "CWinSystemAmlogic: Detected HDMI switch");
++
++        int state;
++        SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
++
++        std::string newEdid;
++        SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
++
++        if (state && newEdid != m_lastEdid) {
++          CServiceBroker::GetAppMessenger()->PostMsg(TMSG_AML_RESIZE);
++          m_lastEdid = newEdid;
++        }
++        udev_device_unref(dev);
++      } else {
++        CLog::Log(LOGERROR, "CWinSystemAmlogic: can't get device from receive_device");
++      }
++    }
++    usleep(250 * 1000);
 +  }
 +}
 +
-+static void hwMon(CWinSystemAmlogic *instance)
++void CWinSystemAmlogic::StartMonitorHWEvent()
 +{
-+	struct udev *udev;
-+	struct udev_device *dev;
-+
-+	struct udev_monitor *mon;
-+	int fd;
-+
-+	/* Create the udev object */
-+	udev = udev_new();
-+	if (!udev) {
-+		return;
-+	}
-+
-+	mon = udev_monitor_new_from_netlink(udev, "udev");
-+	udev_monitor_filter_add_match_subsystem_devtype(mon, "extcon", NULL);
-+	udev_monitor_filter_add_match_subsystem_devtype(mon, "switch", NULL);
-+
-+	udev_monitor_enable_receiving(mon);
-+	fd = udev_monitor_get_fd(mon);
-+
-+	/* Poll for events */
-+
-+	while (1 && instance->m_monitorEvents) {
-+		fd_set fds;
-+		struct timeval tv;
-+		int ret;
-+
-+		FD_ZERO(&fds);
-+		FD_SET(fd, &fds);
-+		tv.tv_sec = 0;
-+		tv.tv_usec = 0;
-+
-+		ret = select(fd + 1, &fds, NULL, NULL, &tv);
-+
-+		/* Check if FD has received data */
-+
-+		if (ret > 0 && FD_ISSET(fd, &fds)) {
-+			dev = udev_monitor_receive_device(mon);
-+			if (dev) {
-+				CLog::Log(LOGDEBUG, "CWinSystemAmlogic: Detected HDMI switch");
-+				int state;
-+				SysfsUtils::GetInt("/sys/class/amhdmitx/amhdmitx0/hpd_state", state);
-+				std::string newEdid;
-+				SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/rawedid", newEdid);
-+
-+				if (state && newEdid != instance->m_lastEdid) {
-+					CServiceBroker::GetAppMessenger()->PostMsg(TMSG_AML_RESIZE);
-+					instance->m_lastEdid = newEdid;
-+				}
-+				udev_device_unref(dev);
-+			} else {
-+				CLog::Log(LOGERROR, "CWinSystemAmlogic: can't get device from receive_device");
-+			}
-+		}
-+		usleep(250 * 1000);
-+	}
++  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
++  m_monitorEvents = true;
++  m_monitorThread = std::thread(&CWinSystemAmlogic::hwMonitorThread, this);
 +}
 +
-+void CWinSystemAmlogic::StartMonitorHWEvent() {
-+    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::StartMonitorHWEvent -- starting event monitor for HDMI hotplug events");
-+    m_monitorEvents = true;
-+    m_monitorThread = std::thread(hwMon, this);
-+    return;
-+}
-+
-+void CWinSystemAmlogic::StopMonitorHWEvent() {
-+    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
-+    m_monitorEvents = false;
-+    m_monitorThread.join();
-+    return;
++void CWinSystemAmlogic::StopMonitorHWEvent()
++{
++  CLog::Log(LOGDEBUG, "CWinSystemAmlogic::StopMonitorHWEvent -- stopping event monitor for HDMI hotplug events");
++  m_monitorEvents = false;
++  m_monitorThread.join();
 +}
 +
 +bool CWinSystemAmlogic::InitWindowSystem()
 +{
-+  m_nativeDisplay = EGL_DEFAULT_DISPLAY;
-+
 +  CDVDVideoCodecAmlogic::Register();
 +  CLinuxRendererGLES::Register();
 +  RETRO::CRPProcessInfoAmlogic::Register();
@@ -14279,143 +14482,144 @@ index 0000000000..550e4413fe
 +
 +bool CWinSystemAmlogic::DestroyWindowSystem()
 +{
++  m_bWindowCreated = false;
++
 +  return true;
 +}
 +
-+void CWinSystemAmlogic::CalculateFrameBufferResolution(const RESOLUTION_INFO &res, int &width, int &height)
-+{
-+	aml_calc_framebuffer_resolution(res, width, height);
-+}
-+
-+bool CWinSystemAmlogic::CreateNewWindow(const std::string& name,
-+                                    bool fullScreen,
-+                                    RESOLUTION_INFO& res)
++bool CWinSystemAmlogic::CreateNewWindow(const std::string &name, bool fullScreen, RESOLUTION_INFO &res)
 +{
 +  RESOLUTION_INFO current_resolution;
-+  current_resolution.iWidth = current_resolution.iHeight = 0;
 +  RENDER_STEREO_MODE stereo_mode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
 +
-+  m_nWidth        = res.iWidth;
-+  m_nHeight       = res.iHeight;
-+  m_displayWidth  = res.iScreenWidth;
-+  m_displayHeight = res.iScreenHeight;
-+  m_fRefreshRate  = res.fRefreshRate;
-+
-+  if ((m_bWindowCreated && aml_get_native_resolution(&current_resolution)) &&
-+    current_resolution.iWidth == res.iWidth && current_resolution.iHeight == res.iHeight &&
-+    current_resolution.iScreenWidth == res.iScreenWidth && current_resolution.iScreenHeight == res.iScreenHeight &&
-+    m_bFullScreen == fullScreen && current_resolution.fRefreshRate == res.fRefreshRate &&
-+    (current_resolution.dwFlags & D3DPRESENTFLAG_MODEMASK) == (res.dwFlags & D3DPRESENTFLAG_MODEMASK) &&
-+    m_stereo_mode == stereo_mode)
-+  {
-+    CLog::Log(LOGDEBUG, "CWinSystemEGL::CreateNewWindow: No need to create a new window");
++  if (m_bWindowCreated && aml_get_native_resolution(&current_resolution)
++      && current_resolution.iWidth == res.iWidth && current_resolution.iHeight == res.iHeight
++      && current_resolution.iScreenWidth == res.iScreenWidth && current_resolution.iScreenHeight == res.iScreenHeight
++      && m_bFullScreen == fullScreen && current_resolution.fRefreshRate == res.fRefreshRate
++      && (current_resolution.dwFlags & D3DPRESENTFLAG_MODEMASK) == (res.dwFlags & D3DPRESENTFLAG_MODEMASK)
++      && m_stereo_mode == stereo_mode) {
++    CLog::Log(LOGDEBUG, "CWinSystemAmlogic::CreateNewWindow: No need to create a new window");
 +    return true;
 +  }
 +
-+  int delay = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt("videoscreen.delayrefreshchange");
-+  if (delay > 0)
-+  {
-+    m_delayDispReset = true;
-+    m_dispResetTimer.Set(std::chrono::milliseconds(static_cast<unsigned int>(delay * 100)));
-+  }
-+
-+  {
-+    std::unique_lock<CCriticalSection> lock(m_resourceSection);
-+    for (std::vector<IDispResource *>::iterator i = m_resources.begin(); i != m_resources.end(); ++i)
-+    {
-+      (*i)->OnLostDisplay();
-+    }
-+  }
-+
++  m_nWidth = res.iWidth;
++  m_nHeight = res.iHeight;
++  m_displayWidth = res.iScreenWidth;
++  m_displayHeight = res.iScreenHeight;
++  m_fRefreshRate = res.fRefreshRate;
 +  m_stereo_mode = stereo_mode;
 +  m_bFullScreen = fullScreen;
 +
-+#ifdef _FBDEV_WINDOW_H_
-+  int fbWidth, fbHeight;
-+  CalculateFrameBufferResolution(res, fbWidth, fbHeight);
++  OnLostDisplay();
 +
-+  fbdev_window *nativeWindow = new fbdev_window;
-+  nativeWindow->width = (ushort) fbWidth;
-+  nativeWindow->height = (ushort) fbHeight;
-+  m_nativeWindow = static_cast<EGLNativeWindowType>(nativeWindow);
-+#endif
++  if (!aml_set_native_resolution(res, m_framebuffer_name, stereo_mode)) {
++    CLog::Log(LOGERROR, "CWinSystemAmlogic::CreateNewWindow -- unable to set native resolution");
++    return false;
++  }
 +
-+  aml_set_native_resolution(res, m_framebuffer_name, stereo_mode);
++  ResetDisplay();
 +
-+  if (!m_delayDispReset)
-+  {
-+    std::unique_lock<CCriticalSection> lock(m_resourceSection);
-+    // tell any shared resources
-+    for (std::vector<IDispResource *>::iterator i = m_resources.begin(); i != m_resources.end(); ++i)
-+    {
-+      (*i)->OnResetDisplay();
++  m_bWindowCreated = true;
++
++  return true;
++}
++
++void CWinSystemAmlogic::ResetDisplay()
++{
++  if (!IsDisplayResetDue()) {
++    int delay = m_settings->GetInt("videoscreen.delayrefreshchange");
++    if (delay > 0) {
++      m_delayDispReset = true;
++      m_dispResetTimer.Set(std::chrono::milliseconds(static_cast<unsigned int>(delay * 100)));
++      return;
 +    }
 +  }
 +
-+  return true;
++  std::unique_lock<CCriticalSection> lock(m_resourceSection);
++
++  // tell any shared resources
++  for (IDispResource *resource : m_resources) {
++    resource->OnResetDisplay();
++  }
++
++  m_delayDispReset = false;
++}
++
++void CWinSystemAmlogic::OnLostDisplay()
++{
++  std::unique_lock<CCriticalSection> lock(m_resourceSection);
++
++  for (IDispResource *resource : m_resources) {
++    resource->OnLostDisplay();
++  }
++}
++
++bool CWinSystemAmlogic::IsDisplayResetDue() const
++{
++  return m_delayDispReset && m_dispResetTimer.IsTimePast();
 +}
 +
 +bool CWinSystemAmlogic::DestroyWindow()
 +{
-+  m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
-+
 +  return true;
 +}
 +
 +static std::string ModeFlagsToString(unsigned int flags, bool identifier)
 +{
 +  std::string res;
-+  if(flags & D3DPRESENTFLAG_INTERLACED)
++
++  if (flags & D3DPRESENTFLAG_INTERLACED) {
 +    res += "i";
-+  else
++  } else {
 +    res += "p";
++  }
 +
-+  if(!identifier)
++  if (!identifier) {
 +    res += " ";
++  }
 +
-+  if(flags & D3DPRESENTFLAG_MODE3DSBS)
++  if (flags & D3DPRESENTFLAG_MODE3DSBS) {
 +    res += "sbs";
-+  else if(flags & D3DPRESENTFLAG_MODE3DTB)
++  } else if (flags & D3DPRESENTFLAG_MODE3DTB) {
 +    res += "tab";
-+  else if(flags & D3DPRESENTFLAG_MODE3DFP)
++  } else if (flags & D3DPRESENTFLAG_MODE3DFP) {
 +    res += "fp";
-+  else if(identifier)
++  } else if (identifier) {
 +    res += "std";
++  }
++
 +  return res;
 +}
 +
 +void CWinSystemAmlogic::Update3dResolutions()
 +{
-+  if (!aml_probe_3d_resolutions(resolutions3d) || resolutions3d.empty())
-+  {
-+    CLog::Log(LOGWARNING, "{}: No valid 3D resolutions found.",__FUNCTION__);
++  if (!aml_probe_3d_resolutions(resolutions3d) || resolutions3d.empty()) {
++    CLog::Log(LOGWARNING, "{}: No valid 3D resolutions found.", __FUNCTION__);
 +    return;
 +  }
 +
-+  for (size_t i = 0; i < resolutions3d.size(); i++)
-+  {
-+	if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_INTERLACED) // ignore interlaced 3D resolutions
-+	  continue;
++  for (size_t i = 0; i < resolutions3d.size(); i++) {
++    if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_INTERLACED) { // ignore interlaced 3D resolutions
++      continue;
++    }
 +
 +    std::string m3d = "<unknown>";
-+    if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_MODE3DSBS)
++    if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_MODE3DSBS) {
 +      m3d = "SBS";
-+    else if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_MODE3DTB)
++    } else if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_MODE3DTB) {
 +      m3d = "TAB";
-+    else if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_MODE3DFP)
++    } else if (resolutions3d[i].dwFlags & D3DPRESENTFLAG_MODE3DFP) {
 +      m3d = "FP";
++    }
 +
 +    CServiceBroker::GetWinSystem()->GetGfxContext().ResetOverscan(resolutions3d[i]);
 +    CDisplaySettings::GetInstance().AddResolutionInfo(resolutions3d[i]);
 +
 +    CLog::Log(LOGINFO, "Found 3D resolution {} x {} with {} x {}{} @ {:f} ({})",
-+      resolutions3d[i].iWidth,
-+      resolutions3d[i].iHeight,
-+      resolutions3d[i].iScreenWidth,
-+      resolutions3d[i].iScreenHeight,
-+      resolutions3d[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
-+      resolutions3d[i].fRefreshRate,
-+      m3d);
++              resolutions3d[i].iWidth, resolutions3d[i].iHeight,
++              resolutions3d[i].iScreenWidth, resolutions3d[i].iScreenHeight,
++              resolutions3d[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
++              resolutions3d[i].fRefreshRate, m3d);
 +  }
 +}
 +
@@ -14427,45 +14631,41 @@ index 0000000000..550e4413fe
 +  std::string curDesktopSetting, curResolution, newRes;
 +  std::vector<RESOLUTION_INFO> resolutions;
 +
-+  if (!aml_probe_resolutions(resolutions) || resolutions.empty())
-+  {
-+    CLog::Log(LOGWARNING, "{}: ProbeResolutions failed.",__FUNCTION__);
++  if (!aml_probe_resolutions(resolutions) || resolutions.empty()) {
++    CLog::Log(LOGWARNING, "{}: ProbeResolutions failed.", __FUNCTION__);
 +  }
 +
 +  /* ProbeResolutions includes already all resolutions.
 +   * Only get desktop resolution so we can replace xbmc's desktop res
 +   */
-+  if (aml_get_native_resolution(&curDisplay))
-+  {
++  if (aml_get_native_resolution(&curDisplay)) {
 +    resDesktop = curDisplay;
 +  }
 +
-+  curDesktopSetting = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
++  curDesktopSetting = m_settings->GetString(CSettings::SETTING_VIDEOSCREEN_SCREENMODE);
 +
-+  curResolution = StringUtils::Format("{:05}{:05}{:09.5f}{}",
-+      resDesktop.iScreenWidth, resDesktop.iScreenHeight, resDesktop.fRefreshRate,
-+      ModeFlagsToString(resDesktop.dwFlags, true));
++  curResolution = StringUtils::Format("{:05}{:05}{:09.5f}{}", resDesktop.iScreenWidth, resDesktop.iScreenHeight,
++                                      resDesktop.fRefreshRate, ModeFlagsToString(resDesktop.dwFlags, true));
 +
-+  if (curDesktopSetting == "DESKTOP")
++  if (curDesktopSetting == "DESKTOP") {
 +    curDesktopSetting = curResolution;
-+  else if (curDesktopSetting.length() == 24)
++  } else if (curDesktopSetting.length() == 24) {
 +    curDesktopSetting = StringUtils::Right(curDesktopSetting, 23);
++  }
 +
 +  CLog::Log(LOGINFO, "Current display setting is {}", curDesktopSetting);
 +  CLog::Log(LOGINFO, "Current output resolution is {}", curResolution);
 +
 +  RESOLUTION ResDesktop = RES_INVALID;
-+  RESOLUTION res_index  = RES_DESKTOP;
++  RESOLUTION res_index = RES_DESKTOP;
 +  bool resExactMatch = false;
 +  std::string ResString;
 +  std::string ResFallback = "00480024.00000istd";
 +
-+  for (size_t i = 0; i < resolutions.size(); i++)
-+  {
++ for (size_t i = 0; i < resolutions.size(); i++) {
 +    // if this is a new setting,
 +    // create a new empty setting to fill in.
-+    if ((int)CDisplaySettings::GetInstance().ResolutionInfoSize() <= res_index)
-+    {
++    if ((int) CDisplaySettings::GetInstance().ResolutionInfoSize() <= res_index) {
 +      RESOLUTION_INFO res;
 +      CDisplaySettings::GetInstance().AddResolutionInfo(res);
 +    }
@@ -14473,18 +14673,17 @@ index 0000000000..550e4413fe
 +    CServiceBroker::GetWinSystem()->GetGfxContext().ResetOverscan(resolutions[i]);
 +    CDisplaySettings::GetInstance().GetResolutionInfo(res_index) = resolutions[i];
 +
-+    CLog::Log(LOGINFO, "Found resolution {:d} x {:d} with {:d} x {:d}{} @ {:f} Hz\n",
-+      resolutions[i].iWidth,
-+      resolutions[i].iHeight,
-+      resolutions[i].iScreenWidth,
-+      resolutions[i].iScreenHeight,
-+      resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
-+      resolutions[i].fRefreshRate);
++    CLog::Log(LOGINFO, "Found resolution {:d} x {:d} with {:d} x {:d}{} @ {:f} Hz",
++              resolutions[i].iWidth, resolutions[i].iHeight,
++              resolutions[i].iScreenWidth, resolutions[i].iScreenHeight,
++              resolutions[i].dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "",
++              resolutions[i].fRefreshRate);
 +
 +    ResString = StringUtils::Format("{:05}{:05}{:09.5f}{}",
-+          resolutions[i].iScreenWidth, resolutions[i].iScreenHeight, resolutions[i].fRefreshRate,
-+          ModeFlagsToString(resolutions[i].dwFlags, true));
-+    if (curDesktopSetting == ResString){
++                                    resolutions[i].iScreenWidth, resolutions[i].iScreenHeight, resolutions[i].fRefreshRate,
++                                    ModeFlagsToString(resolutions[i].dwFlags, true));
++
++    if (curDesktopSetting == ResString) {
 +      ResDesktop = res_index;
 +      resExactMatch = true;
 +      newRes = ResString;
@@ -14492,25 +14691,22 @@ index 0000000000..550e4413fe
 +    }
 +
 +    /* fall back to the highest resolution available but not more than current desktop */
-+    if(curDesktopSetting.substr(5,18).compare(ResString.substr(5,18)) >= 0 &&
-+        ResString.substr(5,18).compare(ResFallback) > 0 && ! resExactMatch)
-+    {
++    if (curDesktopSetting.substr(5, 18).compare(ResString.substr(5, 18)) >= 0 && ResString.substr(5, 18).compare(ResFallback) > 0 && !resExactMatch) {
 +      ResDesktop = res_index;
-+      ResFallback = ResString.substr(5,18);
++      ResFallback = ResString.substr(5, 18);
 +      newRes = ResString;
 +      CLog::Log(LOGINFO, "Fallback resolution at 16 + {} {}", i, ResFallback);
 +    }
 +
-+    res_index = (RESOLUTION)((int)res_index + 1);
++    res_index = (RESOLUTION) ((int) res_index + 1);
 +  }
 +
 +  // set RES_DESKTOP
-+  if (ResDesktop != RES_INVALID)
-+  {
++  if (ResDesktop != RES_INVALID) {
 +    CLog::Log(LOGINFO, "Found {} at {:d}, setting to RES_DESKTOP at {:d}", newRes, (int) ResDesktop, (int) RES_DESKTOP);
-+
 +    CDisplaySettings::GetInstance().GetResolutionInfo(RES_DESKTOP) = CDisplaySettings::GetInstance().GetResolutionInfo(ResDesktop);
 +  }
++
 +  Update3dResolutions();
 +  CDisplaySettings::GetInstance().ApplyCalibrations();
 +}
@@ -14523,7 +14719,9 @@ index 0000000000..550e4413fe
 +bool CWinSystemAmlogic::Show(bool show)
 +{
 +  std::string blank_framebuffer = "/sys/class/graphics/" + m_framebuffer_name + "/blank";
++
 +  SysfsUtils::SetInt(blank_framebuffer.c_str(), show ? 0 : 1);
++
 +  return true;
 +}
 +
@@ -14536,42 +14734,48 @@ index 0000000000..550e4413fe
 +void CWinSystemAmlogic::Unregister(IDispResource *resource)
 +{
 +  std::unique_lock<CCriticalSection> lock(m_resourceSection);
++
 +  std::vector<IDispResource*>::iterator i = find(m_resources.begin(), m_resources.end(), resource);
-+  if (i != m_resources.end())
++  if (i != m_resources.end()) {
 +    m_resources.erase(i);
++  }
 +}
 +
 +CHDRCapabilities CWinSystemAmlogic::GetDisplayHDRCapabilities() const
 +{
 +  std::string hdr_caps;
 +  CHDRCapabilities HDRcaps;
-+  if (SysfsUtils::GetString("/sys/class/amvecm/hdr_support", hdr_caps) == 0)
-+  {
-+    if (hdr_caps.find("HDR10") != std::string::npos)
++
++  if (SysfsUtils::GetString("/sys/class/amvecm/hdr_support", hdr_caps) == 0) {
++    if (hdr_caps.find("HDR10") != std::string::npos) {
 +      HDRcaps.SetHDR10();
-+    if (hdr_caps.find("HDR10+") != std::string::npos)
++    }
++    if (hdr_caps.find("HDR10+") != std::string::npos) {
 +      HDRcaps.SetHDR10Plus();
-+    if (hdr_caps.find("HLG") != std::string::npos)
++    }
++    if (hdr_caps.find("HLG") != std::string::npos) {
 +      HDRcaps.SetHLG();
-+    if (hdr_caps.find("STD") != std::string::npos)
++    }
++    if (hdr_caps.find("STD") != std::string::npos) {
 +      HDRcaps.SetDolbyVision();
-+    if (hdr_caps.find("LL") != std::string::npos)
++    }
++    if (hdr_caps.find("LL") != std::string::npos) {
 +      HDRcaps.SetDolbyVisionLL();
++    }
 +  }
++
 +  return HDRcaps;
 +}
 +
 +bool CWinSystemAmlogic::IsHDRDisplay()
 +{
-+  CHDRCapabilities HDRcaps;
-+  HDRcaps = CWinSystemAmlogic::GetDisplayHDRCapabilities();
-+  return HDRcaps.SupportsHDR10();
++  return GetDisplayHDRCapabilities().SupportsHDR10();
 +}
 +
 +float CWinSystemAmlogic::GetGuiSdrPeakLuminance() const
 +{
 +  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-+  const int guiSdrPeak = settings->GetInt(CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE);
++  const int guiSdrPeak = m_settings->GetInt(CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE);
 +
 +  return 0.5f * guiSdrPeak / 100.0f + 0.5f;
 +}
@@ -14595,14 +14799,23 @@ index 0000000000..550e4413fe
 +  return bitdepth;
 +}
 +
++float CWinSystemAmlogic::GetDisplayLatency()
++{
++  if (m_fRefreshRate == 0.) {
++    // default display latency
++    return CWinSystemBase::GetDisplayLatency();
++  }
++
++  return 2000. / m_fRefreshRate;
++}
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
 new file mode 100644
-index 0000000000..5470f97f78
+index 0000000000..1a077750b5
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
-@@ -0,0 +1,73 @@
+@@ -0,0 +1,82 @@
 +/*
-+ *  Copyright (C) 2005-2018 Team Kodi
++ *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
 + *
 + *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -14611,18 +14824,53 @@ index 0000000000..5470f97f78
 +
 +#pragma once
 +
-+#include "platform/linux/input/LibInputHandler.h"
-+#include "rendering/gles/RenderSystemGLES.h"
-+#include "threads/CriticalSection.h"
-+#include "windowing/WinSystem.h"
 +#include "threads/SystemClock.h"
-+#include "EGL/egl.h"
-+#include <thread>
++#include "rendering/gles/RenderSystemGLES.h"
++#include "platform/linux/input/LibInputHandler.h"
++#include "windowing/WinSystem.h"
 +
++class VeroSettings;
++class CSettings;
 +class IDispResource;
 +
 +class CWinSystemAmlogic : public CWinSystemBase
 +{
++private:
++  std::shared_ptr<CSettings> m_settings;
++  VeroSettings *m_veroSettings;
++
++  std::string m_framebuffer_name;
++
++  int m_displayWidth;
++  int m_displayHeight;
++
++  CCriticalSection m_resourceSection;
++  std::vector<IDispResource*> m_resources;
++
++  bool m_dispResetPending;
++  bool m_delayDispReset;
++  XbmcThreads::EndTime<> m_dispResetTimer;
++
++  std::thread m_monitorThread;
++  bool m_monitorEvents;
++  std::string m_lastEdid;
++
++  std::unique_ptr<CLibInputHandler> m_libinput;
++
++  RENDER_STEREO_MODE m_stereo_mode;
++  std::vector<RESOLUTION_INFO> resolutions3d;
++
++  void StartMonitorHWEvent();
++  void StopMonitorHWEvent();
++  void hwMonitorThread();
++
++  void Update3dResolutions();
++  void OnLostDisplay();
++
++protected:
++  void ResetDisplay();
++  bool IsDisplayResetDue() const;
++
 +public:
 +  CWinSystemAmlogic();
 +  virtual ~CWinSystemAmlogic();
@@ -14630,78 +14878,49 @@ index 0000000000..5470f97f78
 +  bool InitWindowSystem() override;
 +  bool DestroyWindowSystem() override;
 +
-+  bool CreateNewWindow(const std::string& name,
-+                       bool fullScreen,
-+                       RESOLUTION_INFO& res) override;
-+
++  bool CreateNewWindow(const std::string &name, bool fullScreen, RESOLUTION_INFO &res) override;
 +  bool DestroyWindow() override;
++
 +  void UpdateResolutions() override;
++
++  float GetDisplayLatency() override;
 +
 +  bool Hide() override;
 +  bool Show(bool show = true) override;
-+  virtual void Register(IDispResource *resource);
-+  virtual void Unregister(IDispResource *resource);
++
++  void Register(IDispResource *resource) override;
++  void Unregister(IDispResource *resource) override;
++
 +  CHDRCapabilities GetDisplayHDRCapabilities() const override;
 +  bool IsHDRDisplay() override;
 +  float GetGuiSdrPeakLuminance() const override;
 +  int GetCurrentBitdepth() override;
-+  bool m_monitorEvents;
-+  std::string m_lastEdid;
-+  
-+protected:
-+  std::string m_framebuffer_name;
-+  EGLDisplay m_nativeDisplay;
-+  EGLNativeWindowType m_nativeWindow;
-+
-+  int m_displayWidth;
-+  int m_displayHeight;
-+
-+  RENDER_STEREO_MODE m_stereo_mode;
-+
-+  bool m_delayDispReset;
-+  XbmcThreads::EndTime<> m_dispResetTimer;
-+
-+  CCriticalSection m_resourceSection;
-+  std::vector<IDispResource*> m_resources;
-+  std::unique_ptr<CLibInputHandler> m_libinput;
-+  void StartMonitorHWEvent();
-+  void StopMonitorHWEvent();
-+  std::thread m_monitorThread;
-+  void CalculateFrameBufferResolution(const RESOLUTION_INFO &res, int &width, int &height);
-+
-+private:
-+  std::vector<RESOLUTION_INFO> resolutions3d;
-+
-+  void Update3dResolutions();
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
 new file mode 100644
-index 0000000000..a773bc73d9
+index 0000000000..2ca3535845
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
-@@ -0,0 +1,180 @@
+@@ -0,0 +1,163 @@
 +/*
-+ *  Copyright (C) 2005-2018 Team Kodi
++ *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
 + *
 + *  SPDX-License-Identifier: GPL-2.0-or-later
 + *  See LICENSES/README.md for more information.
 + */
 +
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <sys/ioctl.h>
-+#include <linux/fb.h>
++#include "WinSystemAmlogicGLESContext.h"
 +
 +#include "VideoSyncAML.h"
-+#include "WinSystemAmlogicGLESContext.h"
++#include "utils/AMLUtils.h"
 +#include "utils/log.h"
-+#include "threads/SingleLock.h"
 +#include "windowing/WindowSystemFactory.h"
-+#include "windowing/GraphicContext.h"
++
 +
 +using namespace KODI;
 +using namespace KODI::WINDOWING::AML;
++
 +
 +void CWinSystemAmlogicGLESContext::Register()
 +{
@@ -14713,89 +14932,100 @@ index 0000000000..a773bc73d9
 +  return std::make_unique<CWinSystemAmlogicGLESContext>();
 +}
 +
++CWinSystemAmlogicGLESContext::CWinSystemAmlogicGLESContext()
++    : m_nativeDisplay(EGL_NO_DISPLAY)
++{
++  m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
++}
++
++CWinSystemAmlogicGLESContext::~CWinSystemAmlogicGLESContext()
++{
++  if (m_nativeWindow) {
++    m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
++  }
++}
++
 +bool CWinSystemAmlogicGLESContext::InitWindowSystem()
 +{
-+  if (!CWinSystemAmlogic::InitWindowSystem())
-+  {
++  m_nativeDisplay = EGL_DEFAULT_DISPLAY;
++
++  if (!CWinSystemAmlogic::InitWindowSystem()) {
 +    return false;
 +  }
 +
-+  if (!m_pGLContext.CreateDisplay(m_nativeDisplay))
-+  {
++  if (!m_pGLContext.CreateDisplay(m_nativeDisplay)) {
 +    return false;
 +  }
 +
-+  if (!m_pGLContext.InitializeDisplay(EGL_OPENGL_ES_API))
-+  {
++  if (!m_pGLContext.InitializeDisplay(EGL_OPENGL_ES_API)) {
 +    return false;
 +  }
 +
-+  if (!m_pGLContext.ChooseConfig(EGL_OPENGL_ES2_BIT))
-+  {
++  if (!m_pGLContext.ChooseConfig(EGL_OPENGL_ES2_BIT)) {
 +    return false;
 +  }
 +
 +  CEGLAttributesVec contextAttribs;
-+  contextAttribs.Add({{EGL_CONTEXT_CLIENT_VERSION, 2}});
++  contextAttribs.Add({{ EGL_CONTEXT_CLIENT_VERSION, 2 } });
 +
-+  if (!m_pGLContext.CreateContext(contextAttribs))
-+  {
++  if (!m_pGLContext.CreateContext(contextAttribs)) {
 +    return false;
 +  }
 +
 +  return true;
 +}
 +
-+bool CWinSystemAmlogicGLESContext::CreateNewWindow(const std::string& name,
-+                                               bool fullScreen,
-+                                               RESOLUTION_INFO& res)
++bool CWinSystemAmlogicGLESContext::CreateNewWindow(const std::string &name, bool fullScreen, RESOLUTION_INFO &res)
 +{
 +  m_pGLContext.DestroySurface();
++  m_nativeWindow = static_cast<EGLNativeWindowType>(NULL);
 +
-+  if (!CWinSystemAmlogic::DestroyWindow())
-+  {
++  if (!CWinSystemAmlogic::DestroyWindow()) {
 +    return false;
 +  }
 +
-+  if (!CWinSystemAmlogic::CreateNewWindow(name, fullScreen, res))
-+  {
++  if (!CWinSystemAmlogic::CreateNewWindow(name, fullScreen, res)) {
 +    return false;
 +  }
 +
-+  if (!m_pGLContext.CreateSurface(m_nativeWindow))
-+  {
++  int fbWidth, fbHeight;
++  CalculateFrameBufferResolution(res, fbWidth, fbHeight);
++
++  fbdev_window *nativeWindow = new fbdev_window;
++  nativeWindow->width = (ushort) fbWidth;
++  nativeWindow->height = (ushort) fbHeight;
++  m_nativeWindow = static_cast<EGLNativeWindowType>(nativeWindow);
++
++  if (!m_pGLContext.CreateSurface(m_nativeWindow)) {
 +    return false;
 +  }
 +
-+  if (!m_pGLContext.BindContext())
-+  {
++  if (!m_pGLContext.BindContext()) {
 +    return false;
-+  }
-+
-+  if (!m_delayDispReset)
-+  {
-+    std::unique_lock<CCriticalSection> lock(m_resourceSection);
-+    // tell any shared resources
-+    for (std::vector<IDispResource *>::iterator i = m_resources.begin(); i != m_resources.end(); ++i)
-+      (*i)->OnResetDisplay();
 +  }
 +
 +  return true;
++}
++
++void CWinSystemAmlogicGLESContext::CalculateFrameBufferResolution(const RESOLUTION_INFO &res, int &width, int &height)
++{
++  aml_calc_framebuffer_resolution(res, width, height);
 +}
 +
 +bool CWinSystemAmlogicGLESContext::ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop)
 +{
 +  CRenderSystemGLES::ResetRenderSystem(newWidth, newHeight);
++
 +  return true;
 +}
 +
-+bool CWinSystemAmlogicGLESContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays)
++bool CWinSystemAmlogicGLESContext::SetFullScreen(bool fullScreen, RESOLUTION_INFO &res, bool blankOtherDisplays)
 +{
 +  CreateNewWindow("", fullScreen, res);
 +
 +  int fbWidth, fbHeight;
-+  CalculateFrameBufferResolution(res, fbWidth, fbHeight);
 +
++  CalculateFrameBufferResolution(res, fbWidth, fbHeight);
 +  CRenderSystemGLES::ResetRenderSystem(fbWidth, fbHeight);
 +
 +  return true;
@@ -14803,46 +15033,21 @@ index 0000000000..a773bc73d9
 +
 +void CWinSystemAmlogicGLESContext::SetVSyncImpl(bool enable)
 +{
-+  if (!m_pGLContext.SetVSync(enable))
-+  {
-+    CLog::Log(LOGERROR, "{},Could not set egl vsync", __FUNCTION__);
++  if (!m_pGLContext.SetVSync(enable)) {
++    CLog::Log(LOGERROR, "{}, Could not set egl vsync", __FUNCTION__);
 +  }
 +}
 +
 +void CWinSystemAmlogicGLESContext::PresentRenderImpl(bool rendered)
 +{
-+  if (m_delayDispReset && m_dispResetTimer.IsTimePast())
-+  {
-+    m_delayDispReset = false;
-+    std::unique_lock<CCriticalSection> lock(m_resourceSection);
-+    // tell any shared resources
-+    for (std::vector<IDispResource *>::iterator i = m_resources.begin(); i != m_resources.end(); ++i)
-+      (*i)->OnResetDisplay();
++  // reset display if needed
++  if (IsDisplayResetDue()) {
++    ResetDisplay();
 +  }
 +
 +  // Ignore errors - eglSwapBuffers() sometimes fails during modeswaps on AML,
 +  // there is probably nothing we can do about it
 +  m_pGLContext.TrySwapBuffers();
-+}
-+
-+EGLDisplay CWinSystemAmlogicGLESContext::GetEGLDisplay() const
-+{
-+  return m_pGLContext.GetEGLDisplay();
-+}
-+
-+EGLSurface CWinSystemAmlogicGLESContext::GetEGLSurface() const
-+{
-+  return m_pGLContext.GetEGLSurface();
-+}
-+
-+EGLContext CWinSystemAmlogicGLESContext::GetEGLContext() const
-+{
-+  return m_pGLContext.GetEGLContext();
-+}
-+
-+EGLConfig  CWinSystemAmlogicGLESContext::GetEGLConfig() const
-+{
-+  return m_pGLContext.GetEGLConfig();
 +}
 +
 +std::unique_ptr<CVideoSync> CWinSystemAmlogicGLESContext::GetVideoSync(CVideoReferenceClock *clock)
@@ -14862,12 +15067,12 @@ index 0000000000..a773bc73d9
 +}
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
 new file mode 100644
-index 0000000000..dc220ddc1e
+index 0000000000..84a7bc22f2
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.h
-@@ -0,0 +1,60 @@
+@@ -0,0 +1,50 @@
 +/*
-+ *  Copyright (C) 2005-2018 Team Kodi
++ *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
 + *
 + *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -14878,21 +15083,26 @@ index 0000000000..dc220ddc1e
 +
 +#include "utils/EGLUtils.h"
 +#include "rendering/gles/RenderSystemGLES.h"
-+#include "utils/GlobalsHandling.h"
 +#include "WinSystemAmlogic.h"
 +
-+namespace KODI
-+{
-+namespace WINDOWING
-+{
-+namespace AML
-+{
++namespace KODI::WINDOWING::AML {
 +
 +class CWinSystemAmlogicGLESContext : public CWinSystemAmlogic, public CRenderSystemGLES
 +{
++private:
++  EGLDisplay m_nativeDisplay;
++  EGLNativeWindowType m_nativeWindow;
++  CEGLContextUtils m_pGLContext;
++
++  void CalculateFrameBufferResolution(const RESOLUTION_INFO &res, int &width, int &height);
++
++protected:
++  void SetVSyncImpl(bool enable) override;
++  void PresentRenderImpl(bool rendered) override;
++
 +public:
-+  CWinSystemAmlogicGLESContext() = default;
-+  virtual ~CWinSystemAmlogicGLESContext() = default;
++  CWinSystemAmlogicGLESContext();
++  virtual ~CWinSystemAmlogicGLESContext();
 +
 +  static void Register();
 +  static std::unique_ptr<CWinSystemBase> CreateWinSystem();
@@ -14900,29 +15110,14 @@ index 0000000000..dc220ddc1e
 +  // Implementation of CWinSystemBase via CWinSystemAmlogic
 +  CRenderSystemBase *GetRenderSystem() override { return this; }
 +  bool InitWindowSystem() override;
-+  bool CreateNewWindow(const std::string& name,
-+                       bool fullScreen,
-+                       RESOLUTION_INFO& res) override;
++  bool CreateNewWindow(const std::string &name, bool fullScreen, RESOLUTION_INFO &res) override;
 +
 +  bool ResizeWindow(int newWidth, int newHeight, int newLeft, int newTop) override;
-+  bool SetFullScreen(bool fullScreen, RESOLUTION_INFO& res, bool blankOtherDisplays) override;
++  bool SetFullScreen(bool fullScreen, RESOLUTION_INFO &res, bool blankOtherDisplays) override;
 +
-+  virtual std::unique_ptr<CVideoSync> GetVideoSync(CVideoReferenceClock *clock) override;
++  std::unique_ptr<CVideoSync> GetVideoSync(CVideoReferenceClock *clock) override;
 +
 +  bool SupportsStereo(RENDER_STEREO_MODE mode) const override;
-+
-+  EGLDisplay GetEGLDisplay() const;
-+  EGLSurface GetEGLSurface() const;
-+  EGLContext GetEGLContext() const;
-+  EGLConfig  GetEGLConfig() const;
-+protected:
-+  void SetVSyncImpl(bool enable) override;
-+  void PresentRenderImpl(bool rendered) override;
-+
-+private:
-+  CEGLContextUtils m_pGLContext;
 +};
 +
-+}
-+}
 +}
