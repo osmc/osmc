@@ -1,0 +1,145 @@
+From patchwork Mon Dec 15 10:04:31 2025
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: "YAN Chao (BCSC/EPA2,
+ Smart Home)" <chao.yan2@bosch.com>
+X-Patchwork-Id: 14347957
+Received: from OSPPR02CU001.outbound.protection.outlook.com
+ (mail-norwayeastazon11013026.outbound.protection.outlook.com [40.107.159.26])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717141448E0
+	for <connman@lists.linux.dev>; Mon, 15 Dec 2025 10:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+ arc=fail smtp.client-ip=40.107.159.26
+ARC-Seal: i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765793176; cv=fail;
+ b=Lvv8b1KYKTNtE0lUqW+cediXJcc6/bZWhIwqDZ6hsoLPGJzPittClOKOGLDBiF8GfSIPQ9DFVEToFvLJ88UNgX89UfZz4O/DlR5THqgFP1GIZfbVecFMNMJrtrCUgdFXV9+NM4GUuYHnEaXxGPneBfYZjeip3Pmw5lU4aUHjcX8=
+ARC-Message-Signature: i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765793176; c=relaxed/simple;
+	bh=F2Zqs7aUc16XHXj49zh7xCBPYpwGqbybwRIgecyrQ84=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type;
+ b=mGVEthp2vSe4ztbajehaQ8+2DKMVGw6xkzT2nE69NrO1LvvxDTu9A05PgzpD77MfyDrg+27f+1PD+7b5v2nqCTTXNZSp++H+9hubpIow1cfZDUYN+vCl3pGh2aAlitvnhOQE5iIQQbGo9oV5rxUWxg1tyLiUbo2zsC0FecNVOa4=
+ARC-Authentication-Results: i=2; smtp.subspace.kernel.org;
+ dmarc=pass (p=reject dis=none) header.from=bosch.com;
+ spf=pass smtp.mailfrom=cn.bosch.com;
+ dkim=pass (2048-bit key) header.d=bosch.com header.i=@bosch.com
+ header.b=WqBO5+CN; arc=fail smtp.client-ip=40.107.159.26
+Authentication-Results: smtp.subspace.kernel.org;
+ dmarc=pass (p=reject dis=none) header.from=bosch.com
+Authentication-Results: smtp.subspace.kernel.org;
+ spf=pass smtp.mailfrom=cn.bosch.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bosch.com header.i=@bosch.com
+ header.b="WqBO5+CN"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Giiuv6MPI0tANXWaPE4xbA9URXJEGJgDsg5YWgdtkBN0VfjQlN/VdXPhYq6feBTz5LhpZIeMZkshFsvVuooL4djPhM6Ubgbpbi8Er/2iRkLJkkPOrHxofaIDz+FBZXScyQjB8Y4s5fNBkS4GownuU/p1W4BZ4RphRpgjlHDFgpxXQ62KinzDwnrgMj2LOm51HvPCWWyJhBVrYjPSnI/OXkcbO1adzlOeWQXuvKJU7iXFOW4GGHNxSKzem6d06fSoBwNTUorC4TVm4hylNnQ+x763xH2o0HUtK5ipHuNi/hW8F7aiKD/1ggJ4gSreB6CcQNENwfCfPUvz/YJCBODc6g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=apaolt+6gzRZRiSgzOG8uLnFnHVkk0jQcswDtrudQm8=;
+ b=fM0N+AaaX4mReUvT7xsXv09irDMtnSHFpE83rhC+sn1iNpCKwMY6tAY4iR6A5X6B+HZLdpvLFs8AHYX8fvI1RKYCKtRVyK6jkizfvGD1OqUE5cOviC+TN1LeOkZhANV/L1OyhR1K8129XeKMvkGyTNE3qVkqvYos6H8oWQZdN7fQVz96KGeSUE/5kSrONmlh7KFXVjZd7RcMxfpcueFj6Mwe1wJg5wgw7ZoD3XTRK7alrk12LIZSy96Tk/KHPjfYS8VA4hCg4lSGPb91c3B7WmbLujNX0VNzRlqpppQaDQjeEUiVQIx3lJ5BUuF3I5+ukBLbsk/pFLmBt7k/5IbgRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 139.15.153.206) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=cn.bosch.com;
+ dmarc=fail (p=reject sp=none pct=100) action=oreject header.from=bosch.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bosch.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=apaolt+6gzRZRiSgzOG8uLnFnHVkk0jQcswDtrudQm8=;
+ b=WqBO5+CN/yj8+Hr2YlnSCgE3BDjSi8Vh9pjqUa91RJPKWJcBS5fhytM8rfK6DfzH/1INY5m4QR3avXC0CQNi68sj/4ZUN1+J+vinXQLzkDAKXROI7oawpakImgsSJ7exw7Y5OAKDKjTNZKfWTH5vVkQsQonypBpzn1raPXrhFAG0Y54v3T4IQWSLBlZxgD3HX8KMYjcSh2G+SRzkGbABuqstrpyuhc1e1fiYSA3Hn8CFzf9X7+axkx5Pyxq9Kmxkv+9M9BIACyfxnpeBRAExIF1LJ1Ks15wrxEUdsWhg7HZN0ifuYjAzlekQo+unoUaYwxyjGB/9qLDBJN9smmStCg==
+Received: from CWLP265CA0380.GBRP265.PROD.OUTLOOK.COM (2603:10a6:401:5e::32)
+ by VE1PR10MB3870.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:800:149::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
+ 2025 10:06:10 +0000
+Received: from AMS0EPF000001A2.eurprd05.prod.outlook.com
+ (2603:10a6:401:5e:cafe::5a) by CWLP265CA0380.outlook.office365.com
+ (2603:10a6:401:5e::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.13 via Frontend Transport; Mon,
+ 15 Dec 2025 10:06:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 139.15.153.206)
+ smtp.mailfrom=cn.bosch.com; dkim=none (message not signed)
+ header.d=none;dmarc=fail action=oreject header.from=bosch.com;
+Received-SPF: Pass (protection.outlook.com: domain of cn.bosch.com designates
+ 139.15.153.206 as permitted sender) receiver=protection.outlook.com;
+ client-ip=139.15.153.206; helo=eop.bosch-org.com; pr=C
+Received: from eop.bosch-org.com (139.15.153.206) by
+ AMS0EPF000001A2.mail.protection.outlook.com (10.167.16.235) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9434.6 via Frontend Transport; Mon, 15 Dec 2025 10:06:09 +0000
+Received: from RNGMBX3003.de.bosch.com (10.124.11.208) by eop.bosch-org.com
+ (139.15.153.206) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.29; Mon, 15 Dec
+ 2025 11:05:55 +0100
+Received: from WX8-C-0001P.wx8.apac.bosch.com (10.190.160.16) by
+ smtp.app.bosch.com (10.124.11.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.35; Mon, 15 Dec 2025 11:05:54 +0100
+From: "YAN Chao (BCSC/EPA2, Smart Home)" <chao.yan2@bosch.com>
+To: <connman@lists.linux.dev>
+CC: "YAN Chao (BCSC/EPA2, Smart Home)" <chao.yan2@bosch.com>
+Subject: [PATCH] wifi: Detect invalid key with auth challenge failed
+Date: Mon, 15 Dec 2025 18:04:31 +0800
+Message-ID: <20251215100431.1867291-1-chao.yan2@bosch.com>
+X-Mailer: git-send-email 2.43.0
+Precedence: bulk
+X-Mailing-List: connman@lists.linux.dev
+List-Id: <connman.lists.linux.dev>
+List-Subscribe: <mailto:connman+subscribe@lists.linux.dev>
+List-Unsubscribe: <mailto:connman+unsubscribe@lists.linux.dev>
+MIME-Version: 1.0
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AMS0EPF000001A2:EE_|VE1PR10MB3870:EE_
+X-MS-Office365-Filtering-Correlation-Id: eef64669-a9b5-4a47-9033-08de3bc191f5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: 
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info: 
+ +P7pG4N/V6ULS5GbkPcb5Wc3HtxneduYYMk5YH0fIW6RS9WkVb+bQFSznyNg/XOCxPcQxp4TaoM67jOnT547ENV3+/cZk7yPnmc59DBPNEkbWc4V6Tnjk32c21jTsbXJePIrBQKwBk+3Kbi11x6H0JOg/N48Mvet+OTupA+DToxBEa1KQW3iATz5wwu9n9gEAUY9S4JroF/Fa6qg//uyChJZWwVSZxxQ2CtY1H7L82l0PejOAg4GrSAoqHWB3aborYFmzmOcMXNthtfmwirTBJYWbjfWm80HTV2YwdBv4QOzubZiAoNj7zYPioyJh5AAHplCi2MO7oaLF/HuLVBvoxmxee/LiuS5wZw/P9gKLqlu+Xoln9v1EifMLtv6VDobnNWh/R9CXP5FGxUNF5d2KdTFGDEsqsXdhHGkH0l5Tscoh4EDDwP91tOWijQVADsxHa7bRw38OCM2J/0ZekJARNHdedBIVP/g69I4jxO/GHD7wmD/3jnrmRbpqXWLMjqaHo+U8UVyuo2bflcDmPXy8gpdlNkXdZG67XLTCNKUXbKgRAvbQi7Nkbs0y0FuLppHQil9vewkOeaF5WsHvoj3hGz41PBaZzfw/SoD94lWukkvRlhABO3YvD2691Udde3I+upzEDgn51F6U6FzXcvP3kgVtHEiKMqX3pyX+cJwTcCmso7Zf5UmN6fJm2Wu5oQmFZaeKFINvUgWnGDUwLx0jZhaTHUG1ngT8d4phGzZ2DrN68fqcIgK6+Ff144yz/T/NxpeeOFP3e/tUCkHgYAB8D6d5tT1VgsBQH+PnUFOD4XXd5vBphSwG7G2ufumrEZdson0lhh/yoyq5BUa5XD1KBZMQyskZ3jhG/gCm+eyubRDe4+kzCYinQihyNcy94qqX5q0n1nAyRT+6UPI+fPFlaEJK8x5TF+I9lC4sZztDmD5dS7lHXz9ojtkBBmn5YNxqYMfwvc0pOqvEEx9Q9h/eQt8GCSdigpxzdQVkO3OAECYr1v1rb8j+NWeZX1kqBxMpnTm4yKz5gZpnVSB2+UvSzULjvH2b4YpSAh8RDxFYbpgC2HjXFRBp6zSJg7CNi3EXjQuOhDpkiCDr/1gS/0SPKYpovpb/FWuzeNOo+zCl+PA39wOIwpKf2aGcqcorsrPUbm3P5dtQUqtCl8FDXhzALhzURxJeZ149MqAPEnUzyA8BlAbCmQsv7u6kuxcnSIC9T3CGfA99MjT1JY3IgP9gOzIPkLQNwyuvXsgXLqN0Ns/OqJ8sYvkBWydut1tzkNg1Z6N6iiA4W8ByZpFeupc25WLakjQ8AYdNYugr3ekhplvCL0+GAaHSWvbPOHJz1+vf7ns0lPMSU6SMn4V5veGpiYJ2cX+WWGr8hwJxvngMfIQKpcHHZmIpfk6SstdTxZF0PvV3gVDWeLssezhRBEJib1wG6Xii0peGFKR0BSfr3ehBB0/QvXnPsJX3IgNkHUpTjNEv8Lz9fZu0Vf8wIjtGY1gCbLyMHBpl7EE4TJ7A6T/BMtyhDdKrOhx230gsYsbkaukdYEDCrSxgJkI//INq6vn+rQDj6dvzncf1r46g1s=
+X-Forefront-Antispam-Report: 
+	CIP:139.15.153.206;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:eop.bosch-org.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: bosch.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 10:06:09.6073
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 
+ eef64669-a9b5-4a47-9033-08de3bc191f5
+X-MS-Exchange-CrossTenant-Id: 0ae51e19-07c8-4e4b-bb6d-648ee58410f4
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: 
+ TenantId=0ae51e19-07c8-4e4b-bb6d-648ee58410f4;Ip=[139.15.153.206];Helo=[eop.bosch-org.com]
+X-MS-Exchange-CrossTenant-AuthSource: 
+	AMS0EPF000001A2.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR10MB3870
+
+Signed-off-by: YAN Chao (BCSC/EPA2, Smart Home) <chao.yan2@bosch.com>
+---
+ plugins/wifi.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 12389fa..551a5fc 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -74,6 +74,7 @@
+ #define P2P_LISTEN_PERIOD 500
+ #define P2P_LISTEN_INTERVAL 2000
+ 
++#define ASSOC_STATUS_AUTH_CHALLENGE_FAILED 15
+ #define ASSOC_STATUS_AUTH_TIMEOUT 16
+ #define ASSOC_STATUS_NO_CLIENT 17
+ #define LOAD_SHAPING_MAX_RETRIES 3
+@@ -2505,7 +2506,8 @@ static bool handle_4way_handshake_failure(GSupplicantInterface *interface,
+ 
+ 	if ((wifi->state != G_SUPPLICANT_STATE_4WAY_HANDSHAKE) &&
+ 			!((wifi->state == G_SUPPLICANT_STATE_ASSOCIATING) &&
+-				(wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT)))
++				(wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT || 
++			     wifi->assoc_code == ASSOC_STATUS_AUTH_CHALLENGE_FAILED)))
+ 		return false;
+ 
+ 	if (wifi->connected)
