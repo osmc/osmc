@@ -1,0 +1,29 @@
+# OSMC boot configuration for Vero V
+#
+# This file is NOT active. To activate, copy it to /boot/cmdline.txt:
+#
+#   cp /boot/cmdline.txt.EXAMPLE /boot/cmdline.txt
+#
+# Changes take effect on next reboot.
+# Recovery: insert an OSMC installer SD card or USB stick to reinstall.
+#
+# -----------------------------------------------------------------------
+# Options
+# -----------------------------------------------------------------------
+#
+# Append extra kernel arguments (space-separated, single line):
+# user_bootargs=loglevel=7
+#
+# Show verbose kernel boot messages:
+# no_quiet=1
+#
+# -----------------------------------------------------------------------
+# Developer options
+# -----------------------------------------------------------------------
+#
+# Enable SDIO debug UART via the SD card slot (Amlogic debug board).
+# WARNING: disables the SD card slot. Remove this line to restore it.
+# user_bootargs=skip_sd_probe=1
+#
+# Multiple arguments can be combined:
+# user_bootargs=loglevel=7 skip_sd_probe=1
