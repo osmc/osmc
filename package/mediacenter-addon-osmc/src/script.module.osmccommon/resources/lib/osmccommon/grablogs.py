@@ -587,6 +587,31 @@ SETS = {
             },
         ],
     },
+
+    'ramoops': {
+        'order': 23,
+        'active': False,
+        'help': 'Ramoops (persistent storage crash logs)',
+        'dest': 'ramoops',
+        'action': 'store_true',
+        'flags': ['-R', '--ramoops'],
+        'logs': [
+            {
+                'name': 'pstore listing',
+                'key': 'pSt0rEls',
+                'ltyp': 'cl_log',
+                'actn': 'ls -la /var/lib/systemd/pstore/',
+                'hwid': 'vero5',
+            },
+            {
+                'name': 'ramoops content',
+                'key': 'rAmOoPs5',
+                'ltyp': 'cl_log',
+                'actn': 'bash -c "for f in /var/lib/systemd/pstore/*; do [ -f \\"$f\\" ] && { echo \\"--- $f ---\\"; cat \\"$f\\"; echo; }; done"',
+                'hwid': 'vero5',
+            },
+        ],
+    },
 }
 
 
