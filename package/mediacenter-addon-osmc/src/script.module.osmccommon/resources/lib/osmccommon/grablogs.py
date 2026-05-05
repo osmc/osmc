@@ -95,6 +95,13 @@ SETS = {
                 'actn': '/proc/cmdline',
             },
             {
+                'name': 'boot cmdline',
+                'key': 'bCmDlN05',
+                'ltyp': 'file_log',
+                'actn': '/boot/cmdline.txt',
+                'hwid': 'vero5',
+            },
+            {
                 'name': 'Debian version',
                 'key': 'm4ls932a',
                 'ltyp': 'file_log',
