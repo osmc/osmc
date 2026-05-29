@@ -17,8 +17,10 @@ function setup_osmc_user()
 	mkdir -p ${1}/etc/sudoers.d
 	echo "osmc     ALL= NOPASSWD: ALL" >${1}/etc/sudoers.d/osmc-no-sudo-password
 	echo "Defaults        !secure_path" >${1}/etc/sudoers.d/osmc-no-secure-path
+	echo "Defaults        env_file=/etc/environment" >${1}/etc/sudoers.d/osmc-environment
 	chmod 0440 ${1}/etc/sudoers.d/osmc-no-sudo-password
 	chmod 0440 ${1}/etc/sudoers.d/osmc-no-secure-path
+	chmod 0440 ${1}/etc/sudoers.d/osmc-environment
 	# Groups for permissions
 	chroot ${1} usermod -G disk,cdrom,lp,dialout,video,audio,adm osmc
 	# Default storage directories
