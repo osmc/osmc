@@ -295,6 +295,13 @@ class Main(object):
         self.exit_procedure()
 
     def holding_pattern_update(self):
+        # update checks may have become suppressed while this check was being
+        # held (such as the user declining to install a downloaded update),
+        # in which case the deferred check should be abandoned
+        if self.update_checks_suppressed():
+            self.function_holding_pattern = None
+            return
+
         check, _ = self.check_update_conditions()
 
         if check:
@@ -366,6 +373,22 @@ class Main(object):
 
         # trigger the flag to skip update checks
         self.skip_update_check = True
+
+    def update_checks_suppressed(self):
+        """
+            Returns whether automatic update checks are currently blocked.
+
+            The block file may be created after the service has started (for
+            example, when the user declines to install updates that have already
+            been downloaded), so it is re-checked at trigger time rather than
+            relying only on the state cached when the service started.
+
+            Manual, user-initiated update checks ignore this.
+        """
+        if not self.skip_update_check and os.path.isfile(self.block_update_file):
+            self.skip_update_check = True
+
+        return self.skip_update_check
 
     def exit_procedure(self):
         # stop the listener
@@ -816,6 +839,12 @@ class Main(object):
         """
         # do not do anything while there is something in the holding pattern
         if self.function_holding_pattern:
+            return
+
+        # updates may have been downloaded and be awaiting install since the
+        # service started, so re-check the block file at trigger time
+        if self.update_checks_suppressed():
+            log('Scheduled update check skipped: update checks are suppressed')
             return
 
         # check whether the install is an alpha version
