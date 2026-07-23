@@ -2,6 +2,14 @@
 
 if [ "$1" = "configure" ]; then
 
+	if ! grep -q 'VNC_NOMOUSE' /etc/osmc/prefs.d/aml-vnc.conf; then
+		printf '\n# Disable sending mouse actions (Server default: mouse enabled)\n#VNC_NOMOUSE="true"\n' >> /etc/osmc/prefs.d/aml-vnc.conf
+	fi
+
+	if ! grep -q 'VNC_DEBUGLOG' /etc/osmc/prefs.d/aml-vnc.conf; then
+		printf '\n# Enable debug log from libvncserver (Server default: log disabled)\n#VNC_DEBUGLOG="true"\n' >> /etc/osmc/prefs.d/aml-vnc.conf
+	fi
+
 	systemctl daemon-reload
 	if [ -e "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install" ]; then
 		rm -f "/var/run/${DPKG_MAINTSCRIPT_PACKAGE}_install"
