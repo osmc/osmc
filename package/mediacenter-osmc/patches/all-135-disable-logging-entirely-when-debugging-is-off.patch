@@ -1,0 +1,68 @@
+From 308b42ba3e2a8b12b29a4705be353fc275539c86 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 9 Jun 2026 00:56:18 +0100
+Subject: [PATCH] AdvancedSettings: disable logging entirely when debug logging
+ is off
+
+Kodi at the default (non-debug) log level logs at INFO, which writes to
+flash continuously throughout a session. On OSMC's flash-based devices
+(eMMC on Vero, SD on Pi) this wastes write cycles for output that isn't
+useful for support - when there is a problem we ask the user to enable
+debug logging and reproduce anyway.
+
+Map the "debug logging off" state to LOG_LEVEL_NONE instead of
+LOG_LEVEL_NORMAL, in both OnSettingsLoaded() (startup/profile load) and
+SetDebugMode() (live GUI toggle). The startup banner and early init are
+still captured: PrintStartupLog() runs before settings are loaded while
+the log level is still the constructor default.
+
+An explicit advancedsettings.xml <loglevel> above normal, or the --debug
+command line flag, still forces logging on (via m_logLevelHint), capped
+at LOG_LEVEL_DEBUG so an override of 2 does not enable the on-screen
+freemem overlay. Enabling debug logging in the GUI restores full logging
+live, and a full startup-to-shutdown debug log on restart.
+---
+ xbmc/settings/AdvancedSettings.cpp | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
+index 34dafe7ea7..4de5e4c54e 100644
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -62,7 +62,17 @@ void CAdvancedSettings::OnSettingsLoaded()
+   }
+   else
+   {
+-    m_logLevel = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
++    // OSMC: with debug logging disabled, turn the log off entirely rather than
++    // logging at INFO. Kodi otherwise writes continuously to flash (eMMC on
++    // Vero, SD on Pi) for output that is not useful for support - when there is
++    // a problem we ask the user to enable debug logging anyway. The startup
++    // banner and early init are already on disk (PrintStartupLog runs before
++    // settings load). An explicit advancedsettings.xml <loglevel> above normal
++    // (or --debug) still forces logging on, exactly as before.
++    if (m_logLevelHint > LOG_LEVEL_NORMAL)
++      m_logLevel = std::min(m_logLevelHint, LOG_LEVEL_DEBUG);
++    else
++      m_logLevel = LOG_LEVEL_NONE;
+     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", m_logLevel);
+   }
+   CServiceBroker::GetLogging().SetLogLevel(m_logLevel);
+@@ -1409,7 +1419,13 @@ void CAdvancedSettings::SetDebugMode(bool debug)
+   }
+   else
+   {
+-    int level = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
++    // OSMC: see OnSettingsLoaded() - disabling debug logging silences the log
++    // entirely to spare flash write cycles, unless advancedsettings.xml (or
++    // --debug) forces a level above normal. Logged before SetLogLevel() so this
++    // line marks where output ends.
++    int level = LOG_LEVEL_NONE;
++    if (m_logLevelHint > LOG_LEVEL_NORMAL)
++      level = std::min(m_logLevelHint, LOG_LEVEL_DEBUG);
+     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", level);
+     m_logLevel = level;
+     CServiceBroker::GetLogging().SetLogLevel(level);
+-- 
+2.34.1
+
