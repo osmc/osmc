@@ -41,46 +41,70 @@ case $CODE in
 	;;
 5)
 	if [ -e /dist_upgrade_wanted ]; then apt-get clean; fi
+	defer_msg=""
 
 	set_font
 	if [ $boot_space -lt 30 ] || [ $root_space -lt 300 ]; then
-		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n        WARNING! Insufficient disk space available to complete update.\n\n30MB required on /boot (${boot_space}MB available) and 300MB required on root partition. (${root_space}MB available)\n\nPlease free sufficient disk space and check for updates to try again. Rebooting in 60 seconds..." 11 85 > /dev/tty1
-		sleep 60; reboot
-	fi
-
-	dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
-
-	count=60
-	while [ $count -gt 0 ]; do
-		if grep -q nfsroot /proc/cmdline; then
-			ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
-		else
-			if connmanctl state | grep -iq 'online'; then break; fi
+		if [ ! -e /dist_upgrade_wanted ]
+		then
+			dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n        WARNING! Insufficient disk space available to complete update.\n\n30MB required on /boot (${boot_space}MB available) and 300MB required on root partition. (${root_space}MB available)\n\nPlease free sufficient disk space and check for updates to try again. Rebooting in 60 seconds..." 11 85 > /dev/tty1
+			sleep 60; reboot
+			exit 0
 		fi
-		sleep 5; let count-=5
-	done
-
-	if [ $count -lt 1 ]
-	then
-		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
-		sleep 20; reboot
+		defer_msg="\n        WARNING! Insufficient disk space available to complete the upgrade.\n\n30MB required on /boot (${boot_space}MB available) and 300MB required on root partition. (${root_space}MB available)\n\nPlease free sufficient disk space. The upgrade will be retried at the next boot."
 	fi
-        dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
-        err=$(apt-get -qq update); if [ -n "$err" ]
-        then
-                if [ -e /dist_upgrade_wanted ]
-                then
-                        dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nRebooting in 20 seconds to try again..." 0 0 > /dev/tty1
-                        sleep 20; reboot
-                        exit 0
-                fi
-                dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
-                sleep 20
-        fi
-        rm -f /dist_upgrade_wanted
-        systemctl start manual-update
-        exit 0
-        ;;
+
+	if [ -z "$defer_msg" ]
+	then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n     Establishing a connection to the OSMC update servers..." 5 71 > /dev/tty1
+
+		count=60
+		while [ $count -gt 0 ]; do
+			if grep -q nfsroot /proc/cmdline; then
+				ping -c 1 -W 2 apt.osmc.tv >/dev/null 2>&1 && break
+			else
+				if connmanctl state | grep -iq 'online'; then break; fi
+			fi
+			sleep 5; let count-=5
+		done
+
+		if [ $count -lt 1 ]
+		then
+			if [ ! -e /dist_upgrade_wanted ]
+			then
+				dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n    No internet connection was found. Rebooting in 20 seconds." 5 71 > /dev/tty1
+				sleep 20; reboot
+				exit 0
+			fi
+			defer_msg="\n    No internet connection was found. The upgrade will be retried at the next boot."
+		fi
+	fi
+
+	if [ -z "$defer_msg" ]
+	then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "\n         Updating the list of available OSMC packages..." 5 71 > /dev/tty1
+		err=$(apt-get -qq update); if [ -n "$err" ]
+		then
+			if [ -e /dist_upgrade_wanted ]
+			then
+				defer_msg="The following errors occured while searching for new packages:\n\n${err}\n\nThe upgrade will be retried at the next boot."
+			else
+				dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "The following errors occured while searching for new packages:\n\n${err}\n\nContinuing in 20 seconds..." 0 0 > /dev/tty1
+				sleep 20
+			fi
+		fi
+	fi
+
+	if [ -n "$defer_msg" ]
+	then
+		dialog --backtitle "Package configuration" --title "OSMC Update" --infobox "${defer_msg}\n\nStarting Kodi in 20 seconds..." 0 0 > /dev/tty1
+		sleep 20
+	else
+		rm -f /dist_upgrade_wanted
+		systemctl start manual-update
+		exit 0
+	fi
+	;;
 esac
 
 if [ ! -e /var/run/fb_resolution ]; then
