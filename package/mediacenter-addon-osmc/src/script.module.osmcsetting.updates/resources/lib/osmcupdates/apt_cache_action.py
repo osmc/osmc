@@ -58,6 +58,7 @@ class Main(object):
 
         self.error_package = ''
         self.error_message = ''
+        self.partial_error = ''
         self.heading = 'Updater'
 
         self.action = action
@@ -117,6 +118,15 @@ class Main(object):
             # if there was no error, then respond to say the action was complete, and the service
             # should proceed to the next step
             call_parent('apt_cache %s complete' % self.action)
+
+        else:
+            # an error on a non-action_list action used to fall through here and send
+            # nothing at all, leaving the settings addon waiting forever with no dialog
+            call_parent('apt_error', {
+                'error': self.error_message,
+                'package': self.error_package,
+                'exception': self.error_message
+            })
 
     def act(self):
         action = self.action_to_method.get(self.action, False)
@@ -226,12 +236,26 @@ class Main(object):
         try:
             self.cache.update(fetch_progress=download_progress, pulse_interval=1000)
 
-        except apt.cache.FetchFailedException:
-            self.error_message = 'Connectivity issue while checking for updates...'
-            print('%s %s ERROR Connectivity issue while updating...' %
-                  (datetime.now(), 'apt_cache_action.py'))
+        except apt.cache.FetchFailedException as e:
+            # apt raises this if ANY single source failed, including one that is
+            # merely expired rather than unreachable. Debian archives its releases
+            # and lets their Release files expire, so from that day on this would
+            # abort every update forever even though everything we need is present.
+            # Only give up if we are left with no usable package lists at all.
+            self.partial_error = str(e)
 
-            return '%s %s connectivty issues' % (datetime.now(), 'apt_cache_action.py')
+            print('%s %s WARNING some sources could not be updated: %s' %
+                  (datetime.now(), 'apt_cache_action.py', self.partial_error))
+
+            if not self.usable_lists():
+                self.error_message = 'Unable to reach any update server...'
+                print('%s %s ERROR no usable package lists, aborting' %
+                      (datetime.now(), 'apt_cache_action.py'))
+
+                return '%s %s connectivity issues' % (datetime.now(), 'apt_cache_action.py')
+
+            print('%s %s continuing with the sources that did update' %
+                  (datetime.now(), 'apt_cache_action.py'))
 
         finally:
             # call the parent and kill the pDialog, now handled in on exit
@@ -248,14 +272,93 @@ class Main(object):
 
         return '%s %s cache updated' % (datetime.now(), 'apt_cache_action.py')
 
+    def usable_lists(self):
+        """
+            True if we still hold trusted metadata from at least one repository,
+            so a single failed source can be reported as a warning rather than
+            treated as total loss of connectivity.
+        """
+        try:
+            self.cache.open()
+
+        except Exception as e:
+            print('%s %s could not reopen cache: %s' % (datetime.now(), 'apt_cache_action.py', e))
+            return False
+
+        for pkg in self.cache:
+            candidate = pkg.candidate
+            if candidate is None:
+                continue
+
+            for origin in candidate.origins:
+                # origin.site is empty for the local dpkg status file
+                if origin.site and origin.trusted:
+                    return True
+
+        return False
+
+    @staticmethod
+    def failed_fetch_origin(message):
+        """
+            Pull the host out of apt's 'Failed to fetch <url>' text so the user is
+            told which repository is broken rather than just that something is.
+        """
+        for line in message.split('\n'):
+            if 'Failed to fetch' not in line:
+                continue
+
+            for word in line.split():
+                if '://' in word:
+                    return word.split('://')[1].split('/')[0]
+
+        return '(unknown repository)'
+
+    @staticmethod
+    def request_offline_update():
+        """
+            Hand the job to the offline updater, which runs on tty1 before Kodi starts
+            and whose first action is 'dpkg --configure -a' -- the repair a broken
+            package actually needs.
+
+            Two flags, because they do different jobs and neither works alone:
+              /dist_upgrade_wanted  is read by the per-device watchdog at its next
+                                    start (before Kodi launches), which is what
+                                    actually triggers the offline update;
+              /tmp/reboot-needed    is what makes the settings addon prompt the user
+                                    to reboot, which is what gets the watchdog to
+                                    restart in the first place.
+
+            This mirrors base-files-osmc's dist_upgrade_migrate(), which touches both.
+            Setting only the first arms the update but never asks for the reboot that
+            would run it, so it could sit unnoticed indefinitely.
+        """
+        for flag in ('/dist_upgrade_wanted', '/tmp/reboot-needed'):
+            try:
+                with open(flag, 'a'):
+                    pass
+
+            except Exception as e:
+                print('%s %s could not create %s: %s' %
+                      (datetime.now(), 'apt_cache_action.py', flag, e))
+
     def commit(self):
         self.cache = apt.Cache()
 
         # check whether any packages are broken, if they are then the install needs to
-        # take place outside of Kodi
+        # take place outside of Kodi.
+        #
+        # This used to 'return' a string, but act() discards return values, so the
+        # early exit was invisible: error_message stayed empty, respond() reported
+        # 'apt_cache commit complete', and the addon believed an upgrade had happened
+        # when nothing was installed. Set the error and hand off to the offline
+        # updater instead, which is what the comment always intended.
         for pkg in self.cache:
             if pkg.is_inst_broken or pkg.is_now_broken:
-                return "%s is BROKEN, cannot proceed with commit" % pkg.shortname
+                self.error_package = pkg.shortname
+                self.error_message = 'Packages are in a broken state and must be ' \
+                                     'repaired outside Kodi...'
+                self.request_offline_update()
+                return
 
         print('%s %s upgrading all packages' % (datetime.now(), 'apt_cache_action.py'))
         self.cache.upgrade(True)
@@ -293,7 +396,22 @@ class Main(object):
 
         download_progress = DownloadProgress()
 
-        self.cache.fetch_archives(progress=download_progress)
+        try:
+            self.cache.fetch_archives(progress=download_progress)
+
+        except apt.cache.FetchFailedException as e:
+            # An EOL Debian suite keeps publishing an index for packages that have
+            # already been reaped from the pool, so individual .debs 404 while the
+            # metadata still advertises them. Report which repository is at fault
+            # instead of the generic 'an error occurred' dialog, and do not pretend
+            # the download succeeded.
+            self.error_message = 'Some packages could not be downloaded...'
+            self.error_package = self.failed_fetch_origin(str(e))
+
+            print('%s %s ERROR fetch failed: %s' %
+                  (datetime.now(), 'apt_cache_action.py', e))
+
+            return '%s %s fetch failed' % (datetime.now(), 'apt_cache_action.py')
 
         # call the parent and the progress bar is killed on error or once all complete
         call_parent('progress_bar', {
