@@ -48,12 +48,15 @@ class HotFix(object):
             hf_raw_text = self.retrieve_paste_hotfix(hf_key)
 
         hf_parsed = self.parse_hotfix(hf_raw_text)
-        user_confirmation = self.confirm_instruction(mirror=hf_from_mirror)
 
+        # show the user what this HotFix is and what it will run BEFORE asking them
+        # to agree to it -- previously consent was requested first and the two display
+        # methods were unimplemented stubs, so the dialog described nothing at all
         self.display_description(hf_parsed['description'])
         self.display_instruction(hf_parsed['instruction'])
 
-        if not user_confirmation:
+        if not self.confirm_instruction(description=hf_parsed['description'],
+                                        mirror=hf_from_mirror):
             return
 
         results = self.apply_instruction(hf_parsed['instruction'])
@@ -174,7 +177,13 @@ class HotFix(object):
 
         delimiters = [' ', ',', '.', '|', ':', ':']
 
-        result_list = hf_result.split('\n')
+        # rstrip first: a payload saved by any normal editor ends with a newline, so
+        # split() produced a trailing empty element and the RESOLUTION line was no
+        # longer last. It then fell through to the catch-all below and was executed
+        # as a command -- 'RESOLUTION: LOG' became argv ['RESOLUTION:', 'LOG'],
+        # raising FileNotFoundError and aborting the run after the real work had
+        # already been done, so a successful HotFix reported failure.
+        result_list = hf_result.rstrip().split('\n')
 
         for i, line in enumerate(result_list):
             if i == 0:
@@ -182,14 +191,20 @@ class HotFix(object):
                     description = line.replace('DESCRIPTION:', '').strip()
                     continue
 
-            if i == len(result_list) - 1:
-                if line.startswith('RESOLUTION:'):
-                    desc = line.replace('RESOLUTION:', '').strip()
-                    for d in delimiters:
-                        if d in desc:
-                            resolution = desc.split(d)
-                            break
-                    continue
+            # tested wherever it appears rather than only on the last line, so a
+            # stray blank line at the end of the file cannot turn it into a command
+            if line.startswith('RESOLUTION:'):
+                desc = line.replace('RESOLUTION:', '').strip()
+                for d in delimiters:
+                    if d in desc:
+                        resolution = [r for r in desc.split(d) if r]
+                        break
+                else:
+                    # a single resolution such as 'RESOLUTION: LOG' contains none of
+                    # the delimiters, and used to parse to an empty list
+                    if desc:
+                        resolution = [desc]
+                continue
 
             if line:
                 instruction.append(line.replace('INSTRUCTION:', '').strip())
@@ -208,17 +223,37 @@ class HotFix(object):
 
     def display_description(self, description):
         """
-            Displays a description of the hotfix on-screen for the user
-            *** YET TO BE IMPLEMENTED
+            Displays a description of the hotfix on-screen for the user.
+
+            Kept separate from the confirmation dialog so the description is logged
+            and normalised in one place; confirm_instruction() puts it in front of
+            the user as part of the question it asks.
         """
+        if not description:
+            description = self.lang(32195)
+
+        log(label='Displaying description', message=description)
+
+        return description
 
     def display_instruction(self, instruction):
         """
-            Displays the specific instructions on-screen for the user
-            *** YET TO BE IMPLEMENTED
-        """
+            Displays the specific instructions on-screen for the user.
 
-    def confirm_instruction(self, mirror=False):
+            A HotFix runs arbitrary commands as root, so the user is shown exactly
+            what will run before being asked to agree to it. A text viewer is used
+            rather than a yes/no dialog because command lines are long and there may
+            be several of them.
+        """
+        if not instruction:
+            return
+
+        numbered = '[CR]'.join('%d. %s' % (n, line)
+                               for n, line in enumerate(instruction, start=1))
+
+        DIALOG.textviewer(self.lang(32194), numbered)
+
+    def confirm_instruction(self, description=None, mirror=False):
         """
             Asks the user to confirm that they wish to apply the instruction.
             Returns TRUE, only if user clicks Yes.
@@ -226,6 +261,10 @@ class HotFix(object):
         strings = [self.lang(32117), self.lang(32118), self.lang(32119)]
         if mirror:
             strings = [self.lang(32117), self.lang(32119)]
+
+        # lead with what this HotFix claims to do, so the question has context
+        if description:
+            strings = [description, ''] + strings
 
         user_confirmation = DIALOG.yesno(self.lang(32116), '[CR]'.join(strings))
 
