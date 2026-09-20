@@ -22,6 +22,22 @@ if [ "$1" = "configure" ]; then
         if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
         chown -R $OWNER /usr/share/kodi/addons/resource.language.*
 
+	# Generate Python bytecode for the add-on tree. Debian's python3 postinst
+	# does this for the standard library and dist-packages, but nothing does it
+	# for /usr/share/kodi/addons, so every add-on launch recompiles from source.
+	# This package Depends on every other package that installs there, so it is
+	# configured last and sees the complete tree.
+	#
+	# Level 0 is what Kodi loads: we drop PYTHONOPTIMIZE on Linux, so the
+	# interpreter no longer asks for opt-1. Compiling at any other level would
+	# reinstate the bug this fixes.
+	#
+	# compileall does not prune, so clear first. That also drops bytecode left by
+	# add-ons a previous version shipped and this one does not, and any opt-1
+	# cache written by a Kodi from before we dropped it.
+	find /usr/share/kodi/addons -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
+	python3 -m compileall -q -o 0 /usr/share/kodi/addons || true
+
 	if ischroot; then exit 0; fi
 	# Invalidate local language cache, we may have updated OSMC strings but the language version may not be newer
 	rm -rf /home/osmc/.kodi/addons/resource.language.* >/dev/null 2>&1 || true
