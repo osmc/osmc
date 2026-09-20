@@ -481,6 +481,501 @@ index 6e69bb9cab..7438999ea4 100755
            <control type="toggle" />
          </setting>
        </group>
+diff --git a/system/shaders/GLES/2.0/gles_shader_default.frag b/system/shaders/GLES/2.0/gles_shader_default.frag
+index 5f0bcd28c4..9d2c85272f 100644
+--- a/system/shaders/GLES/2.0/gles_shader_default.frag
++++ b/system/shaders/GLES/2.0/gles_shader_default.frag
+@@ -24,6 +24,42 @@ precision mediump float;
+ uniform lowp vec4 m_unicol;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec4 rgb;
+@@ -36,7 +72,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb.rgb = transferPQ(rgb.rgb);
++#else
++  rgb.rgb = fix709to2020(rgb.rgb);
+ #endif
+ 
+   gl_FragColor = rgb;
+diff --git a/system/shaders/GLES/2.0/gles_shader_fonts.frag b/system/shaders/GLES/2.0/gles_shader_fonts.frag
+index a26d28b593..3ae85b74dc 100644
+--- a/system/shaders/GLES/2.0/gles_shader_fonts.frag
++++ b/system/shaders/GLES/2.0/gles_shader_fonts.frag
+@@ -26,6 +26,42 @@ varying vec4 m_cord0;
+ varying lowp vec4 m_colour;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec4 rgb;
+@@ -39,7 +75,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb.rgb = transferPQ(rgb.rgb);
++#else
++  rgb.rgb = fix709to2020(rgb.rgb);
+ #endif
+ 
+   gl_FragColor = rgb;
+diff --git a/system/shaders/GLES/2.0/gles_shader_multi.frag b/system/shaders/GLES/2.0/gles_shader_multi.frag
+index f4c608d150..5273ed89f7 100644
+--- a/system/shaders/GLES/2.0/gles_shader_multi.frag
++++ b/system/shaders/GLES/2.0/gles_shader_multi.frag
+@@ -27,6 +27,42 @@ varying vec4 m_cord0;
+ varying vec4 m_cord1;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec4 rgb;
+@@ -39,7 +75,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb.rgb = transferPQ(rgb.rgb);
++#else
++  rgb.rgb = fix709to2020(rgb.rgb);
+ #endif
+ 
+   gl_FragColor = rgb;
+diff --git a/system/shaders/GLES/2.0/gles_shader_multi_blendcolor.frag b/system/shaders/GLES/2.0/gles_shader_multi_blendcolor.frag
+index 98e5f7e7df..85305bdd37 100644
+--- a/system/shaders/GLES/2.0/gles_shader_multi_blendcolor.frag
++++ b/system/shaders/GLES/2.0/gles_shader_multi_blendcolor.frag
+@@ -28,6 +28,42 @@ varying vec4 m_cord1;
+ uniform lowp vec4 m_unicol;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec4 rgb;
+@@ -40,7 +76,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb.rgb = transferPQ(rgb.rgb);
++#else
++  rgb.rgb = fix709to2020(rgb.rgb);
+ #endif
+ 
+   gl_FragColor = rgb;
+diff --git a/system/shaders/GLES/2.0/gles_shader_texture.frag b/system/shaders/GLES/2.0/gles_shader_texture.frag
+index ef1609c7f1..024c0ec26d 100644
+--- a/system/shaders/GLES/2.0/gles_shader_texture.frag
++++ b/system/shaders/GLES/2.0/gles_shader_texture.frag
+@@ -26,6 +26,42 @@ uniform lowp vec4 m_unicol;
+ varying vec4 m_cord0;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec4 rgb;
+@@ -38,7 +74,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb.rgb = transferPQ(rgb.rgb);
++#else
++  rgb.rgb = fix709to2020(rgb.rgb);
+ #endif
+ 
+   gl_FragColor = rgb;
+diff --git a/system/shaders/GLES/2.0/gles_shader_texture_noalpha.frag b/system/shaders/GLES/2.0/gles_shader_texture_noalpha.frag
+index 7db591c84e..899dfabd02 100644
+--- a/system/shaders/GLES/2.0/gles_shader_texture_noalpha.frag
++++ b/system/shaders/GLES/2.0/gles_shader_texture_noalpha.frag
+@@ -13,6 +13,42 @@ uniform sampler2D m_samp0;
+ varying vec4 m_cord0;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec3 rgb = texture2D(m_samp0, m_cord0.xy).rgb;
+@@ -23,7 +59,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb = transferPQ(rgb);
++#else
++  rgb = fix709to2020(rgb);
+ #endif
+ 
+   gl_FragColor = vec4(rgb, 1.0);
+diff --git a/system/shaders/GLES/2.0/gles_shader_texture_noblend.frag b/system/shaders/GLES/2.0/gles_shader_texture_noblend.frag
+index 44d797b539..2f7a479e54 100644
+--- a/system/shaders/GLES/2.0/gles_shader_texture_noblend.frag
++++ b/system/shaders/GLES/2.0/gles_shader_texture_noblend.frag
+@@ -25,6 +25,42 @@ uniform sampler2D m_samp0;
+ varying vec4 m_cord0;
+ uniform float m_sdrPeak;
+ 
++#if defined(KODI_TRANSFER_PQ)
++// pow(x, ST2084_m2) with m2 ~= 79 amplifies mediump rounding error by ~79x --
++// needs highp or the PQ curve comes out wrong.
++precision highp float;
++
++vec3 transferPQ(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // REC.709 to linear
++  x = pow(x, vec3(1.0 / 0.45));
++  // REC.709 to BT.2020
++  x = vec3(0.627402 * x.r + 0.329292 * x.g + 0.043306 * x.b,
++           0.069095 * x.r + 0.919544 * x.g + 0.011360 * x.b,
++           0.016394 * x.r + 0.088028 * x.g + 0.895578 * x.b);
++  // linear to PQ -- m_sdrPeak is the GUI SDR white level in nits
++  x = pow(x * (m_sdrPeak / 10000.0), vec3(ST2084_m1));
++  x = (ST2084_c1 + ST2084_c2 * x) / (1.0 + ST2084_c3 * x);
++  x = pow(x, vec3(ST2084_m2));
++  return x;
++}
++#else
++
++vec3 fix709to2020(vec3 x)
++{
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++           -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++           -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++  return x;
++}
++#endif
++
+ void main ()
+ {
+   vec4 rgb;
+@@ -37,7 +73,9 @@ void main ()
+ #endif
+ 
+ #if defined(KODI_TRANSFER_PQ)
+-  rgb.rgb *= m_sdrPeak;
++  rgb.rgb = transferPQ(rgb.rgb);
++#else
++  rgb.rgb = fix709to2020(rgb.rgb);
+ #endif
+ 
+   gl_FragColor = rgb;
+diff --git a/system/shaders/GLES/2.0/gles_shader_texture_pqtosrgb.frag b/system/shaders/GLES/2.0/gles_shader_texture_pqtosrgb.frag
+new file mode 100644
+index 0000000000..749fb62658
+--- /dev/null
++++ b/system/shaders/GLES/2.0/gles_shader_texture_pqtosrgb.frag
+@@ -0,0 +1,83 @@
++/*
++ *      Copyright (C) 2010-2013 Team XBMC
++ *      http://xbmc.org
++ *
++ *  This Program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2, or (at your option)
++ *  any later version.
++ *
++ *  This Program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with XBMC; see the file COPYING.  If not, see
++ *  <http://www.gnu.org/licenses/>.
++ *
++ */
++
++#version 100
++
++precision mediump float;
++uniform sampler2D m_samp0;
++uniform lowp vec4 m_unicol;
++varying vec4 m_cord0;
++uniform float m_sdrPeak;
++
++// pow(x, 1/ST2084_m2) amplifies mediump rounding error the same way the
++// forward transferPQ() in gles_shader_texture.frag does -- needs highp.
++precision highp float;
++
++// Inverse of transferPQ() (gles_shader_texture.frag): decodes a PQ/BT.2020
++// bitmap (e.g. a PGS/DVB subtitle graded against HDR video) down to plain
++// sRGB/BT.709, for the case where the video source is HDR but the kernel is
++// tone-mapping the actual video plane down to SDR -- the GUI/OSD is rendering
++// plain sRGB in that case (KODI_TRANSFER_PQ off), so the subtitle bitmap must
++// be brought down to match rather than composited as-is or left PQ-uplifted.
++vec3 transferPQtoSRGB(vec3 x)
++{
++  const float ST2084_m1 = 2610.0 / (4096.0 * 4.0);
++  const float ST2084_m2 = (2523.0 / 4096.0) * 128.0;
++  const float ST2084_c1 = 3424.0 / 4096.0;
++  const float ST2084_c2 = (2413.0 / 4096.0) * 32.0;
++  const float ST2084_c3 = (2392.0 / 4096.0) * 32.0;
++
++  // First correct FFmpeg's RGB values to BT2020
++  x = vec3(0.94990 * x.r + 0.04551 * x.g + 0.00459 * x.b,
++         -0.05422 * x.r + 1.03811 * x.g + 0.01612 * x.b,
++         -0.00296 * x.r - 0.00994 * x.g + 1.01290 * x.b);
++
++  // PQ to linear (ST.2084 EOTF) -- m_sdrPeak is the GUI SDR white level in
++  // nits, matching the normalisation transferPQ() uses in the other direction.
++  x = pow(x, vec3(1.0 / ST2084_m2));
++  x = max(x - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * x);
++  x = pow(x, vec3(1.0 / ST2084_m1));
++  x = x * (10000.0 / m_sdrPeak);
++
++  // BT.2020 to REC.709
++  x = vec3(1.660491 * x.r - 0.587641 * x.g - 0.072850 * x.b,
++           -0.124550 * x.r + 1.132900 * x.g - 0.008349 * x.b,
++           -0.018151 * x.r - 0.100579 * x.g + 1.118730 * x.b);
++
++  // linear to REC.709
++  x = pow(clamp(x, 0.0, 1.0), vec3(0.45));
++  return x;
++}
++
++void main ()
++{
++  vec4 rgb;
++
++  rgb = texture2D(m_samp0, m_cord0.xy).rgba * m_unicol;
++
++  rgb.rgb = transferPQtoSRGB(rgb.rgb);
++
++#if defined(KODI_LIMITED_RANGE)
++  rgb.rgb *= (235.0 - 16.0) / 255.0;
++  rgb.rgb += 16.0 / 255.0;
++#endif
++
++  gl_FragColor = rgb;
++}
 diff --git a/tools/depends/target/ffmpeg/0001-added_upstream_mvc_patches.patch b/tools/depends/target/ffmpeg/0001-added_upstream_mvc_patches.patch
 new file mode 100644
 index 0000000000..0585fdc83f
@@ -1483,6 +1978,24 @@ index 9d78c6e36d..12310a029e 100644
  
    bool m_dpmsIsActive = false;
    bool m_dpmsIsManual = false;
+diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
+index 9e65aa0dfc..116d937915 100644
+--- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
++++ b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAE.cpp
+@@ -1721,7 +1721,12 @@ void CActiveAE::ApplySettingsToFormat(AEAudioFormat& format,
+           int bestMatch = format.m_channelLayout.BestMatch(alts);
+           stdLayout = alts[bestMatch];
+         }
+-        format.m_channelLayout.ResolveChannels(stdLayout);
++        // retain a back-center channel here rather than folding it into
++        // rear/side channels against the settings-derived stdLayout - the
++        // sink may not have been opened yet, so its real capabilities
++        // aren't known. It gets properly resolved later, against the
++        // negotiated m_sinkFormat, once the sink is actually open.
++        format.m_channelLayout.ResolveChannels(stdLayout, true);
+       }
+     }
+     // don't change from multi to stereo in AUTO mode
 diff --git a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp b/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
 index 6aee94c6d3..dcbae016ef 100644
 --- a/xbmc/cores/AudioEngine/Engines/ActiveAE/ActiveAEResampleFFMPEG.cpp
@@ -1510,15 +2023,16 @@ index 6aee94c6d3..dcbae016ef 100644
    // tell resampler to clamp float values
    // not required for sink stage (remapLayout == true)
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-index d861faacca..3dada19c7f 100644
+index d861faacca..d0612c1d9e 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
 +++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.cpp
-@@ -20,6 +20,15 @@
+@@ -20,12 +20,23 @@
  #include "utils/XTimeUtils.h"
  #include "utils/log.h"
  
 +#if defined(HAS_LIBAMCODEC)
 +#include "utils/AMLUtils.h"
++#include "utils/StringUtils.h"
 +#include "utils/SysfsUtils.h"
 +#include "settings/Settings.h"
 +#include "settings/VeroSettings.h"
@@ -1529,7 +2043,14 @@ index d861faacca..3dada19c7f 100644
  #include <algorithm>
  #include <limits.h>
  #include <set>
-@@ -86,6 +95,8 @@ inline std::unique_ptr<snd_config_t, SndConfigDeleter> SndConfigCopy(snd_config_
+ #include <sstream>
+ #include <stdint.h>
+ #include <string>
++#include <vector>
+ 
+ #include <sys/utsname.h>
+ 
+@@ -86,6 +97,8 @@ inline std::unique_ptr<snd_config_t, SndConfigDeleter> SndConfigCopy(snd_config_
  }
  } // namespace
  
@@ -1538,7 +2059,7 @@ index d861faacca..3dada19c7f 100644
  CAESinkALSA::CAESinkALSA() :
    m_pcm(NULL)
  {
-@@ -198,7 +209,7 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+@@ -198,7 +211,7 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
    {
      /* ask for the actual map */
      snd_pcm_chmap_t* actualMap = snd_pcm_get_chmap(m_pcm);
@@ -1547,7 +2068,7 @@ index d861faacca..3dada19c7f 100644
      {
        alsaMapStr = ALSAchmapToString(actualMap);
  
-@@ -235,8 +246,8 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
+@@ -235,8 +248,8 @@ inline CAEChannelInfo CAESinkALSA::GetChannelLayout(const AEAudioFormat& format,
              format.m_channelLayout.Count(), info.Count());
    CLog::Log(LOGDEBUG, "CAESinkALSA::GetChannelLayout - Requested Layout: {}",
              std::string(format.m_channelLayout));
@@ -1558,22 +2079,67 @@ index d861faacca..3dada19c7f 100644
  
    return info;
  }
-@@ -417,8 +428,12 @@ snd_pcm_chmap_t* CAESinkALSA::SelectALSAChannelMap(const CAEChannelInfo& info)
+@@ -304,7 +317,6 @@ unsigned int CAESinkALSA::AEChannelToALSAChannel(AEChannel aeChannel)
+ CAEChannelInfo CAESinkALSA::ALSAchmapToAEChannelMap(snd_pcm_chmap_t* alsaMap)
+ {
+   CAEChannelInfo info;
+-
+   for (unsigned int i = 0; i < alsaMap->channels; i++)
+   {
+     /* handle double side speaker quirk */
+@@ -312,7 +324,14 @@ CAEChannelInfo CAESinkALSA::ALSAchmapToAEChannelMap(snd_pcm_chmap_t* alsaMap)
+       info += AE_CH_BL;
+     else if (alsaMap->pos[i] == SND_CHMAP_SR && info.HasChannel(AE_CH_SR))
+       info += AE_CH_BR;
+-    else
++    /* use CTA 861 G names for deprecated channels. RLC/RRC are not
++       equivalent to SL/SR but it doesn't matter */
++    else if (alsaMap->pos[i] == SND_CHMAP_RLC)
++      info += AE_CH_SL;
++    else if (alsaMap->pos[i] == SND_CHMAP_RRC)
++      info += AE_CH_SR;
++    /* ignore unused positions in CTA channel allocation table */
++    else if (alsaMap->pos[i] != SND_CHMAP_NA)
+       info += ALSAChannelToAEChannel(alsaMap->pos[i]);
+   }
+   return info;
+@@ -417,9 +436,13 @@ snd_pcm_chmap_t* CAESinkALSA::SelectALSAChannelMap(const CAEChannelInfo& info)
    for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++];
         supportedMap; supportedMap = supportedMaps[i++])
    {
 -    if (supportedMap->map.channels == info.Count())
 -    {
+-      CAEChannelInfo candidate = ALSAchmapToAEChannelMap(&supportedMap->map);
 +    if (info.Count() < 3)
 +      break;
 +
-+    CLog::Log(LOGDEBUG, "CAESinkALSA::SelectALSAChannelMap checking available maps i: {} channels {} requested channels {}", i, supportedMap->map.channels, info.Count());
++    CAEChannelInfo candidate = ALSAchmapToAEChannelMap(&supportedMap->map);
++    CLog::Log(LOGAUDIO, "checking {}", std::string(candidate));
 +
-+    if (supportedMap->map.channels == info.Count()) {
-       CAEChannelInfo candidate = ALSAchmapToAEChannelMap(&supportedMap->map);
++    if (candidate.Count() == info.Count()) {
        const CAEChannelInfo* selectedInfo = &info;
  
-@@ -508,6 +523,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+       if (!candidate.ContainsChannels(info) || !info.ContainsChannels(candidate))
+@@ -449,7 +472,8 @@ snd_pcm_chmap_t* CAESinkALSA::SelectALSAChannelMap(const CAEChannelInfo& info)
+   {
+     CAEChannelInfo allChannels;
+     std::vector<CAEChannelInfo> supportedMapsAE;
+-
++    CLog::Log(LOGAUDIO, "CAESinkALSA::SelectAlsaChannelMap find best match for {}",
++      std::string(info));
+     /* Convert the ALSA maps to AE maps. */
+     int i = 0;
+     for (snd_pcm_chmap_query_t* supportedMap = supportedMaps[i++];
+@@ -462,6 +486,8 @@ snd_pcm_chmap_t* CAESinkALSA::SelectALSAChannelMap(const CAEChannelInfo& info)
+     /* see if we find a better result with the alternate form */
+     if (infoAlternate.Count() && score < 0)
+     {
++      CLog::Log(LOGAUDIO, "CAESinkALSA::SelectAlsaChannelMap try alternative {}",
++        std::string(infoAlternate));
+       int scoreAlt = 0;
+       int bestAlt = infoAlternate.BestMatch(supportedMapsAE, &scoreAlt);
+       if (scoreAlt > score)
+@@ -508,6 +534,8 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
    inconfig.format = format.m_dataFormat;
    inconfig.sampleRate = format.m_sampleRate;
  
@@ -1582,7 +2148,7 @@ index d861faacca..3dada19c7f 100644
    /*
     * We can't use the better GetChannelLayout() at this point as the device
     * is not opened yet, and we need inconfig.channels to select the correct
-@@ -527,12 +544,61 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -527,14 +555,86 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      m_passthrough   = false;
    }
  
@@ -1643,8 +2209,33 @@ index d861faacca..3dada19c7f 100644
 +
    AEDeviceType devType = AEDeviceTypeFromName(device);
  
++#if defined(HAS_LIBAMCODEC)
++  // snd_pcm_query_chmaps() just enumerates the standard CTA-861D channel
++  // maps the HDMI transmitter is capable of producing - it is not filtered
++  // by what the connected AVR actually supports, so it can't be trusted to
++  // decide whether a back-center channel is genuinely usable. The EDID's
++  // speaker allocation is the only reliable source for that, so cross-check
++  // it here before SelectALSAChannelMap() matches against the chmap list.
++  if (device == "default" && format.m_channelLayout.HasChannel(AE_CH_BC))
++  {
++    CAEDeviceInfo edidInfo;
++    bool badHDMI = false;
++    if (GetSpeakers(0, edidInfo, badHDMI) && !edidInfo.m_channels.HasChannel(AE_CH_BC))
++    {
++      // resolve against the channels that are actually available
++      format.m_channelLayout.ResolveChannels(edidInfo.m_channels);
++      CLog::Log(LOGINFO,
++                "CAESinkALSA::Initialize - AVR EDID does not report a back-center speaker, "
++                "layout adjusted to {}",
++                std::string(format.m_channelLayout));
++    }
++  }
++#endif
++
    std::string AESParams;
-@@ -548,15 +614,10 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+   /* digital interfaces should have AESx set, though in practice most
+    * receivers don't care */
+@@ -548,15 +648,10 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
  
    if (!OpenPCMDevice(device, AESParams, inconfig.channels, &m_pcm, config.get()))
    {
@@ -1661,7 +2252,7 @@ index d861faacca..3dada19c7f 100644
  
    snd_pcm_chmap_t* selectedChmap = NULL;
    if (!m_passthrough)
-@@ -564,24 +625,65 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
+@@ -564,24 +659,65 @@ bool CAESinkALSA::Initialize(AEAudioFormat &format, std::string &device)
      selectedChmap = SelectALSAChannelMap(format.m_channelLayout);
      if (selectedChmap)
      {
@@ -1729,7 +2320,7 @@ index d861faacca..3dada19c7f 100644
    // we want it blocking
    snd_pcm_nonblock(m_pcm, 0);
    snd_pcm_prepare (m_pcm);
-@@ -880,7 +982,7 @@ void CAESinkALSA::Stop()
+@@ -880,7 +1016,7 @@ void CAESinkALSA::Stop()
  {
    if (!m_pcm)
      return;
@@ -1738,7 +2329,7 @@ index d861faacca..3dada19c7f 100644
  }
  
  void CAESinkALSA::GetDelay(AEDelayStatus& status)
-@@ -1196,11 +1298,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
+@@ -1196,11 +1332,8 @@ void CAESinkALSA::EnumerateDevicesEx(AEDeviceInfoList &list, bool force)
         * "plughw", "dsnoop"). */
  
        else if (baseName != "default"
@@ -1752,7 +2343,27 @@ index d861faacca..3dada19c7f 100644
              && baseName != "hw"
              && baseName != "dmix"
              && baseName != "plughw"
-@@ -1485,6 +1584,10 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1443,10 +1576,19 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+ #endif
+ 
+             if (!GetELD(hctl, dev, info, badHDMI))
++            {
+               CLog::Log(LOGDEBUG,
+                         "CAESinkALSA - Unable to obtain ELD information for device \"{}\" (not "
+                         "supported by device, or kernel older than 3.2)",
+                         device);
++#if defined(HAS_LIBAMCODEC)
++              if (!GetSpeakers(dev, info, badHDMI))
++                CLog::Log(LOGDEBUG,
++                          "CAESinkALSA - Unable to obtain speaker allocation from EDID for "
++                          "device \"{}\"",
++                          device);
++#endif
++            }
+ 
+             /* snd_hctl_close also closes ctlhandle */
+             snd_hctl_close(hctl);
+@@ -1485,6 +1627,10 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
        info.m_streamTypes.push_back(CAEStreamInfo::STREAM_TYPE_DTS_512);
        info.m_dataFormats.push_back(AE_FMT_RAW);
      }
@@ -1763,7 +2374,7 @@ index d861faacca..3dada19c7f 100644
      else if (info.m_displayNameExtra.empty())
      {
        /* for USB audio, it gets a bit confusing as there is
-@@ -1499,7 +1602,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+@@ -1499,7 +1645,7 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
      if (device == "@" || device == "default")
      {
        /* Make it "Default (whatever)" */
@@ -1772,6 +2383,105 @@ index d861faacca..3dada19c7f 100644
        info.m_displayNameExtra = "";
      }
  
+@@ -1619,6 +1765,84 @@ void CAESinkALSA::EnumerateDevice(AEDeviceInfoList &list, const std::string &dev
+   list.push_back(info);
+ }
+ 
++#if defined(HAS_LIBAMCODEC)
++bool CAESinkALSA::GetSpeakers(int device, CAEDeviceInfo& info, bool& badHDMI)
++{
++  badHDMI = false;
++
++  std::string edidText;
++  if (SysfsUtils::GetString("/sys/class/amhdmitx/amhdmitx0/edid", edidText))
++  {
++    CLog::Log(LOGDEBUG, "CAESinkALSA::GetSpeakers - cannot read EDID from kernel");
++    badHDMI = true;
++    return false;
++  }
++
++  const std::vector<std::string> lines = StringUtils::Split(edidText, "\n");
++  int speakerAlloc = -1;
++  for (const std::string& line : lines)
++  {
++    if (!StringUtils::StartsWith(line, "Speaker Allocation:"))
++      continue;
++
++    if (sscanf(line.c_str(), "Speaker Allocation: 0x%x", &speakerAlloc) != 1)
++      break;
++  }
++  if (speakerAlloc >= 0)
++  {
++    // CEA-861 speaker allocation bitmap, same bit layout CAEELDParser uses
++    // for the ELD's speaker allocation byte
++    if (speakerAlloc & 0x01 || speakerAlloc == 0) // FL/FR
++    {
++      if (!info.m_channels.HasChannel(AE_CH_FL))
++        info.m_channels += AE_CH_FL;
++      if (!info.m_channels.HasChannel(AE_CH_FR))
++        info.m_channels += AE_CH_FR;
++    }
++    if (speakerAlloc & 0x02) // LFE
++      if (!info.m_channels.HasChannel(AE_CH_LFE))
++        info.m_channels += AE_CH_LFE;
++    if (speakerAlloc & 0x04) // FC
++      if (!info.m_channels.HasChannel(AE_CH_FC))
++        info.m_channels += AE_CH_FC;
++    if (speakerAlloc & 0x08) // RL/RR
++    {
++      if (!info.m_channels.HasChannel(AE_CH_BL))
++        info.m_channels += AE_CH_BL;
++      if (!info.m_channels.HasChannel(AE_CH_BR))
++        info.m_channels += AE_CH_BR;
++    }
++    if (speakerAlloc & 0x10) // RC
++      if (!info.m_channels.HasChannel(AE_CH_BC))
++        info.m_channels += AE_CH_BC;
++    if (speakerAlloc & 0x20) // FLC/FRC
++    {
++      if (!info.m_channels.HasChannel(AE_CH_FLOC))
++        info.m_channels += AE_CH_FLOC;
++      if (!info.m_channels.HasChannel(AE_CH_FROC))
++        info.m_channels += AE_CH_FROC;
++    }
++    // In CTA 861-G bit 6 is deprecated but if present it
++    // signals we have both rear and side channels
++    if (speakerAlloc & 0x40 || speakerAlloc & 0x4000) // RLC/RRC or SiL/SiR
++    {
++      if (!info.m_channels.HasChannel(AE_CH_SL))
++        info.m_channels += AE_CH_SL;
++      if (!info.m_channels.HasChannel(AE_CH_SR))
++        info.m_channels += AE_CH_SR;
++    }
++
++    info.m_deviceType = AE_DEVTYPE_HDMI;
++    CLog::Log(LOGDEBUG, "CAESinkALSA::GetSpeakers: {}", std::string(info.m_channels));
++    return true;
++  }
++
++  CLog::Log(LOGDEBUG, "CAESinkALSA::GetSpeakers - no Speaker Allocation entry found in EDID dump");
++  badHDMI = true;
++  return false;
++}
++#endif
++
+ bool CAESinkALSA::GetELD(snd_hctl_t *hctl, int device, CAEDeviceInfo& info, bool& badHDMI)
+ {
+   badHDMI = false;
+diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.h b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.h
+index 90c532176d..8439161ad8 100644
+--- a/xbmc/cores/AudioEngine/Sinks/AESinkALSA.h
++++ b/xbmc/cores/AudioEngine/Sinks/AESinkALSA.h
+@@ -94,6 +94,9 @@ private:
+   static void EnumerateDevice(AEDeviceInfoList &list, const std::string &device, const std::string &description, snd_config_t *config);
+   static bool SoundDeviceExists(const std::string& device);
+   static bool GetELD(snd_hctl_t *hctl, int device, CAEDeviceInfo& info, bool& badHDMI);
++#if defined(HAS_LIBAMCODEC)
++  static bool GetSpeakers(int device, CAEDeviceInfo& info, bool& badHDMI);
++#endif
+ 
+   static void sndLibErrorHandler(const char *file, int line, const char *function, int err, const char *fmt, ...);
+ };
 diff --git a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp b/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
 index 6da358f792..07da243ef9 100644
 --- a/xbmc/cores/AudioEngine/Sinks/AESinkAUDIOTRACK.cpp
@@ -1948,11 +2658,70 @@ index db476bb8d4..ad28ef5331 100644
    static void UpdateAvailablePCMCapabilities();
    static void UpdateAvailablePassthroughCapabilities(bool isRaw = false);
  
+diff --git a/xbmc/cores/AudioEngine/Utils/AEChannelData.h b/xbmc/cores/AudioEngine/Utils/AEChannelData.h
+index 71010bbf26..5f1cc32e7c 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEChannelData.h
++++ b/xbmc/cores/AudioEngine/Utils/AEChannelData.h
+@@ -57,6 +57,8 @@ enum AEStdChLayout
+   AE_CH_LAYOUT_4_1,
+   AE_CH_LAYOUT_5_0,
+   AE_CH_LAYOUT_5_1,
++  AE_CH_LAYOUT_6_0,
++  AE_CH_LAYOUT_6_1,
+   AE_CH_LAYOUT_7_0,
+   AE_CH_LAYOUT_7_1,
+ 
 diff --git a/xbmc/cores/AudioEngine/Utils/AEChannelInfo.cpp b/xbmc/cores/AudioEngine/Utils/AEChannelInfo.cpp
-index e3d74ca3a1..d724ab4bd5 100644
+index e3d74ca3a1..442890e0a8 100644
 --- a/xbmc/cores/AudioEngine/Utils/AEChannelInfo.cpp
 +++ b/xbmc/cores/AudioEngine/Utils/AEChannelInfo.cpp
-@@ -313,7 +313,8 @@ bool CAEChannelInfo::ContainsChannels(const CAEChannelInfo& rhs) const
+@@ -12,6 +12,7 @@
+ #include <assert.h>
+ #include <limits>
+ #include <string.h>
++#include "utils/log.h"
+ 
+ CAEChannelInfo::CAEChannelInfo()
+ {
+@@ -28,7 +29,7 @@ CAEChannelInfo::CAEChannelInfo(const AEStdChLayout rhs)
+   *this = rhs;
+ }
+ 
+-void CAEChannelInfo::ResolveChannels(const CAEChannelInfo& rhs)
++void CAEChannelInfo::ResolveChannels(const CAEChannelInfo& rhs, bool retainBC)
+ {
+   /* mono gets upmixed to dual mono */
+   if (m_channelCount == 1 && m_channels[0] == AE_CH_FC)
+@@ -85,7 +86,7 @@ void CAEChannelInfo::ResolveChannels(const CAEChannelInfo& rhs)
+         break;
+       }
+ 
+-    if (found)
++    if (found || (retainBC && m_channels[i] == AE_CH_BC))
+       newInfo += m_channels[i];
+   }
+ 
+@@ -101,7 +102,9 @@ void CAEChannelInfo::ResolveChannels(const CAEChannelInfo& rhs)
+ 
+   // mix back center if not available in destination layout
+   // prefer mixing into backs if available
+-  if (srcHasBC && !dstHasBC)
++  // (skipped when retaining BC - that decision is deferred to a later
++  // resolve against the real destination layout)
++  if (!retainBC && srcHasBC && !dstHasBC)
+   {
+     if (dstHasRL && !newInfo.HasChannel(AE_CH_BL))
+       newInfo += AE_CH_BL;
+@@ -168,6 +171,8 @@ CAEChannelInfo& CAEChannelInfo::operator=(const enum AEStdChLayout rhs)
+       {AE_CH_FL, AE_CH_FR, AE_CH_BL, AE_CH_BR, AE_CH_LFE, AE_CH_NULL},
+       {AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_BL, AE_CH_BR, AE_CH_NULL},
+       {AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_LFE, AE_CH_BL, AE_CH_BR, AE_CH_NULL},
++      {AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_BC, AE_CH_SL, AE_CH_SR, AE_CH_NULL},
++      {AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_LFE, AE_CH_BC, AE_CH_SL, AE_CH_SR, AE_CH_NULL},
+       {AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_BL, AE_CH_BR, AE_CH_SL, AE_CH_SR, AE_CH_NULL},
+       {AE_CH_FL, AE_CH_FR, AE_CH_FC, AE_CH_LFE, AE_CH_BL, AE_CH_BR, AE_CH_SL, AE_CH_SR,
+        AE_CH_NULL}};
+@@ -313,7 +318,8 @@ bool CAEChannelInfo::ContainsChannels(const CAEChannelInfo& rhs) const
  {
    for (unsigned int i = 0; i < rhs.m_channelCount; ++i)
    {
@@ -1962,6 +2731,24 @@ index e3d74ca3a1..d724ab4bd5 100644
        return false;
    }
    return true;
+diff --git a/xbmc/cores/AudioEngine/Utils/AEChannelInfo.h b/xbmc/cores/AudioEngine/Utils/AEChannelInfo.h
+index 1b59e5f11e..9dc8c5b69f 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEChannelInfo.h
++++ b/xbmc/cores/AudioEngine/Utils/AEChannelInfo.h
+@@ -35,8 +35,11 @@ public:
+   enum AEChannel operator[](unsigned int i) const;
+   operator std::string() const;
+ 
+-  /* remove any channels that dont exist in the provided info */
+-  void ResolveChannels(const CAEChannelInfo& rhs);
++  /* remove any channels that dont exist in the provided info. If retainBC is
++   * true, a back-center channel is kept as-is instead of being dropped or
++   * folded into rear/side channels, deferring that decision to a later
++   * resolve against the real, negotiated destination layout. */
++  void ResolveChannels(const CAEChannelInfo& rhs, bool retainBC = false);
+   void Reset();
+   inline unsigned int Count() const { return m_channelCount; }
+   static const char* GetChName(const enum AEChannel ch);
 diff --git a/xbmc/cores/RetroPlayer/process/RPProcessInfo.h b/xbmc/cores/RetroPlayer/process/RPProcessInfo.h
 index f5ffe670d6..cc505bac26 100644
 --- a/xbmc/cores/RetroPlayer/process/RPProcessInfo.h
@@ -5477,10 +6264,10 @@ index 0000000000..07efe40027
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..3c5df6b5a6
+index 0000000000..5b645c6f21
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,137 @@
 +/*
 + *  Copyright (C) 2024 OSMC
 + *
@@ -5537,14 +6324,12 @@ index 0000000000..3c5df6b5a6
 +{
 +	bool isProfile4 = hints.dovi.dv_profile == 4;
 +	bool isSDR = hints.colorPrimaries == 1;
-+	bool isProfile8HLG = hints.dovi.dv_profile == 8
-+			&& hints.dovi.dv_bl_signal_compatibility_id == 4;
 +	bool isDVoutputDisabled =
 +		CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOPLAYER_HDR_PROCESS) != 2;
 +	uint32_t dvFlags = 5;
 +
 +	bool enable_dv = hints.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION && isDolbyVisionSupported()
-+			&& !isProfile4 && !isSDR && !isProfile8HLG;
++			&& !isProfile4 && !isSDR;
 +
 +	if (SysfsUtils::GetIntDec("/sys/module/amdolby_vision/parameters/dolby_vision_flags", dvFlags))
 +		CLog::Log(LOGERROR, "DVCodec: Failed to get DV flags");
@@ -9998,10 +10783,10 @@ index 8598052b41..98b41313c0 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..73ed403b84
+index 0000000000..7566a28dd3
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,225 @@
+@@ -0,0 +1,218 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10083,22 +10868,14 @@ index 0000000000..73ed403b84
 +  CalculateFrameAspectRatio(picture.iDisplayWidth, picture.iDisplayHeight);
 +  SetViewMode(m_videoSettings.m_ViewMode);
 +
++  const bool sourceIsHDR = picture.color_transfer == AVCOL_TRC_SMPTE2084 ||
++                           picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION;
++  CServiceBroker::GetWinSystem()->GetGfxContext().SetSourceIsHDR(sourceIsHDR);
++
 +  // Configure GUI/OSD for HDR PQ when display is in HDR PQ mode
-+  if (!forceSDRoutput) {
-+    if (picture.color_transfer == AVCOL_TRC_SMPTE2084)
-+    {
-+      if (CServiceBroker::GetWinSystem()->IsHDRDisplay())
-+      {
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
-+      }
-+    }
-+    else if (picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION)
-+    {
-+      if (CServiceBroker::GetWinSystem()->GetDisplayHDRCapabilities().SupportsDolbyVision())
-+      {
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
-+      }
-+    }
++  if (!forceSDRoutput && CServiceBroker::GetWinSystem()->IsHDRDisplay() && sourceIsHDR)
++  {
++      CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
 +  }
 +
 +  ManageRenderArea();
@@ -10202,6 +10979,7 @@ index 0000000000..73ed403b84
 +    }
 +  }
 +  CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(false);
++  CServiceBroker::GetWinSystem()->GetGfxContext().SetSourceIsHDR(false);
 +}
 +
 +bool CRendererAML::Flush(bool saveBuffers)
@@ -10378,6 +11156,44 @@ index a6690004e6..8126ebc90f 100644
    protected:
      /*!
       * \brief Given the resolution ratio determines if it is a 4/3 resolution
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
+index cf3b31324a..c6323beb1e 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
+@@ -22,6 +22,7 @@
+ #include "utils/GLUtils.h"
+ #include "utils/MathUtils.h"
+ #include "utils/log.h"
++#include "windowing/GraphicContext.h"
+ #include "windowing/WinSystem.h"
+ 
+ #include <cmath>
+@@ -438,7 +439,24 @@ void COverlayTextureGLES::Render(SRenderState& state)
+ 
+   CRenderSystemGLES* renderSystem =
+       dynamic_cast<CRenderSystemGLES*>(CServiceBroker::GetRenderSystem());
+-  renderSystem->EnableGUIShader(ShaderMethodGLES::SM_TEXTURE);
++
++  ShaderMethodGLES method = ShaderMethodGLES::SM_TEXTURE;
++  if (m_pgsSubtitle)
++  {
++    // PGS/DVB bitmap subtitles are graded against the video they accompany,
++    // so when it's HDR they're already BT.2020/PQ.
++    CGraphicContext& gfxContext = CServiceBroker::GetWinSystem()->GetGfxContext();
++    if (gfxContext.IsSourceHDR() && !gfxContext.IsTransferPQ())
++      // Source is HDR but the kernel is tone-mapping the video down to SDR --
++      // the GUI/OSD is plain sRGB in this case, so bring the subtitle bitmap
++      // down to match rather than compositing it as PQ-graded bytes.
++      method = ShaderMethodGLES::SM_TEXTURE_PQTOSRGB;
++    else
++      // Real PQ output (or SDR source) -- pass the bitmap through untouched
++      // rather than running it through the GUI's sRGB->PQ uplift a second time.
++      method = ShaderMethodGLES::SM_TEXTURE_NOPQ;
++  }
++  renderSystem->EnableGUIShader(method);
+   GLint posLoc = renderSystem->GUIShaderGetPos();
+   GLint colLoc = renderSystem->GUIShaderGetCol();
+   GLint tex0Loc = renderSystem->GUIShaderGetCoord0();
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
 index 57566719cc..6ef6463185 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
@@ -11215,21 +12031,6 @@ index 0859158c9c..988f0f3888 100644
    if(LIBINPUT_FOUND)
      list(APPEND SOURCES LibInputHandler.cpp
                          LibInputKeyboard.cpp
-diff --git a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
-index bd04197a51..7cb68a19b4 100644
---- a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
-+++ b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
-@@ -39,8 +39,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
-   if (!m_hasUPower)
-     CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
- 
--  m_canPowerdown = LogindCheckCapability("CanPowerOff");
--  m_canReboot    = LogindCheckCapability("CanReboot");
-+  m_canPowerdown = true;
-+  m_canReboot    = true;
-   m_canHibernate = LogindCheckCapability("CanHibernate");
-   m_canSuspend   = LogindCheckCapability("CanSuspend");
- 
 diff --git a/xbmc/platform/linux/storage/UDevProvider.cpp b/xbmc/platform/linux/storage/UDevProvider.cpp
 index 2d94c39daa..58e17c1882 100644
 --- a/xbmc/platform/linux/storage/UDevProvider.cpp
@@ -11269,6 +12070,20 @@ index 8c7edbb591..77a06bd431 100644
  });
  
  static_assert(static_cast<size_t>(ThreadPriority::PRIORITY_COUNT) == nativeThreadPriorityMap.size(),
+diff --git a/xbmc/platform/posix/PosixMountProvider.cpp b/xbmc/platform/posix/PosixMountProvider.cpp
+index da4173f5eb..def03260d1 100644
+--- a/xbmc/platform/posix/PosixMountProvider.cpp
++++ b/xbmc/platform/posix/PosixMountProvider.cpp
+@@ -94,7 +94,8 @@ std::vector<std::string> CPosixMountProvider::GetDiskUsage()
+   FILE* pipe = popen("df -h", "r");
+ #endif
+ 
+-  static const char* excludes[] = {"rootfs","devtmpfs","tmpfs","none","efivarfs","systemd-1","/dev/loop", "udev", NULL};
++  // filter out the OSMC/Vero TEE partition (device node /dev/tee, mounted at /tee)
++  static const char* excludes[] = {"rootfs","devtmpfs","tmpfs","none","efivarfs","systemd-1","/dev/loop", "udev", "/dev/tee", NULL};
+ 
+   if (pipe)
+   {
 diff --git a/xbmc/powermanagement/PowerManager.cpp b/xbmc/powermanagement/PowerManager.cpp
 index fb04187763..beec394924 100644
 --- a/xbmc/powermanagement/PowerManager.cpp
@@ -11286,11 +12101,148 @@ index fb04187763..beec394924 100644
  }
  
  bool CPowerManager::Hibernate()
+diff --git a/xbmc/rendering/gles/GLESShader.cpp b/xbmc/rendering/gles/GLESShader.cpp
+index 961c3f7961..e738cfe2e0 100644
+--- a/xbmc/rendering/gles/GLESShader.cpp
++++ b/xbmc/rendering/gles/GLESShader.cpp
+@@ -48,7 +48,7 @@ void CGLESShader::OnCompiledAndLinked()
+   m_hStep   = glGetUniformLocation(ProgramHandle(), "m_step");
+   m_hContrast   = glGetUniformLocation(ProgramHandle(), "m_contrast");
+   m_hBrightness = glGetUniformLocation(ProgramHandle(), "m_brightness");
+-  m_sdrPeak = glGetUniformLocation(ProgramHandle(), "m_sdrPeak");
++  m_hSdrPeak = glGetUniformLocation(ProgramHandle(), "m_sdrPeak");
+ 
+   // Variables passed directly to the Vertex shader
+   m_hProj  = glGetUniformLocation(ProgramHandle(), "m_proj");
+@@ -169,7 +169,7 @@ bool CGLESShader::OnEnabled()
+   glUniform1f(m_hContrast, 1.0f);
+ 
+   const float sdrPeak = CServiceBroker::GetWinSystem()->GetGuiSdrPeakLuminance();
+-  glUniform1f(m_sdrPeak, sdrPeak);
++  glUniform1f(m_hSdrPeak, sdrPeak);
+ 
+   return true;
+ }
+diff --git a/xbmc/rendering/gles/GLESShader.h b/xbmc/rendering/gles/GLESShader.h
+index 1f59895740..bbe534a2e6 100644
+--- a/xbmc/rendering/gles/GLESShader.h
++++ b/xbmc/rendering/gles/GLESShader.h
+@@ -53,6 +53,7 @@ protected:
+   GLint m_hStep = 0;
+   GLint m_hContrast = 0;
+   GLint m_hBrightness = 0;
++  GLint m_hSdrPeak = 0;
+ 
+   const GLfloat *m_proj;
+   const GLfloat *m_model;
+@@ -62,6 +63,4 @@ protected:
+   GLfloat m_clipXOffset;
+   GLfloat m_clipYFactor;
+   GLfloat m_clipYOffset;
+-
+-  GLfloat m_sdrPeak;
+ };
+diff --git a/xbmc/rendering/gles/RenderSystemGLES.cpp b/xbmc/rendering/gles/RenderSystemGLES.cpp
+index 476bde7733..2d571a5c0f 100644
+--- a/xbmc/rendering/gles/RenderSystemGLES.cpp
++++ b/xbmc/rendering/gles/RenderSystemGLES.cpp
+@@ -8,6 +8,9 @@
+ 
+ #include "RenderSystemGLES.h"
+ 
++#include <algorithm>
++#include <vector>
++
+ #include "guilib/DirtyRegion.h"
+ #include "guilib/GUITextureGLES.h"
+ #include "platform/MessagePrinter.h"
+@@ -401,6 +404,11 @@ void CRenderSystemGLES::InitialiseShaders()
+     defines += "#define KODI_LIMITED_RANGE 1\n";
+   }
+ 
++  // PGS/DVB bitmap subtitles that are already graded for the HDR title they
++  // accompany must bypass this -- see SM_TEXTURE_NOPQ below -- so keep the
++  // defines used for that variant without KODI_TRANSFER_PQ.
++  const std::string definesNoPQ = defines;
++
+   if (m_transferPQ)
+   {
+     defines += "#define KODI_TRANSFER_PQ 1\n";
+@@ -517,6 +525,32 @@ void CRenderSystemGLES::InitialiseShaders()
+     m_pShader[ShaderMethodGLES::SM_TEXTURE_NOALPHA].reset();
+     CLog::Log(LOGERROR, "GUI Shader gles_shader_texture_noalpha.frag - compile and link failed");
+   }
++
++  // Same program as SM_TEXTURE, compiled without KODI_TRANSFER_PQ, for overlays
++  // (PGS/DVB bitmap subtitles) that are already graded in the display's HDR
++  // colour space and must not be run through the sRGB/BT.709->PQ/BT.2020 uplift.
++  m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ] =
++      std::make_unique<CGLESShader>("gles_shader_texture.frag", definesNoPQ);
++  if (!m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ]->CompileAndLink())
++  {
++    m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ]->Free();
++    m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ].reset();
++    CLog::Log(LOGERROR, "GUI Shader gles_shader_texture.frag (no PQ) - compile and link failed");
++  }
++
++  // For overlays (PGS/DVB bitmap subtitles) graded against HDR video when the
++  // kernel is tone-mapping that video down to SDR output -- the GUI/OSD is
++  // rendering plain sRGB in that case (KODI_TRANSFER_PQ off), so the subtitle
++  // bitmap's PQ/BT.2020 grading must be brought down to match, rather than
++  // uplifted (SM_TEXTURE) or passed through untouched (SM_TEXTURE_NOPQ).
++  m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB] =
++      std::make_unique<CGLESShader>("gles_shader_texture_pqtosrgb.frag", definesNoPQ);
++  if (!m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB]->CompileAndLink())
++  {
++    m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB]->Free();
++    m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB].reset();
++    CLog::Log(LOGERROR, "GUI Shader gles_shader_texture_pqtosrgb.frag - compile and link failed");
++  }
+ }
+ 
+ void CRenderSystemGLES::ReleaseShaders()
+@@ -568,6 +602,14 @@ void CRenderSystemGLES::ReleaseShaders()
+   if (m_pShader[ShaderMethodGLES::SM_TEXTURE_NOALPHA])
+     m_pShader[ShaderMethodGLES::SM_TEXTURE_NOALPHA]->Free();
+   m_pShader[ShaderMethodGLES::SM_TEXTURE_NOALPHA].reset();
++
++  if (m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ])
++    m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ]->Free();
++  m_pShader[ShaderMethodGLES::SM_TEXTURE_NOPQ].reset();
++
++  if (m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB])
++    m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB]->Free();
++  m_pShader[ShaderMethodGLES::SM_TEXTURE_PQTOSRGB].reset();
+ }
+ 
+ void CRenderSystemGLES::EnableGUIShader(ShaderMethodGLES method)
+diff --git a/xbmc/rendering/gles/RenderSystemGLES.h b/xbmc/rendering/gles/RenderSystemGLES.h
+index e0cd72b9c1..fb8c9653e9 100644
+--- a/xbmc/rendering/gles/RenderSystemGLES.h
++++ b/xbmc/rendering/gles/RenderSystemGLES.h
+@@ -33,6 +33,8 @@ enum class ShaderMethodGLES
+   SM_TEXTURE_RGBA_BOB,
+   SM_TEXTURE_RGBA_BOB_OES,
+   SM_TEXTURE_NOALPHA,
++  SM_TEXTURE_NOPQ,
++  SM_TEXTURE_PQTOSRGB,
+   SM_MAX
+ };
+ 
+@@ -63,6 +65,8 @@ private:
+       {ShaderMethodGLES::SM_TEXTURE_RGBA_BOB, "texture rgba bob"},
+       {ShaderMethodGLES::SM_TEXTURE_RGBA_BOB_OES, "texture rgba bob OES"},
+       {ShaderMethodGLES::SM_TEXTURE_NOALPHA, "texture no alpha"},
++      {ShaderMethodGLES::SM_TEXTURE_NOPQ, "texture no pq"},
++      {ShaderMethodGLES::SM_TEXTURE_PQTOSRGB, "texture pq to srgb"},
+   });
+ 
+   static_assert(static_cast<size_t>(ShaderMethodGLES::SM_MAX) == ShaderMethodGLESMap.size(),
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 34dafe7ea7..76518d8db2 100644
+index 4de5e4c54e..0b08c3ea87 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
-@@ -424,7 +424,7 @@ void CAdvancedSettings::Initialize()
+@@ -434,7 +434,7 @@ void CAdvancedSettings::Initialize()
    m_pictureExtensions =
        ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.rss|.webp|.jp2|.apng|.avif";
    m_musicExtensions = ".b4s|.nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.gdm|.imf|.m15|.sfx|.uni|.ac3|.dts|.cue|.aif|.aiff|.wpl|.xspf|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.wv|.dsp|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.wtv|.mka|.tak|.opus|.dff|.dsf|.m4b|.dtshd";
@@ -11299,7 +12251,7 @@ index 34dafe7ea7..76518d8db2 100644
    m_subtitlesExtensions = ".utf|.utf8|.utf-8|.sub|.srt|.smi|.rt|.txt|.ssa|.text|.ssa|.aqt|.jss|"
                            ".ass|.vtt|.idx|.ifo|.zip|.sup";
    m_discStubExtensions = ".disc";
-@@ -436,6 +436,7 @@ void CAdvancedSettings::Initialize()
+@@ -446,6 +446,7 @@ void CAdvancedSettings::Initialize()
    m_stereoscopicregex_3d = "[-. _]3d[-. _]";
    m_stereoscopicregex_sbs = "[-. _]h?sbs[-. _]";
    m_stereoscopicregex_tab = "[-. _]h?tab[-. _]";
@@ -11307,7 +12259,7 @@ index 34dafe7ea7..76518d8db2 100644
  
    m_logLevelHint = m_logLevel = LOG_LEVEL_NORMAL;
  
-@@ -600,6 +601,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
+@@ -610,6 +611,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
      XMLUtils::GetString(pElement, "stereoscopicregex3d", m_stereoscopicregex_3d);
      XMLUtils::GetString(pElement, "stereoscopicregexsbs", m_stereoscopicregex_sbs);
      XMLUtils::GetString(pElement, "stereoscopicregextab", m_stereoscopicregex_tab);
@@ -13845,7 +14797,7 @@ index e3300e925c..6801245fa9 100644
  
  void CGraphicContext::GetAllowedResolutions(std::vector<RESOLUTION> &res)
 diff --git a/xbmc/windowing/GraphicContext.h b/xbmc/windowing/GraphicContext.h
-index 0c5201f1e7..cb8bf71bd4 100644
+index 0c5201f1e7..8b7e6ddc9f 100644
 --- a/xbmc/windowing/GraphicContext.h
 +++ b/xbmc/windowing/GraphicContext.h
 @@ -29,11 +29,19 @@
@@ -13887,7 +14839,22 @@ index 0c5201f1e7..cb8bf71bd4 100644
  
    /* \brief Get UI scaling information from a given resolution to the screen resolution.
     Takes account of overscan and UI zooming.
-@@ -198,6 +208,7 @@ protected:
+@@ -182,6 +192,14 @@ public:
+   void SetTransferPQ(bool PQ) { m_isTransferPQ = PQ; }
+   bool IsTransferPQ() const { return m_isTransferPQ; }
+ 
++  // Whether the currently playing video's own source is HDR-graded, regardless
++  // of whether the kernel/display is actually outputting PQ right now (see
++  // IsTransferPQ() above -- that reflects the *output*, this reflects the
++  // *source*, so e.g. "HDR source tone-mapped down to SDR output" is
++  // sourceIsHDR=true, IsTransferPQ()=false).
++  void SetSourceIsHDR(bool isHDR) { m_sourceIsHDR = isHDR; }
++  bool IsSourceHDR() const { return m_sourceIsHDR; }
++
+ protected:
+ 
+   void UpdateCameraPosition(const CPoint &camera, const float &factor);
+@@ -198,6 +216,7 @@ protected:
    bool m_bCalibrating = false;
    RESOLUTION m_Resolution = RES_INVALID;
    float m_fFPSOverride = 0.0f;
@@ -13895,6 +14862,12 @@ index 0c5201f1e7..cb8bf71bd4 100644
  
    RESOLUTION_INFO m_windowResolution;
    std::stack<CPoint> m_cameras;
+@@ -234,4 +253,5 @@ protected:
+   RENDER_STEREO_MODE m_nextStereoMode = RENDER_STEREO_MODE_OFF;
+ 
+   bool m_isTransferPQ{false};
++  bool m_sourceIsHDR{false};
+ };
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
 index 270392c163..0009a8ab5c 100644
 --- a/xbmc/windowing/Resolution.cpp
@@ -14368,10 +15341,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..b65b0fe3e4
+index 0000000000..07b01a158b
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,511 @@
+@@ -0,0 +1,515 @@
 +/*
 + *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14382,6 +15355,7 @@ index 0000000000..b65b0fe3e4
 +
 +#include "WinSystemAmlogic.h"
 +
++#include <cmath>
 +#include <string>
 +
 +#include "ServiceBroker.h"
@@ -14838,9 +15812,12 @@ index 0000000000..b65b0fe3e4
 +
 +float CWinSystemAmlogic::GetGuiSdrPeakLuminance() const
 +{
++  // Max nits for 100% UI setting = 1000 nits, < 10000 nits, min 80 nits for 0%
++  // (same formula and setting as CWinSystemWin32/CWinSystemWin10 -- keeps the
++  // nits contract consistent for the GLES PQ shader math in GLESShader.cpp)
 +  const int guiSdrPeak = m_settings->GetInt(CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE);
 +
-+  return 0.5f * guiSdrPeak / 100.0f + 0.5f;
++  return 80.0f * std::pow(std::exp(1.0f), 0.025257f * guiSdrPeak);
 +}
 +
 +bool CWinSystemAmlogic::IsDolbyVisionSupportedByDisplay() const
