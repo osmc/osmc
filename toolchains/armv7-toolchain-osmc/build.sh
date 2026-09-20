@@ -56,7 +56,13 @@ verify_action
 # Set up sources.list
 echo "deb https://deb.debian.org/debian $RLS main contrib non-free
 deb https://deb.debian.org/debian/ $RLS-updates main contrib non-free
-deb https://security.debian.org/ $RLS-security main contrib non-free
+# Debian 11 (bullseye) is EOL as of 2026-08-31 and the pool behind its security suite
+# has been reaped. Debian re-signed the index on 2026-09-12 with no expiry, so
+# apt-get update succeeds, but most packages that index advertises now return 404.
+# OSMC mirrors the final published state of the suite, so build against that rather
+# than against a bullseye main that is behind what devices actually run.
+# OSMC remove on Trixie release
+deb https://apt.osmc.tv $RLS-security main
 " > ${DIR}/etc/apt/sources.list
 
 # Debian minbase does not ship ca-certificates yet. Work around this
