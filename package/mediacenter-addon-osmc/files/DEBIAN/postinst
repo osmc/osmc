@@ -42,7 +42,7 @@ then
 	if is_atv; then rm -rf /usr/share/kodi/addons/script.module.osmcsetting.updates >/dev/null 2>&1; fi
 	if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
 	chown -R $OWNER /usr/share/kodi/addons/script.module.xmltodict
-	chown -R $OWNER /usr/share/kodi/addons/script.module.osmcsetting.*
+	chown -R $OWNER /usr/share/kodi/addons/script.module.osmc*
 	chown -R $OWNER /usr/share/kodi/addons/service.osmc.settings
 	chmod +x /usr/bin/grab-logs
 	chmod +x /usr/bin/readgui
