@@ -11,12 +11,14 @@
 import os
 import re
 import shlex
+import socket
 import subprocess
 import traceback
 from io import open
 
 import requests
 
+import xbmc
 import xbmcaddon
 import xbmcgui
 from osmccommon.osmc_language import LangRetriever
@@ -35,6 +37,11 @@ class HotFix(object):
         self._lang = None
 
         self.tmp_hfo_location = '/var/tmp/uploadHotFixOutput.txt'
+
+        # A HotFix that needs a restart touches this rather than rebooting the
+        # device itself, so the decision is the user's and the run is never cut
+        # short mid-command.
+        self.reboot_flag = '/tmp/reboot_needed_hotfix'
 
         # hf_key = 'ucawobahij'  # https://discourse.osmc.tv/t/kodi-v19-troubleshooting-faq/89968
 
@@ -59,11 +66,13 @@ class HotFix(object):
                                         mirror=hf_from_mirror):
             return
 
-        results = self.apply_instruction(hf_parsed['instruction'])
+        results, failed_line = self.apply_instruction(hf_parsed['instruction'])
 
         self.save_temp_hotfix_output(results)
 
         self.resolution_dispatcher(results, hf_parsed['resolution'])
+
+        self.report_outcome(failed_line)
 
     @property
     def addon(self):
@@ -153,20 +162,25 @@ class HotFix(object):
                     - one line string only
                     - must start with "DESCRIPTION:", otherwise treated as part of the INSTRUCTION
 
+                COMMENTS (optional):
+                    - any line whose first non-space character is "#" is ignored
+
                 INSTRUCTION:
                     - can be multiple lines
                     - multiple lines will be run consecutively only if the exit code is 0
                     - can start with "INSTRUCTION:" but not required
+                    - each line is one command, run directly without a shell: no
+                      pipes, redirection, && or globbing
 
                 RESOLUTION (optional):
                     - one line string with resolution actions
-                    - can be comma, space, bar, colon, or semi-colon delimited
+                    - several actions may be separated by any of space, comma,
+                      full stop, bar, colon or semi-colon, in any combination
                     - must be the last line in the result
                     - and must start with "RESOLUTION:", otherwise it will be treated as part of
                       the INSTRUCTION SET
                     - UPLOAD: upload the results of the INSTRUCTION to paste.osmc.io and provide
                       the user with the link
-                    - SAVE: to save the results to a specific file
                     - LOG: write the results to the kodi log
                     - LOG is a mandatory RESOLUTION and is done every time by default
              """
@@ -175,7 +189,6 @@ class HotFix(object):
         instruction = []
         resolution = []
 
-        delimiters = [' ', ',', '.', '|', ':', ':']
 
         # rstrip first: a payload saved by any normal editor ends with a newline, so
         # split() produced a trailing empty element and the RESOLUTION line was no
@@ -194,16 +207,28 @@ class HotFix(object):
             # tested wherever it appears rather than only on the last line, so a
             # stray blank line at the end of the file cannot turn it into a command
             if line.startswith('RESOLUTION:'):
-                desc = line.replace('RESOLUTION:', '').strip()
-                for d in delimiters:
-                    if d in desc:
-                        resolution = [r for r in desc.split(d) if r]
-                        break
-                else:
-                    # a single resolution such as 'RESOLUTION: LOG' contains none of
-                    # the delimiters, and used to parse to an empty list
-                    if desc:
-                        resolution = [desc]
+                # Split on any run of separators rather than on the first single
+                # character that happens to appear. The old loop tried each
+                # separator in turn and split on the first one found, which broke
+                # every natural way of writing more than one action:
+                #   'UPLOAD, LOG' split on the space, giving 'UPLOAD,' -- silently
+                #                 ignored, so the output was never uploaded
+                #   'UPLOAD | LOG' split on the space, leaving a bare '|'
+                #   'UPLOAD;LOG'   did not split at all: the docstring offered a
+                #                  semi-colon that was never in the list
+                # Only 'UPLOAD LOG' and 'UPLOAD,LOG' worked, and a HotFix author
+                # had no way to tell the difference -- an ignored action is not
+                # reported anywhere.
+                resolution = [r for r in re.split(r'[\s,.|:;]+',
+                                                  line.replace('RESOLUTION:', '', 1)) if r]
+                continue
+
+            # '#' starts a comment. Without this every line is a command, so a
+            # HotFix cannot carry any explanation of itself and a template cannot
+            # document its own fields -- '# do X' would be split to ['#', 'do',
+            # 'X'] and executed. Nothing legitimate begins a command with '#',
+            # so no existing HotFix changes behaviour.
+            if line.lstrip().startswith('#'):
                 continue
 
             if line:
@@ -274,9 +299,19 @@ class HotFix(object):
     def apply_instruction(instruction):
         """
             Applies the instruction via the command line.
-            Returns the resulting output in a list of lines.
+
+            Returns (results, failed_line). failed_line is None when every command
+            returned zero, otherwise it is the command that stopped the run.
+
+            The caller needs that distinction to tell the user whether the HotFix
+            worked. The output alone does not say: a successful run and a run that
+            died on its first command both come back as a list of lines, which is
+            why nothing was reported before.
+
+            stderr is folded into the captured output. apt writes its warnings and
+            most of its errors there, so without this the saved and uploaded output
+            omits exactly the part needed to diagnose a failure.
         """
-        dangerous = ['rm -rf /', ]
         results = []
         for line in instruction:
             try:
@@ -284,26 +319,103 @@ class HotFix(object):
                 results.append('>>>>> INSTRUCTION >>>>> %s\n' % ' '.join(instruct))
 
                 try:
-                    output = subprocess.check_output(instruct)
+                    output = subprocess.check_output(instruct, stderr=subprocess.STDOUT)
                     if isinstance(output, bytes):
                         output = output.decode('utf-8')
                     results.append(output)
 
                 except subprocess.CalledProcessError as e:
-                    # raise RuntimeError("command '{}' return with error (code {}): {}"
-                    # .format(e.cmd, e.returncode, e.output))
                     log(label='Non-zero exit code from line', message=e.output)
                     output = e.output
                     if isinstance(output, bytes):
                         output = output.decode('utf-8')
                     results.append(output)
-                    break
+                    return results, line
 
             except Exception as e:
                 results.append('Error: %s\n%s' % (str(e), traceback.format_exc()))
-                break
+                return results, line
 
-        return results
+        return results, None
+
+    def report_outcome(self, failed_line=None):
+        """
+            Tell the user whether the HotFix worked.
+
+            Nothing was shown before: the dialog closed and the user was left to
+            guess whether anything had happened, which is the most common complaint
+            about the HotFix mechanism. A HotFix is applied by someone sitting in
+            front of the device, so the answer belongs on screen rather than only
+            in the Kodi log.
+        """
+        if failed_line is not None:
+            log(label='HotFix stopped on line', message=failed_line)
+
+            _ = DIALOG.ok(self.lang(32197),
+                          '[CR]'.join([self.lang(32199), failed_line,
+                                       self.lang(32200)]))
+            return False
+
+        log('HotFix completed: every instruction returned zero')
+
+        _ = DIALOG.ok(self.lang(32196), self.lang(32198))
+
+        self.offer_reboot()
+
+        return True
+
+    def offer_reboot(self):
+        """
+            A HotFix that needs a restart says so by touching self.reboot_flag,
+            rather than calling reboot itself. Two reasons: a HotFix that reboots
+            directly kills its own remaining commands and whatever else the device
+            was doing, and deciding at run time lets a HotFix ask for a restart
+            only when it actually changed something that needs one -- a fixed
+            header field could not.
+
+            The user is asked rather than counted down. A HotFix can be applied
+            while media is playing, and they are at the screen anyway, having just
+            confirmed the run, so a timer buys nothing and can interrupt playback
+            or an apt operation that is still settling.
+
+            Declining does not lose the request: it is handed to /tmp/reboot-needed,
+            which the updater already watches, so the user is reminded through the
+            normal path instead.
+        """
+        if not os.path.isfile(self.reboot_flag):
+            return False
+
+        try:
+            os.remove(self.reboot_flag)
+        except Exception as e:
+            log(label='Could not remove reboot flag', message=str(e))
+
+        reboot = DIALOG.yesno(self.lang(32201),
+                              '[CR]'.join([self.lang(32202), self.lang(32080)]),
+                              yeslabel=self.lang(32081), nolabel=self.lang(32082))
+
+        if not reboot:
+            try:
+                with open('/tmp/reboot-needed', 'a'):
+                    pass
+            except Exception as e:
+                log(label='Could not set /tmp/reboot-needed', message=str(e))
+
+            return False
+
+        # close the settings addon first, exactly as the updater does before a
+        # reboot, so it is not torn down mid-write
+        try:
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as open_socket:
+                open_socket.connect('/var/tmp/osmc.settings.sockfile')
+                open_socket.sendall(b'exit')
+        except Exception as e:
+            log(label='Could not signal settings addon to exit', message=str(e))
+
+        xbmc.sleep(1000)
+        xbmc.executebuiltin('Reboot')
+
+        return True
 
     def resolution_dispatcher(self, results, resolutions=None):
         """
@@ -313,9 +425,13 @@ class HotFix(object):
         if resolutions is None:
             resolutions = []
 
+        # SAVE, which copied the output to /boot, is deliberately absent. On a
+        # Raspberry Pi /boot is the small FAT partition the device boots from;
+        # writing arbitrary command output there risks filling or corrupting it,
+        # and the output is already kept in the Kodi log and at
+        # /var/tmp/uploadHotFixOutput.txt, both of which grab-logs collects.
         resolution_map = {
             'UPLOAD': self.resolution_upload,
-            'SAVE': self.resolution_save,
             'LOG': self.resolution_log,
         }
 
@@ -346,11 +462,14 @@ class HotFix(object):
 
         if not key:
             log("OSMC HotFix upload failed.")
-            save = DIALOG.yesno(self.lang(32120),
-                                '[CR]'.join([self.lang(32121), self.lang(32122)]))
 
-            if save:
-                self.resolution_save(results=None)
+            # Previously this offered to copy the output to /boot. It no longer
+            # does: an upload failure means no network, and a device with no
+            # network could not have fetched the HotFix in the first place, so
+            # the case is close to unreachable and not worth writing to the boot
+            # partition for. Say where the output already is instead.
+            _ = DIALOG.ok(self.lang(32120),
+                          '[CR]'.join([self.lang(32121), self.lang(32203)]))
 
         else:
             url = 'https://paste.osmc.tv/ %s' % key
@@ -366,13 +485,6 @@ class HotFix(object):
 
         with open(self.tmp_hfo_location, 'w', encoding='utf-8') as f:
             f.writelines(results)
-
-    def resolution_save(self, results):
-        """
-            Save the results to a file at the SD card
-        """
-        log('Copying HotFix output to /boot/')
-        os.popen('sudo cp -rf %s /boot/' % self.tmp_hfo_location)
 
     @staticmethod
     def resolution_log(results):

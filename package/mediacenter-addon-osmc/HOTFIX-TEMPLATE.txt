@@ -1,0 +1,129 @@
+DESCRIPTION: Repoints the Debian security repository at OSMC's copy so updates and app installs work again.
+#
+# =============================================================================
+#  OSMC HotFix -- template and worked example
+#
+#  Everything below is one working HotFix that uses every feature of the format.
+#  Copy it, replace the commands with your own, and delete what you do not need.
+#
+#  REQUIRES the My OSMC updates add-on that supports DESCRIPTION, RESOLUTION and
+#  '#' comments. On older add-ons those lines are run as commands and the HotFix
+#  fails. Check what is on devices before publishing one that uses them.
+# =============================================================================
+#
+# -----------------------------------------------------------------------------
+#  THE FORMAT
+#
+#  DESCRIPTION:   optional, MUST be the first line. One line, shown to the user
+#                 before they are asked to agree. Say what changes, in words a
+#                 user would use. Omit it and they are told none was given.
+#
+#  # comment      any line whose first non-space character is '#'. Indented
+#                 comments work too, as below.
+#
+#  (blank line)   ignored, so steps can be spaced out for readability.
+#
+#  INSTRUCTION:   an optional prefix on a command line. It is stripped and the
+#                 rest is run. Purely decorative -- step 4 uses it to show the
+#                 form, the other steps do not bother.
+#
+#  <command>      everything else, in order. See HOW LINES ARE RUN.
+#
+#  RESOLUTION:    optional, last line. What to do with the collected output:
+#                   LOG     write it to the Kodi log. Always done, asked for
+#                           or not.
+#                   UPLOAD  post it to paste.osmc.tv and show the user the URL,
+#                           which is what they should quote on the forum.
+#                 Separate several with space, comma, full stop, bar, colon or
+#                 semi-colon, in any combination: 'UPLOAD, LOG' and 'UPLOAD|LOG'
+#                 are both fine. There is no SAVE -- output is never written to
+#                 /boot, which is the boot partition on a Pi.
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
+#  HOW LINES ARE RUN
+#
+#  - One line is one command, executed directly. There is NO shell, so |  >
+#    &&  ;  and *  do NOT work on their own. Wrap them: sudo sh -c '...'
+#    Steps 6 and 8 below do exactly that.
+#  - The run STOPS at the first command returning non-zero. Nothing after it
+#    runs. Order the commands so that is what you want, and use it deliberately
+#    as a guard, as step 5 does.
+#  - Use sudo for anything needing root: the add-on does not run as root.
+#  - Single-quote anything containing a backslash, or it is stripped before the
+#    command sees it and the command silently misbehaves. Step 3 relies on this.
+#  - stdout and stderr are both captured, so apt's warnings reach the output.
+#  - The user sees every command before agreeing, so keep them readable.
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
+#  WHAT THE USER SEES
+#
+#  1. the DESCRIPTION line
+#  2. the full list of commands, before being asked to agree
+#  3. "HotFix complete -- all steps completed successfully", or
+#     "HotFix failed" naming the exact command that stopped it
+#  4. the paste.osmc.tv URL, if UPLOAD was asked for
+#  5. a restart prompt, only if the HotFix asked for one AND every step passed
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
+#  ASKING FOR A RESTART
+#
+#  Never reboot from a HotFix: it kills the commands after it. Touch
+#  /tmp/reboot_needed_hotfix instead and the user is asked once the run has
+#  finished. Touch it only on the path that genuinely needs it, so a HotFix that
+#  changed nothing does not ask -- step 8 shows the conditional form.
+#
+#  If the user declines, the request is passed to /tmp/reboot-needed, which the
+#  updater already watches, so they are reminded through the normal path.
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
+#  BEFORE PUBLISHING
+#
+#  - Run it TWICE on a test device. A user who sees no immediate change will run
+#    it again, so it must be safe to repeat.
+#  - Back up anything you edit, with cp -n so the second run cannot overwrite
+#    the backup with the already-modified file.
+#  - Include a verification step. Without one, a HotFix whose sed matched
+#    nothing reports success having done nothing at all.
+# -----------------------------------------------------------------------------
+
+
+# ============================ THE HOTFIX ITSELF ==============================
+
+# 1. Back up first. -n means a second run keeps the original backup.
+sudo cp -n /etc/apt/sources.list /etc/apt/sources.list.hotfix-backup
+
+# 2. Remove the old entry.
+sudo sed -i -E '/bullseye-security/d' /etc/apt/sources.list
+
+# 3. Tidy up: deleting a line leaves the blank that followed it, so two blanks
+#    collapse together. Squeeze runs of blanks back to one.
+#       note the single quotes -- unquoted, the \n would be eaten before sed
+#       ever saw it, and the expression would silently do nothing
+sudo sed -i '/^$/{N;/^\n$/D}' /etc/apt/sources.list
+
+# 4. Add the replacement. The INSTRUCTION: prefix is optional and is stripped;
+#    this is the only step that uses it, to show the form.
+INSTRUCTION: sudo sed -i '$a deb https://apt.osmc.tv bullseye-security main' /etc/apt/sources.list
+
+# 5. Verify, and use stop-on-failure as a guard: grep -c returns non-zero when
+#    nothing matched, so the run stops here rather than carrying on after a
+#    change that silently did nothing.
+sudo grep -c '^deb https://apt.osmc.tv bullseye-security main' /etc/apt/sources.list
+
+# 6. Put a diff of what changed into the output, so the uploaded paste shows it.
+#    A pipe needs a shell, hence sh -c. The trailing 'true' stops a non-zero
+#    diff exit (files differ, which is the whole point) from ending the run.
+sudo sh -c 'diff /etc/apt/sources.list.hotfix-backup /etc/apt/sources.list | head -20; true'
+
+# 7. Act on the change.
+sudo apt-get update
+
+# 8. Ask for a restart only if something installed actually needs one. Debian
+#    packages set /var/run/reboot-required when they do.
+sudo sh -c 'test -f /var/run/reboot-required && touch /tmp/reboot_needed_hotfix; true'
+
+RESOLUTION: UPLOAD, LOG

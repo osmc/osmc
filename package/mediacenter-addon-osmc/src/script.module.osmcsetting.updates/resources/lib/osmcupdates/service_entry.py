@@ -747,8 +747,7 @@ class Main(object):
         # notify the user that the installation or uninstall of their desired apfs has
         # completed successfully prompt for immediate reboot if needed.
 
-        if any([os.path.isfile('/tmp/reboot-needed'),
-                os.path.isfile('fname/var/run/reboot-required')]):
+        if self.check_if_reboot_required():
             reboot = DIALOG.yesno(self.lang(32090),
                                   '[CR]'.join([self.lang(32091), self.lang(32133)]),
                                   yeslabel=self.lang(32081), nolabel=self.lang(32082))
