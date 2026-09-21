@@ -1,0 +1,77 @@
+From f493201b273e2712f7483f100a12aeba801748e8 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 15 Sep 2026 00:00:00 +0100
+Subject: [PATCH] CPythonInvoker: log how long a script took to run
+
+stop() already reports "script termination took {}ms" for the teardown half
+of a script's life, but there is nothing for the half users actually notice:
+how long the script took to start and run. That leaves add-on start-up cost
+invisible in a debug log, so a slow add-on can only be investigated by
+instrumenting it.
+
+Record a steady_clock timestamp alongside the existing "start processing"
+line and report the elapsed time on both terminal paths. The span covers
+Py_NewInterpreter(), the recursive script.module dependency resolution that
+builds sys.path, and the script body itself - which together are what a user
+experiences as the add-on taking time to appear.
+
+Note that for xbmc.service add-ons this figure is the service's lifetime
+rather than its start-up cost, since such scripts only return at shutdown.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/python/PythonInvoker.cpp | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/interfaces/python/PythonInvoker.cpp b/xbmc/interfaces/python/PythonInvoker.cpp
+index 87bc2a46f9..494556109a 100644
+--- a/xbmc/interfaces/python/PythonInvoker.cpp
++++ b/xbmc/interfaces/python/PythonInvoker.cpp
+@@ -44,6 +44,7 @@
+ // clang-format on
+ 
+ #include <cassert>
++#include <chrono>
+ #include <iterator>
+ 
+ #ifdef TARGET_WINDOWS
+@@ -144,6 +145,12 @@ bool CPythonInvoker::execute(const std::string& script, std::vector<std::wstring
+ 
+   CLog::Log(LOGDEBUG, "CPythonInvoker({}, {}): start processing", GetId(), m_sourceFile);
+ 
++  // Useful for add-on performance metrics, and the counterpart to the "script
++  // termination took {}ms" line in stop(): this covers sub-interpreter creation,
++  // sys.path setup and the script body, i.e. what a user perceives as the time
++  // taken for an add-on to start.
++  const auto startTime = std::chrono::steady_clock::now();
++
+   std::string realFilename(CSpecialProtocol::TranslatePath(m_sourceFile));
+   std::string scriptDir = URIUtils::GetDirectory(realFilename);
+   URIUtils::RemoveSlashAtEnd(scriptDir);
+@@ -338,14 +345,21 @@ bool CPythonInvoker::execute(const std::string& script, std::vector<std::wstring
+   InvokerState stateToSet;
+   if (!failed && !PyErr_Occurred())
+   {
+-    CLog::Log(LOGDEBUG, "CPythonInvoker({}, {}): script successfully run", GetId(), m_sourceFile);
++    CLog::Log(LOGDEBUG, "CPythonInvoker({}, {}): script successfully run in {}ms", GetId(),
++              m_sourceFile,
++              std::chrono::duration_cast<std::chrono::milliseconds>(
++                  std::chrono::steady_clock::now() - startTime)
++                  .count());
+     stateToSet = InvokerStateScriptDone;
+     onSuccess();
+   }
+   else if (PyErr_ExceptionMatches(PyExc_SystemExit))
+   {
+     m_systemExitThrown = true;
+-    CLog::Log(LOGDEBUG, "CPythonInvoker({}, {}): script aborted", GetId(), m_sourceFile);
++    CLog::Log(LOGDEBUG, "CPythonInvoker({}, {}): script aborted after {}ms", GetId(), m_sourceFile,
++              std::chrono::duration_cast<std::chrono::milliseconds>(
++                  std::chrono::steady_clock::now() - startTime)
++                  .count());
+     stateToSet = InvokerStateFailed;
+     onAbort();
+   }
+-- 
+2.34.1
+

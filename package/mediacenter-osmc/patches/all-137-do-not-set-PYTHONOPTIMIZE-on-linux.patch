@@ -1,0 +1,59 @@
+From f44710a38cb8e09569e30da6c4a21ceae1e783b9 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 8 Sep 2026 06:00:00 +0100
+Subject: [PATCH] XBPython: do not set PYTHONOPTIMIZE on Linux
+
+Kodi sets PYTHONOPTIMIZE=1 before Py_Initialize() on Linux. CPython then
+looks exclusively for <mod>.cpython-3X.opt-1.pyc and will not fall back to
+the plain .pyc that Debian ships for the standard library and for
+dist-packages. Those __pycache__ directories are root-owned while Kodi runs
+as the unprivileged 'osmc' user, so the cache CPython wants can never be
+written, and importlib swallows the failed write silently (set_data() routes
+the EACCES to _bootstrap._verbose_message, which only prints under -v).
+Nothing is logged, by Kodi or by Python.
+
+Because every addon invocation runs in a fresh sub-interpreter
+(Py_NewInterpreter / Py_EndInterpreter in CPythonInvoker), sys.modules starts
+empty each time, so the whole import graph is re-parsed and re-compiled from
+source on every single script launch, forever.
+
+Measured on a Vero V (Cortex-A55, bullseye, python3.9): a typical addon
+import set of 150 stdlib modules / ~2.9 MiB of source costs ~1520 ms of pure
+recompilation per launch, against ~47 ms to unmarshal the equivalent
+bytecode - a 37x penalty paid on every launch.
+
+The original justification does not apply here. It was added in 2015 for a
+Pi cross-compiled "unified build" sysroot whose .py files had been stripped,
+leaving only .pyo. OSMC builds against the system Debian python3 and ships
+.py sources alongside Debian's plain .pyc, so the flag buys nothing and
+defeats the packaged bytecode cache.
+
+This mirrors the change Dom Cobley made for the Raspberry Pi OS Kodi
+packages in 2022, which was never submitted upstream.
+See: https://forum.kodi.tv/showthread.php?tid=369573
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ xbmc/interfaces/python/XBPython.cpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/xbmc/interfaces/python/XBPython.cpp b/xbmc/interfaces/python/XBPython.cpp
+index 5fdd17610f..95b1335691 100644
+--- a/xbmc/interfaces/python/XBPython.cpp
++++ b/xbmc/interfaces/python/XBPython.cpp
+@@ -486,8 +486,10 @@ bool XBPython::OnScriptInitialized(ILanguageInvoker* invoker)
+   if (!m_bInitialized)
+   {
+     // Darwin packs .pyo files, we need PYTHONOPTIMIZE on in order to load them.
+-    // linux built with unified builds only packages the pyo files so need it
+-#if defined(TARGET_DARWIN) || defined(TARGET_LINUX)
++    // Do not set it on Linux: we link the system python and Debian ships the
++    // stdlib as plain .pyc only, so PYTHONOPTIMIZE would make every import
++    // miss the packaged cache and recompile from source on every script run.
++#if defined(TARGET_DARWIN)
+     setenv("PYTHONOPTIMIZE", "1", 1);
+ #endif
+     // Info about interesting python envvars available
+-- 
+2.34.1
+
