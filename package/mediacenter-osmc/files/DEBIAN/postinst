@@ -30,13 +30,16 @@ if [ "$1" = "configure" ]; then
 	#
 	# Level 0 is what Kodi loads: we drop PYTHONOPTIMIZE on Linux, so the
 	# interpreter no longer asks for opt-1. Compiling at any other level would
-	# reinstate the bug this fixes.
-	#
-	# compileall does not prune, so clear first. That also drops bytecode left by
-	# add-ons a previous version shipped and this one does not, and any opt-1
-	# cache written by a Kodi from before we dropped it.
-	find /usr/share/kodi/addons -type d -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null || true
-	python3 -m compileall -q -o 0 /usr/share/kodi/addons || true
+	# reinstate the bug this fixes. -qq because -q still prints compile errors to
+	# stdout, where they would land in the apt output.
+	python3 -m compileall -qq -o 0 /usr/share/kodi/addons || true
+	# dpkg runs maintainer scripts with umask 022, so every __pycache__ created
+	# above is root:root 0755, and Kodi runs as osmc. If one of those caches ever
+	# went stale it could never be rewritten, and that module would recompile
+	# silently on every launch - the bug we are fixing, made permanent. Give each
+	# __pycache__ its parent's ownership; the packages that chown their own
+	# add-ons are configured before us and cannot do this themselves.
+	find /usr/share/kodi/addons -type d -name __pycache__ -exec chown -R --reference={}/.. {} \; 2>/dev/null || true
 
 	if ischroot; then exit 0; fi
 	# Invalidate local language cache, we may have updated OSMC strings but the language version may not be newer
