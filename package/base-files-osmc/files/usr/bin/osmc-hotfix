@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+    Copyright (C) 2014-2026 OSMC (KodeKarnage)
+
+    SPDX-License-Identifier: GPL-2.0-or-later
+
+    Apply an OSMC HotFix from a terminal.
+
+    The logic is shared with My OSMC: both front ends use HotFixCore, so what
+    this fetches, parses and runs cannot drift from what the GUI does.
+
+    There is deliberately no --yes. A HotFix runs arbitrary commands as root,
+    and the point of this tool is that a person reads them first. Skipping that
+    would turn a forum one-liner into a silent root execution, which is worse
+    than the GUI it is meant to complement. For the same reason it refuses to
+    run when stdin is not a terminal, so it cannot be fed an answer by a pipe.
+
+    This is not a privilege boundary: anyone who can run this already has
+    passwordless sudo. It is there so that a HotFix is never applied without
+    somebody having seen what is in it.
+"""
+
+import argparse
+import os
+import sys
+
+CORE_PATH = ('/usr/share/kodi/addons/script.module.osmcsetting.updates'
+             '/resources/lib/osmcupdates')
+
+if CORE_PATH not in sys.path:
+    sys.path.append(CORE_PATH)
+
+try:
+    from osmc_hotfix_core import HotFixCore
+except ImportError:
+    sys.stderr.write(
+        'osmc-hotfix: cannot find the HotFix core.\n'
+        '  Expected it at %s/osmc_hotfix_core.py\n'
+        '  It ships in mediacenter-addon-osmc; check that package is installed.\n'
+        % CORE_PATH)
+    sys.exit(2)
+
+
+def make_logger(verbose):
+    def _log(message, label=''):
+        if not verbose:
+            return
+        if label:
+            sys.stderr.write('  [%s] %s\n' % (label, message))
+        else:
+            sys.stderr.write('  %s\n' % message)
+    return _log
+
+
+def confirm(prompt):
+    """
+        Ask, requiring an explicit yes. Anything else, including a bare Enter,
+        declines.
+    """
+    try:
+        answer = input('%s [y/N] ' % prompt)
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+
+    return answer.strip().lower() in ('y', 'yes')
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='osmc-hotfix',
+        description='Apply an OSMC HotFix.',
+        epilog='A HotFix runs commands as root. You will be shown what it '
+               'contains and asked to confirm. There is no unattended mode.')
+    parser.add_argument('key', help='the HotFix ID, as given by OSMC')
+    parser.add_argument('-n', '--dry-run', action='store_true',
+                        help='show what would run, without running it')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='report what is happening while fetching')
+    args = parser.parse_args()
+
+    core = HotFixCore(log=make_logger(args.verbose))
+
+    print('Fetching HotFix %s ...' % args.key)
+    raw, source, url = core.retrieve(args.key)
+
+    if not raw.strip():
+        sys.stderr.write(
+            'osmc-hotfix: no HotFix found with the ID %r.\n'
+            '  Checked OSMC\'s mirror and paste.osmc.tv.\n'
+            '  Check the ID, and that this device has a working connection.\n'
+            % args.key)
+        return 1
+
+    parsed = core.parse(raw)
+
+    if not parsed['instruction']:
+        sys.stderr.write('osmc-hotfix: that HotFix contains no commands to run.\n')
+        return 1
+
+    print()
+    print('Source:      %s' % url)
+
+    if source != HotFixCore.SOURCE_MIRROR:
+        print('             NOT from OSMC\'s mirror. Anyone can post to')
+        print('             paste.osmc.tv, so only continue if you trust')
+        print('             whoever gave you this ID.')
+
+    print('Description: %s' % parsed['description'])
+    print()
+    print('The following will run as root:')
+    print()
+    for n, line in enumerate(parsed['instruction'], start=1):
+        print('  %d. %s' % (n, line))
+    print()
+
+    if args.dry_run:
+        print('Dry run: nothing was executed.')
+        return 0
+
+    if not sys.stdin.isatty():
+        sys.stderr.write(
+            'osmc-hotfix: refusing to run without a terminal.\n'
+            '  A HotFix has to be confirmed by a person who has read it.\n'
+            '  Use --dry-run to inspect one non-interactively.\n')
+        return 2
+
+    if not confirm('Apply this HotFix?'):
+        print('Cancelled. Nothing was run.')
+        return 1
+
+    print()
+    results, failed_line = core.apply(parsed['instruction'])
+
+    for chunk in results:
+        sys.stdout.write(chunk)
+    if results and not str(results[-1]).endswith('\n'):
+        print()
+
+    saved = core.save_output(results)
+
+    print()
+    if failed_line is not None:
+        print('HotFix FAILED.')
+        print('  This step did not complete: %s' % failed_line)
+        print('  No further steps were run.')
+    else:
+        print('HotFix complete. All steps completed successfully.')
+
+    if saved:
+        print('  Output saved to %s' % saved)
+
+    if 'UPLOAD' in parsed['resolution']:
+        paste = core.upload_output()
+        if paste:
+            print('  Output uploaded to %s' % paste)
+        else:
+            print('  Could not upload the output; it is in the file above.')
+
+    if failed_line is not None:
+        return 1
+
+    # A failed HotFix never offers a restart, and the flag is left alone: the
+    # device is in a half-changed state and rebooting is not obviously right.
+    if core.reboot_requested():
+        core.clear_reboot_request()
+        print()
+        if confirm('This HotFix needs the device to restart. Restart now?'):
+            os.execvp('sudo', ['sudo', 'systemctl', 'reboot'])
+        core.defer_reboot()
+        print('Not restarting now. You will be reminded to restart later.')
+
+    return 0
+
+
+if __name__ == '__main__':
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print()
+        sys.exit(130)
