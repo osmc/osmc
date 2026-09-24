@@ -1,4 +1,4 @@
-From 308b42ba3e2a8b12b29a4705be353fc275539c86 Mon Sep 17 00:00:00 2001
+From b8de4b8ae9b02324843b56cb3d09a45b697d252f Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 9 Jun 2026 00:56:18 +0100
 Subject: [PATCH] AdvancedSettings: disable logging entirely when debug logging
@@ -21,19 +21,38 @@ command line flag, still forces logging on (via m_logLevelHint), capped
 at LOG_LEVEL_DEBUG so an override of 2 does not enable the on-screen
 freemem overlay. Enabling debug logging in the GUI restores full logging
 live, and a full startup-to-shutdown debug log on restart.
+
+Report which of those two outcomes was chosen. Upstream logs a single
+"Disabled debug logging due to GUI setting" line from outside the branch
+that picks the level. That was accurate when the only alternative was
+LOG_LEVEL_NORMAL, but not once an override can keep logging on: a box
+carrying <loglevel>1</loglevel> opens its debug log with
+
+  info <general>: Disabled debug logging due to GUI setting. Level 1.
+
+which claims logging is disabled in the very log that proves otherwise,
+as the first line anyone reads in a log a user was asked to supply. Log
+from inside each branch instead. The override case names what kept
+logging on, and the off case says logging is disabled entirely rather
+than just debug logging, which is what LOG_LEVEL_NONE actually does. In
+SetDebugMode() the call still precedes SetLogLevel(), so the line marking
+where output ends is written at the level still in force.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/settings/AdvancedSettings.cpp | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ xbmc/settings/AdvancedSettings.cpp | 41 +++++++++++++++++++++++++++---
+ 1 file changed, 37 insertions(+), 4 deletions(-)
 
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
-index 34dafe7ea7..4de5e4c54e 100644
+index 34dafe7ea7..4cb749964a 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
 +++ b/xbmc/settings/AdvancedSettings.cpp
-@@ -62,7 +62,17 @@ void CAdvancedSettings::OnSettingsLoaded()
+@@ -62,8 +62,26 @@ void CAdvancedSettings::OnSettingsLoaded()
    }
    else
    {
 -    m_logLevel = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
+-    CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", m_logLevel);
 +    // OSMC: with debug logging disabled, turn the log off entirely rather than
 +    // logging at INFO. Kodi otherwise writes continuously to flash (eMMC on
 +    // Vero, SD on Pi) for output that is not useful for support - when there is
@@ -42,27 +61,47 @@ index 34dafe7ea7..4de5e4c54e 100644
 +    // settings load). An explicit advancedsettings.xml <loglevel> above normal
 +    // (or --debug) still forces logging on, exactly as before.
 +    if (m_logLevelHint > LOG_LEVEL_NORMAL)
++    {
 +      m_logLevel = std::min(m_logLevelHint, LOG_LEVEL_DEBUG);
++      CLog::Log(LOGINFO,
++                "Debug logging is off in the GUI, but advancedsettings.xml <loglevel> or --debug "
++                "keeps logging on. Level {}.",
++                m_logLevel);
++    }
 +    else
++    {
 +      m_logLevel = LOG_LEVEL_NONE;
-     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", m_logLevel);
++      CLog::Log(LOGINFO, "Disabled logging entirely due to GUI setting. Level {}.", m_logLevel);
++    }
    }
    CServiceBroker::GetLogging().SetLogLevel(m_logLevel);
-@@ -1409,7 +1419,13 @@ void CAdvancedSettings::SetDebugMode(bool debug)
+ }
+@@ -1409,8 +1427,23 @@ void CAdvancedSettings::SetDebugMode(bool debug)
    }
    else
    {
 -    int level = std::min(m_logLevelHint, LOG_LEVEL_DEBUG/*LOG_LEVEL_NORMAL*/);
+-    CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", level);
 +    // OSMC: see OnSettingsLoaded() - disabling debug logging silences the log
 +    // entirely to spare flash write cycles, unless advancedsettings.xml (or
 +    // --debug) forces a level above normal. Logged before SetLogLevel() so this
 +    // line marks where output ends.
 +    int level = LOG_LEVEL_NONE;
 +    if (m_logLevelHint > LOG_LEVEL_NORMAL)
++    {
 +      level = std::min(m_logLevelHint, LOG_LEVEL_DEBUG);
-     CLog::Log(LOGINFO, "Disabled debug logging due to GUI setting. Level {}.", level);
++      CLog::Log(LOGINFO,
++                "Debug logging is off in the GUI, but advancedsettings.xml <loglevel> or --debug "
++                "keeps logging on. Level {}.",
++                level);
++    }
++    else
++    {
++      CLog::Log(LOGINFO, "Disabled logging entirely due to GUI setting. Level {}.", level);
++    }
      m_logLevel = level;
      CServiceBroker::GetLogging().SetLogLevel(level);
+   }
 -- 
 2.34.1
 
