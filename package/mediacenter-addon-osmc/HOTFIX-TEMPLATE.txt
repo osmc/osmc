@@ -75,6 +75,11 @@ DESCRIPTION: Repoints the Debian security repository at OSMC's copy so updates a
 #  finished. Touch it only on the path that genuinely needs it, so a HotFix that
 #  changed nothing does not ask -- step 8 shows the conditional form.
 #
+#  Create it WITHOUT sudo. /tmp is world-writable, so it does not need root, and
+#  a root-owned flag cannot be cleared afterwards: /tmp is sticky, so only the
+#  owner may unlink it. The add-on works around that, but a flag it cannot
+#  remove would otherwise linger and make the next HotFix ask to restart too.
+#
 #  If the user declines, the request is passed to /tmp/reboot-needed, which the
 #  updater already watches, so they are reminded through the normal path.
 # -----------------------------------------------------------------------------
@@ -124,6 +129,6 @@ sudo apt-get update
 
 # 8. Ask for a restart only if something installed actually needs one. Debian
 #    packages set /var/run/reboot-required when they do.
-sudo sh -c 'test -f /var/run/reboot-required && touch /tmp/reboot_needed_hotfix; true'
+sh -c 'test -f /var/run/reboot-required && touch /tmp/reboot_needed_hotfix; true'
 
 RESOLUTION: UPLOAD, LOG

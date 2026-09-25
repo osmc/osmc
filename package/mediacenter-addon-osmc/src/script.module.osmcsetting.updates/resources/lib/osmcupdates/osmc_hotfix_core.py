@@ -39,7 +39,7 @@ class HotFixCore(object):
         Retrieve, parse and apply a HotFix. UI-agnostic.
     """
 
-    MIRROR_INDEX = 'https://download.osmc.tv/hotfixes/'
+    MIRROR = 'https://download.osmc.tv/hotfixes/'
     PASTE_RAW = 'https://paste.osmc.tv/raw/%s'
     PASTE_POST = 'https://paste.osmc.tv/documents'
 
@@ -83,7 +83,7 @@ class HotFixCore(object):
         """
         raw_text = self.retrieve_mirror(key)
         if raw_text:
-            return raw_text, self.SOURCE_MIRROR, self.MIRROR_INDEX + key
+            return raw_text, self.SOURCE_MIRROR, self.MIRROR + key
 
         url = self.PASTE_RAW % key
         return self.retrieve_paste(key), self.SOURCE_PASTE, url
@@ -92,34 +92,29 @@ class HotFixCore(object):
         """
             Retrieve from https://download.osmc.tv/hotfixes/.
 
-            The key is checked against the directory listing before being
-            fetched, so a key that is not published cannot be turned into an
-            arbitrary URL under that path.
+            One request, to download.osmc.tv only. That host runs Mirrorbits,
+            which redirects to a mirror it knows holds the file, so following
+            the redirect is all that is needed -- and a 404 is a definitive
+            answer rather than something to retry elsewhere.
+
+            This used to scrape the HTML directory index first and check the key
+            appeared in it, then fetch the file as a second request. Mirrorbits
+            redirects each request independently, so the two could land on
+            different mirrors: during the window between a new HotFix being
+            uploaded and Mirrorbits rescanning, the listing could say a key
+            exists while the fetch returned 404 from a mirror that had not yet
+            synced it. Asking once removes that disagreement, and the status
+            code already distinguishes published from not.
         """
-        self.log(label='Retrieving hotfixes from', message=self.MIRROR_INDEX)
+        url = self.MIRROR + key
+        self.log(label='Retrieving hotfix from', message=url)
 
         try:
-            response = requests.get(self.MIRROR_INDEX, timeout=self.TIMEOUT)
-            response.raise_for_status()
-            listing = response.text
-        except Exception as e:
-            self.log(label='Could not reach the HotFix mirror', message=str(e))
-            return ''
-
-        found = re.findall(r'<img.+?>\s*<a href.+?>(.+?)</a>', listing)
-        hotfixes = [name for name in found
-                    if name not in ['Name', 'Parent Directory']]
-
-        if key not in hotfixes:
-            self.log(label='Not published on the mirror', message=key)
-            return ''
-
-        try:
-            response = requests.get(self.MIRROR_INDEX + key, timeout=self.TIMEOUT)
+            response = requests.get(url, timeout=self.TIMEOUT)
             response.raise_for_status()
             raw_text = response.text
         except Exception as e:
-            self.log(label='Could not fetch from the mirror', message=str(e))
+            self.log(label='Not available from the mirror', message=str(e))
             return ''
 
         self.log(label='Mirror HotFix Result', message=raw_text)
@@ -327,11 +322,29 @@ class HotFixCore(object):
         """
             Remove the flag, whether or not the user agrees to restart, so a
             later unrelated HotFix does not inherit the request.
+
+            The sudo fallback is not optional. A HotFix that asks for a restart
+            will often have done so with 'sudo touch', leaving the flag owned by
+            root, and /tmp is mode 1777 -- the sticky bit means only the owner
+            may unlink it. This code runs as the Kodi user, so os.remove fails
+            with EPERM, the flag survives, and every subsequent HotFix sees a
+            restart request it never made.
         """
+        if not os.path.isfile(self.REBOOT_FLAG):
+            return True
+
         try:
             os.remove(self.REBOOT_FLAG)
+            return True
         except Exception as e:
-            self.log(label='Could not remove reboot flag', message=str(e))
+            self.log(label='Could not remove reboot flag directly', message=str(e))
+
+        try:
+            subprocess.call(['sudo', 'rm', '-f', self.REBOOT_FLAG])
+        except Exception as e:
+            self.log(label='Could not remove reboot flag with sudo', message=str(e))
+
+        return not os.path.isfile(self.REBOOT_FLAG)
 
     def defer_reboot(self):
         """
@@ -341,5 +354,17 @@ class HotFixCore(object):
         try:
             with open(self.REBOOT_HANDOFF, 'a'):
                 pass
+            return True
         except Exception as e:
             self.log(label='Could not set %s' % self.REBOOT_HANDOFF, message=str(e))
+
+        # Same ownership trap as clear_reboot_request(): the updater may have
+        # created this flag as root, and appending to it as the Kodi user then
+        # fails.
+        try:
+            subprocess.call(['sudo', 'touch', self.REBOOT_HANDOFF])
+        except Exception as e:
+            self.log(label='Could not set %s with sudo' % self.REBOOT_HANDOFF,
+                     message=str(e))
+
+        return os.path.isfile(self.REBOOT_HANDOFF)
