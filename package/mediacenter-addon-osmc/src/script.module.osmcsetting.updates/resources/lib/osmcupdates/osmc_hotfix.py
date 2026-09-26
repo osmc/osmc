@@ -154,7 +154,7 @@ class HotFix(object):
 
             _ = DIALOG.ok(self.lang(32197),
                           '[CR]'.join([self.lang(32199), failed_line,
-                                       self.lang(32200)]))
+                                       self.lang(32200), '', self.lang(32204)]))
             return False
 
         log('HotFix completed: every instruction returned zero')
@@ -216,9 +216,12 @@ class HotFix(object):
 
         # SAVE, which copied the output to /boot, is deliberately absent. On a
         # Raspberry Pi /boot is the small FAT partition the device boots from;
-        # writing arbitrary command output there risks filling or corrupting it,
-        # and the output is already in the Kodi log and at the core's output
-        # file, both of which grab-logs collects.
+        # writing arbitrary command output there risks filling or corrupting it.
+        # Nothing is lost by not writing there: LOG is always applied, and it
+        # puts the output in the Kodi log, which grab-logs does collect. The
+        # core's own output file is not collected by grab-logs -- it is there so
+        # the user still has the output locally, including after a restart the
+        # HotFix itself asked for.
         resolution_map = {
             'UPLOAD': self.resolution_upload,
             'LOG': self.resolution_log,

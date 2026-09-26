@@ -151,6 +151,14 @@ def main():
     if saved:
         print('  Output saved to %s' % saved)
 
+        # Only on failure. grab-logs does not pick this file up and a terminal
+        # run writes nothing to the Kodi log, so without this the one person who
+        # needs to share the output has no idea how to. Not offered on success,
+        # where publishing it serves nobody.
+        if failed_line is not None:
+            print('  To share it when reporting this:')
+            print('    paste-log %s' % saved)
+
     if 'UPLOAD' in parsed['resolution']:
         paste = core.upload_output()
         if paste:

@@ -43,7 +43,16 @@ class HotFixCore(object):
     PASTE_RAW = 'https://paste.osmc.tv/raw/%s'
     PASTE_POST = 'https://paste.osmc.tv/documents'
 
-    OUTPUT_FILE = '/var/tmp/uploadHotFixOutput.txt'
+    # /tmp, so it is cleared on boot rather than left behind indefinitely.
+    # Losing it to a restart does not cost anything that matters: a HotFix that
+    # fails never offers a restart, so the output worth keeping is never the
+    # output a reboot would remove.
+    #
+    # grab-logs does NOT collect this file. It collects the Kodi log, where the
+    # LOG resolution also writes, so a GUI run is covered by a normal log
+    # upload. A command-line run is not, which is why a failure tells the user
+    # how to share it.
+    OUTPUT_FILE = '/tmp/uploadHotFixOutput.txt'
 
     # A HotFix that needs a restart touches REBOOT_FLAG rather than rebooting
     # the device itself, which would kill its own remaining commands and the
