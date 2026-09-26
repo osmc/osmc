@@ -116,7 +116,14 @@ class HotFix(object):
         numbered = '[CR]'.join('%d. %s' % (n, line)
                                for n, line in enumerate(instruction, start=1))
 
-        DIALOG.textviewer(self.lang(32194), numbered)
+        # The trailing hint is not decoration. Kodi's text viewer has no OK
+        # button and no visible way out -- only Back closes it -- so without a
+        # line saying so the user is left looking at a page of commands with no
+        # idea what is expected of them, and no clue that they have not yet
+        # agreed to anything. Reported by a tester who could not tell whether
+        # the HotFix had already started.
+        DIALOG.textviewer(self.lang(32194),
+                          numbered + '[CR][CR]' + self.lang(32205))
 
     def confirm_instruction(self, description=None, mirror=False):
         """
