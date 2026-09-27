@@ -116,12 +116,18 @@ class HotFix(object):
         numbered = '[CR]'.join('%d. %s' % (n, line)
                                for n, line in enumerate(instruction, start=1))
 
-        # The trailing hint is not decoration. Kodi's text viewer has no OK
-        # button and no visible way out -- only Back closes it -- so without a
-        # line saying so the user is left looking at a page of commands with no
-        # idea what is expected of them, and no clue that they have not yet
-        # agreed to anything. Reported by a tester who could not tell whether
-        # the HotFix had already started.
+        # The trailing hint is not decoration. CGUIDialogTextViewer::OnAction
+        # handles only ACTION_TOGGLE_FONT and defers the rest to CGUIDialog, so
+        # the dialog itself closes on Back and nothing else; any other key that
+        # works comes from the skin. OSMC's own skin.osmc DialogTextViewer.xml
+        # has no button at all -- group, label, textbox, scrollbar -- so on the
+        # default skin Back is the only way out, which is why the hint names
+        # that and not OK. Estuary does provide a close button, so OK works
+        # there too, but naming it would be wrong for most devices.
+        #
+        # The wording avoids "continue": a tester pointed out that it could be
+        # read as agreeing to run the HotFix, which is exactly the opposite of
+        # what this screen is for.
         DIALOG.textviewer(self.lang(32194),
                           numbered + '[CR][CR]' + self.lang(32205))
 
