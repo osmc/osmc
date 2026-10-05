@@ -42,9 +42,29 @@ class HotFix(object):
 
         hf_key = self.user_enters_key()
 
+        # the input dialog returns '' when the user cancels it, which is not a
+        # mistake to report back to them
+        if not hf_key.strip():
+            return
+
         hf_raw_text, source, url = self.core.retrieve(hf_key)
 
+        # Both of these were only guarded in /usr/bin/osmc-hotfix. Without them
+        # an ID that names nothing ran the whole sequence against an empty
+        # instruction list: display_instruction() returned early so no commands
+        # were shown, the trust question was still asked, apply([]) reported no
+        # failure, and report_outcome() then said the HotFix had completed
+        # successfully -- telling the user something had been done when nothing
+        # had. Reported by a tester, who entered '11'.
+        if not hf_raw_text.strip():
+            _ = DIALOG.ok(self.lang(32206), self.lang(32207))
+            return
+
         hf_parsed = self.core.parse(hf_raw_text)
+
+        if not hf_parsed['instruction']:
+            _ = DIALOG.ok(self.lang(32208), self.lang(32209))
+            return
 
         # show the user what this HotFix is and what it will run BEFORE asking
         # them to agree to it -- previously consent was requested first and the

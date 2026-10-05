@@ -82,6 +82,12 @@ def main():
 
     core = HotFixCore(log=make_logger(args.verbose))
 
+    if not HotFixCore.VALID_KEY.match(args.key.strip()):
+        sys.stderr.write(
+            'osmc-hotfix: %r is not a usable HotFix ID.\n'
+            '  An ID is letters, digits, and - . _ only.\n' % args.key)
+        return 1
+
     print('Fetching HotFix %s ...' % args.key)
     raw, source, url = core.retrieve(args.key)
 

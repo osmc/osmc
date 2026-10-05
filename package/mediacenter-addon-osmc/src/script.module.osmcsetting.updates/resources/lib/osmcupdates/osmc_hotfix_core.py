@@ -65,6 +65,15 @@ class HotFixCore(object):
     SOURCE_MIRROR = 'mirror'
     SOURCE_PASTE = 'paste'
 
+    # A key is pasted into both URLs, so it has to be a single path element.
+    # An empty key is the one that mattered in practice: the Kodi input dialog
+    # returns '' when the user cancels it, MIRROR + '' is the directory index,
+    # and the index answers 200 with HTML -- which parsed into seventeen
+    # 'commands' beginning '<!DOCTYPE HTML PUBLIC ...' and offered them to the
+    # user to run as root. Anything with a slash in it would likewise address
+    # something other than a HotFix.
+    VALID_KEY = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._-]*$')
+
     TIMEOUT = 30
 
     def __init__(self, log=None):
@@ -88,8 +97,16 @@ class HotFixCore(object):
             front end is expected to say which one it got, because the content
             is about to be run as root.
 
-            raw_text is '' when neither source has it.
+            raw_text is '' when neither source has it, which includes a key
+            that could not name a HotFix in the first place -- that is answered
+            here rather than by asking the servers about it.
         """
+        key = (key or '').strip()
+
+        if not self.VALID_KEY.match(key):
+            self.log(label='Not a usable HotFix ID', message=repr(key))
+            return '', self.SOURCE_MIRROR, ''
+
         raw_text = self.retrieve_mirror(key)
         if raw_text:
             return raw_text, self.SOURCE_MIRROR, self.MIRROR + key
