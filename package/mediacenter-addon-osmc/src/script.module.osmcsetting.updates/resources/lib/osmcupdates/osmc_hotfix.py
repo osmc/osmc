@@ -81,9 +81,9 @@ class HotFix(object):
 
         self.core.save_output(results)
 
-        self.resolution_dispatcher(results, hf_parsed['resolution'])
+        extra = self.resolution_dispatcher(results, hf_parsed['resolution'])
 
-        self.report_outcome(failed_line)
+        self.report_outcome(failed_line, extra)
 
     @property
     def addon(self):
@@ -172,7 +172,7 @@ class HotFix(object):
 
         return user_confirmation
 
-    def report_outcome(self, failed_line=None):
+    def report_outcome(self, failed_line=None, extra=None):
         """
             Tell the user whether the HotFix worked.
 
@@ -181,18 +181,36 @@ class HotFix(object):
             complaint about the HotFix mechanism. A HotFix is applied by someone
             sitting in front of the device, so the answer belongs on screen
             rather than only in the Kodi log.
+
+            extra is whatever the resolutions want to add -- in practice the
+            paste URL. It goes in this dialog rather than one of its own so the
+            user dismisses a single screen that both states the outcome and
+            carries the detail, outcome first.
         """
+        extra = extra or []
+
         if failed_line is not None:
             log(label='HotFix stopped on line', message=failed_line)
 
-            _ = DIALOG.ok(self.lang(32197),
-                          '[CR]'.join([self.lang(32199), failed_line,
-                                       self.lang(32200), '', self.lang(32204)]))
+            body = [self.lang(32199), failed_line, self.lang(32200)]
+            if extra:
+                body += [''] + extra
+
+            # 32203 and 32204 both tell the user to upload the Kodi log, so
+            # only one of them appears. A failed upload has already said it.
+            if self.lang(32203) not in extra:
+                body += ['', self.lang(32204)]
+
+            _ = DIALOG.ok(self.lang(32197), '[CR]'.join(body))
             return False
 
         log('HotFix completed: every instruction returned zero')
 
-        _ = DIALOG.ok(self.lang(32196), self.lang(32198))
+        body = [self.lang(32198)]
+        if extra:
+            body += [''] + extra
+
+        _ = DIALOG.ok(self.lang(32196), '[CR]'.join(body))
 
         self.offer_reboot()
 
@@ -263,9 +281,20 @@ class HotFix(object):
         if 'LOG' not in resolutions:
             resolutions.append('LOG')
 
+        # Resolutions return lines to show rather than opening dialogs of their
+        # own. A tester found the old arrangement back to front: the upload
+        # dialog with the paste URL appeared first and had to be dismissed
+        # before "HotFix complete" appeared behind it, so the result of the
+        # HotFix was announced after a detail about it, in two dismissals.
+        lines = []
+
         for resolution in resolutions:
             func = resolution_map.get(resolution, self.missing_resolution)
-            func(results)
+            reported = func(results)
+            if reported:
+                lines.extend(reported)
+
+        return lines
 
     @staticmethod
     def missing_resolution(results):
@@ -288,12 +317,9 @@ class HotFix(object):
             # network could not have fetched the HotFix in the first place, so
             # the case is close to unreachable and not worth writing to the boot
             # partition for. Say where the output already is instead.
-            _ = DIALOG.ok(self.lang(32120),
-                          '[CR]'.join([self.lang(32121), self.lang(32203)]))
-            return
+            return [self.lang(32121), self.lang(32203)]
 
-        _ = DIALOG.ok(self.lang(32120),
-                      '[CR]'.join([self.lang(32123), "URL: %s" % url]))
+        return [self.lang(32123), "URL: %s" % url]
 
     @staticmethod
     def resolution_log(results):
