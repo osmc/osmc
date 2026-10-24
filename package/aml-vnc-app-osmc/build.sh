@@ -24,7 +24,8 @@ then
 	echo "Package: ${1}-aml-vnc-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-aml-vnc-app-osmc"
 	echo -e "VNC Server\naml-vnc.service" > $APP_FILE
 	pushd src/aml-vnc-server*
-	make
+	install_patch "../../patches" "all"
+	make DISABLE_DRM=1
 	mkdir -p ${out}/usr/bin
 	cp -ar aml-vnc ${out}/usr/bin
 	strip_files "${out}"
