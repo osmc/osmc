@@ -6,6 +6,9 @@
 fb_restore() {
 	if [ -e /var/run/fb_mode ] && [ -e /var/run/fb_resolution ]
 	then
+		echo 3doff >/sys/class/amhdmitx/amhdmitx0/config
+		echo 0 >/sys/module/amvideo/parameters/framepacking_support
+		echo 1 >/sys/class/video/disable_video
 		cat /var/run/fb_mode >/sys/class/display/mode
 		echo 1 >/sys/class/vtconsole/vtcon1/bind
 		/bin/fbset $(cat /var/run/fb_resolution)
