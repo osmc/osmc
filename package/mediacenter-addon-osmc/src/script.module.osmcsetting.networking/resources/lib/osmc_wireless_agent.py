@@ -193,7 +193,7 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         for arg in sys.argv[1:]:
             if arg.startswith("fromfile"):
-                keyfile = open("/tmp/preseed_data")
+                keyfile = open("/tmp/preseed_data", encoding="utf-8")
                 data = keyfile.read()
                 keyfile.close()
                 lines = data.split('\n')
