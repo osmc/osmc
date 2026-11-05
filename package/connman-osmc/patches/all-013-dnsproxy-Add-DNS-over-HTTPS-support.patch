@@ -1,0 +1,1903 @@
+From 17631fe44fd488baab815cf896b5b49d8f858346 Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:41:04 +0000
+Subject: [PATCH] dnsproxy: Add DNS over HTTPS support
+
+Forward queries over DNS over HTTPS according to the new DNSOverHTTPS
+setting:
+
+  off     plain DNS only (default).
+  auto    when every DNS server in use is a public resolver known to
+          serve DoH on the same address, talk DoH to those resolvers,
+          otherwise use plain DNS. The resolver answering never
+          changes, so local DNS such as Pi-hole keeps working.
+  on      use the DNSOverHTTPSServers, plain DNS while none of them
+          can be reached.
+  strict  use the DNSOverHTTPSServers and fail rather than fall back.
+
+Names only the local network can resolve always go to the network's
+servers in plain text: single label names, the local, lan, home,
+home.arpa, internal and similar domains, reverse lookups of private
+addresses and, except in strict mode, the network's search domains.
+
+DoH replies take the normal reply path, so they are cached and
+delivered to UDP and TCP clients like plain replies. Replies larger
+than a UDP client accepts are truncated so the client retries over
+TCP. Requests handled over DoH are never also sent in plain text by
+flush_requests() or new TCP server connections, are not failed when a
+plain TCP server connection closes and are never matched by ID
+against plain DNS replies. When the DoH servers are merely overloaded
+a request fails with SERVFAIL instead of falling back to plain text.
+
+Plain DNS replies are now only accepted when they answer the question
+of the request, or for the alternative ID the question with a search
+domain appended, as dnsmasq does. The 16 bit ID alone is easily
+guessed by anyone who can send UDP packets to the proxy, and a forged
+reply would otherwise be cached and answer later queries, including
+queries meant to go over DoH.
+
+The state is inactive until DoH has been used, active after a
+successful exchange and unavailable when no server could be reached,
+or in strict mode without servers. When the mode or the servers are
+changed over D-Bus, a root NS query, which reveals no name, updates the
+state straight away. Backed off servers are tried again when the
+default service changes. The mode and the servers are only stored once
+they are set over D-Bus, so main.conf keeps applying until then.
+
+cache_update() now takes the protocol instead of the server, which was
+only used for its protocol.
+---
+ doc/connman.conf.5.in      |   16 +
+ src/connman.h              |    7 +
+ src/dns-systemd-resolved.c |   30 +
+ src/dnsproxy.c             | 1420 ++++++++++++++++++++++++++++++++----
+ src/main.c                 |   41 ++
+ src/main.conf              |   10 +
+ 6 files changed, 1376 insertions(+), 148 deletions(-)
+
+diff --git a/doc/connman.conf.5.in b/doc/connman.conf.5.in
+index a81ac7bb..ea2dfefa 100644
+--- a/doc/connman.conf.5.in
++++ b/doc/connman.conf.5.in
+@@ -70,6 +70,22 @@ to the list of nameservers given by the service. The
+ nameserver entries must be in numeric format, host
+ names are ignored.
+ .TP
++.BI DNSOverHTTPS= off\ \fR|\fB\ auto\ \fR|\fB\ on\ \fR|\fB\ strict
++How the DNS proxy uses DNS over HTTPS (RFC 8484). With auto, queries
++are sent over HTTPS when every DNS server in use is a public resolver
++known to offer it on the same address. With on, queries are sent to
++the DNSOverHTTPSServers, falling back to plain text DNS while they
++cannot be reached. With strict, queries fail instead of falling back.
++Names that only the local network can resolve always use the network's
++DNS servers. A value set over D-Bus takes precedence. Default value is
++off.
++.TP
++.BI DNSOverHTTPSServers= url\fR[,...]
++List of DNS over HTTPS servers, separated by ",", used by the on and
++strict modes unless servers are set over D-Bus. Each server is an
++https://host[:port][/path] URL and must support HTTP/2. Default value
++is empty.
++.TP
+ .BI DefaultAutoConnectTechnologies= technology\fR[,...]
+ List of technologies that are marked autoconnectable
+ by default, separated by commas ",". The default value
+diff --git a/src/connman.h b/src/connman.h
+index 73532b66..4f609a39 100644
+--- a/src/connman.h
++++ b/src/connman.h
+@@ -1024,6 +1024,13 @@ int __connman_dnsproxy_append(int index, const char *domain, const char *server)
+ int __connman_dnsproxy_remove(int index, const char *domain, const char *server);
+ int __connman_dnsproxy_set_mdns(int index, bool enabled);
+ void __connman_dnsproxy_set_listen_port(unsigned int port);
++const char *__connman_dnsproxy_get_doh_mode(void);
++const char *__connman_dnsproxy_get_doh_state(void);
++void __connman_dnsproxy_append_doh_servers(DBusMessageIter *iter,
++							void *user_data);
++int __connman_dnsproxy_configure_doh(const char *mode, char **servers);
++int __connman_dnsproxy_set_doh_mode(const char *mode);
++int __connman_dnsproxy_set_doh_servers(char **servers);
+ 
+ struct doh_server;
+ 
+diff --git a/src/dns-systemd-resolved.c b/src/dns-systemd-resolved.c
+index 912ab3fe..1191dcab 100644
+--- a/src/dns-systemd-resolved.c
++++ b/src/dns-systemd-resolved.c
+@@ -488,3 +488,33 @@ void __connman_dnsproxy_cleanup(void)
+ 		connection = NULL;
+ 	}
+ }
++
++const char *__connman_dnsproxy_get_doh_mode(void)
++{
++	return "off";
++}
++
++const char *__connman_dnsproxy_get_doh_state(void)
++{
++	return "off";
++}
++
++void __connman_dnsproxy_append_doh_servers(DBusMessageIter *iter,
++							void *user_data)
++{
++}
++
++int __connman_dnsproxy_configure_doh(const char *mode, char **servers)
++{
++	return -EOPNOTSUPP;
++}
++
++int __connman_dnsproxy_set_doh_mode(const char *mode)
++{
++	return -EOPNOTSUPP;
++}
++
++int __connman_dnsproxy_set_doh_servers(char **servers)
++{
++	return -EOPNOTSUPP;
++}
+diff --git a/src/dnsproxy.c b/src/dnsproxy.c
+index 3297484d..0c194fee 100644
+--- a/src/dnsproxy.c
++++ b/src/dnsproxy.c
+@@ -135,6 +135,9 @@ struct request_data {
+ 	gsize resplen;
+ 	struct listener_data *ifdata;
+ 	bool append_domain;
++	bool doh;		/* owned by DNS over HTTPS */
++	unsigned int doh_serial;
++	unsigned int doh_attempts;
+ };
+ 
+ struct listener_data {
+@@ -340,6 +343,10 @@ static struct request_data *find_request(guint16 id)
+ 	for (GSList *list = request_list; list; list = list->next) {
+ 		struct request_data *req = list->data;
+ 
++		/* DoH requests never use their IDs on the wire */
++		if (req->doh)
++			continue;
++
+ 		if (req->dstid == id || req->altid == id)
+ 			return req;
+ 	}
+@@ -347,6 +354,122 @@ static struct request_data *find_request(guint16 id)
+ 	return NULL;
+ }
+ 
++/*
++ * Returns the length of the uncompressed question name of a DNS message,
++ * including the root label, or 0 if it is malformed.
++ */
++static size_t question_name_len(const unsigned char *msg, size_t len)
++{
++	size_t pos = DNS_HEADER_SIZE;
++
++	while (pos < len && msg[pos]) {
++		if (msg[pos] & NS_CMPRSFLGS)
++			return 0;
++
++		pos += msg[pos] + 1;
++	}
++
++	if (pos >= len || pos + 1 + DNS_QTYPE_QCLASS_SIZE > len)
++		return 0;
++
++	return pos + 1 - DNS_HEADER_SIZE;
++}
++
++static bool labels_equal(const unsigned char *a, const unsigned char *b,
++								size_t len)
++{
++	for (size_t i = 0; i < len; i++) {
++		if (g_ascii_tolower(a[i]) != g_ascii_tolower(b[i]))
++			return false;
++	}
++
++	return true;
++}
++
++/* Whether the wire format labels spell the dotted name */
++static bool labels_match_name(const unsigned char *labels, const char *name)
++{
++	while (*labels) {
++		size_t len = strcspn(name, ".");
++
++		if (len != *labels || g_ascii_strncasecmp(name,
++					(const char *) labels + 1, len) != 0)
++			return false;
++
++		labels += len + 1;
++		name += len;
++		if (*name == '.')
++			name++;
++	}
++
++	return *name == '\0';
++}
++
++/* Whether the wire format name is one of the configured search domains */
++static bool is_search_domain(const unsigned char *labels)
++{
++	for (GSList *list = server_list; list; list = list->next) {
++		struct server_data *data = list->data;
++
++		for (GList *dom = data->domains; dom; dom = dom->next) {
++			const char *domain = dom->data;
++
++			if (domain && *domain &&
++					labels_match_name(labels, domain))
++				return true;
++		}
++	}
++
++	return false;
++}
++
++/*
++ * A reply must answer the question of the request, or for the alternative
++ * ID the question with one of the search domains appended. Anything else
++ * is ignored so that it can neither complete nor be cached for the
++ * request.
++ */
++static bool reply_matches_request(const struct request_data *req,
++				const unsigned char *reply, size_t reply_len,
++				int protocol)
++{
++	const size_t req_offset = protocol_offset(req->protocol);
++	const size_t reply_offset = protocol_offset(protocol);
++	const unsigned char *question, *answer;
++	const struct domain_hdr *hdr;
++	size_t question_len, answer_len;
++
++	if (!req->request || req->request_len <= req_offset ||
++					reply_len <= reply_offset)
++		return false;
++
++	question = (const unsigned char *) req->request + req_offset;
++	answer = reply + reply_offset;
++	hdr = (const void *) answer;
++
++	question_len = question_name_len(question,
++					req->request_len - req_offset);
++	answer_len = question_name_len(answer, reply_len - reply_offset);
++	if (!question_len || !answer_len || ntohs(hdr->qdcount) != 1)
++		return false;
++
++	question += DNS_HEADER_SIZE;
++	answer += DNS_HEADER_SIZE;
++
++	/* QTYPE and QCLASS */
++	if (memcmp(question + question_len, answer + answer_len,
++					DNS_QTYPE_QCLASS_SIZE) != 0)
++		return false;
++
++	if (hdr->id == req->altid && req->altid != req->dstid)
++		return answer_len > question_len &&
++			labels_equal(question, answer, question_len - 1) &&
++			is_search_domain(answer + question_len - 1);
++
++	return answer_len == question_len &&
++			labels_equal(question, answer, question_len);
++}
++
+ static struct server_data *find_server(int index,
+ 					const char *server,
+ 						int protocol)
+@@ -1417,9 +1540,9 @@ static int reply_query_type(const unsigned char *msg, int len)
+ /*
+  * update the cache with the DNS reply found in msg
+  */
+-static int cache_update(struct server_data *srv, const unsigned char *msg, size_t msg_len)
++static int cache_update(int protocol, const unsigned char *msg, size_t msg_len)
+ {
+-	const size_t offset = protocol_offset(srv->protocol);
++	const size_t offset = protocol_offset(protocol);
+ 	int err, ttl = 0;
+ 	uint16_t *lenhdr;
+ 	size_t qlen;
+@@ -1484,7 +1607,7 @@ static int cache_update(struct server_data *srv, const unsigned char *msg, size_
+ 				(offset ? 0 : DNS_HEADER_TCP_EXTRA_BYTES);
+ 			data->data = g_malloc(data->data_len);
+ 			ptr = data->data;
+-			if (srv->protocol == IPPROTO_UDP) {
++			if (protocol == IPPROTO_UDP) {
+ 				/* add the two bytes length header also for
+ 				 * UDP responses */
+ 				lenhdr = (void*)ptr;
+@@ -1626,7 +1749,7 @@ static int cache_update(struct server_data *srv, const unsigned char *msg, size_
+ 		question, type, ttl,
+ 		sizeof(*entry) + sizeof(*data) + data->data_len + qlen,
+ 		data->data_len,
+-		srv->protocol == IPPROTO_TCP ?
++		protocol == IPPROTO_TCP ?
+ 			(unsigned int)(data->data[0] * 256 + data->data[1]) :
+ 			data->data_len);
+ 
+@@ -2198,6 +2321,12 @@ static struct request_data* lookup_request(
+ 	if (!req)
+ 		return NULL;
+ 
++	if (!reply_matches_request(req, reply, len, protocol)) {
++		debug("Ignoring reply for another question (id 0x%04x)",
++								hdr->id);
++		return NULL;
++	}
++
+ 	debug("req %p dstid 0x%04x altid 0x%04x rcode %d",
+ 			req, req->dstid, req->altid, hdr->rcode);
+ 
+@@ -2207,7 +2336,7 @@ static struct request_data* lookup_request(
+ }
+ 
+ static int forward_dns_reply(char *reply, size_t reply_len, int protocol,
+-			struct server_data *data, struct request_data *req)
++						struct request_data *req)
+ {
+ 	const size_t offset = protocol_offset(protocol);
+ 	struct domain_hdr *hdr = (void *)(reply + offset);
+@@ -2255,7 +2384,7 @@ static int forward_dns_reply(char *reply, size_t reply_len, int protocol,
+ 		memcpy(req->resp, reply, reply_len);
+ 		req->resplen = reply_len;
+ 
+-		cache_update(data, (unsigned char*)reply, reply_len);
++		cache_update(protocol, (unsigned char*)reply, reply_len);
+ 
+ 		g_free(new_reply);
+ 	}
+@@ -2378,7 +2507,7 @@ static gboolean udp_server_event(GIOChannel *channel, GIOCondition condition,
+ 		/* invalid / corrupt request */
+ 		return TRUE;
+ 
+-	res = forward_dns_reply((char*)buf, len, IPPROTO_UDP, data, req);
++	res = forward_dns_reply((char*)buf, len, IPPROTO_UDP, req);
+ 
+ 	/* on success or no further responses are expected, destroy the req */
+ 	if (res == 0 || req->numresp >= req->numserv)
+@@ -2414,7 +2543,7 @@ hangup:
+ 			req = list->data;
+ 			list = list->next;
+ 
+-			if (req->protocol == IPPROTO_UDP)
++			if (req->protocol == IPPROTO_UDP || req->doh)
+ 				continue;
+ 			else if (!req->request)
+ 				continue;
+@@ -2479,7 +2608,7 @@ hangup:
+ 			int status;
+ 			req = list->data;
+ 
+-			if (req->protocol == IPPROTO_UDP) {
++			if (req->protocol == IPPROTO_UDP || req->doh) {
+ 				list = list->next;
+ 				continue;
+ 			}
+@@ -2583,7 +2712,8 @@ hangup:
+ 			/* invalid / corrupt request */
+ 			return TRUE;
+ 
+-		res = forward_dns_reply((char*)reply->buf, reply->received, IPPROTO_TCP, server, req);
++		res = forward_dns_reply((char*)reply->buf, reply->received,
++						IPPROTO_TCP, req);
+ 
+ 		g_free(reply);
+ 		server->incoming_reply = NULL;
+@@ -2845,199 +2975,1134 @@ static bool resolv(struct request_data *req,
+ 	return false;
+ }
+ 
+-static void update_domain(int index, const char *domain, bool append)
+-{
+-	DBG("index %d domain %s", index, domain);
++/*
++ * DNS over HTTPS
++ *
++ * off:    plain DNS only.
++ * auto:   when every enabled server is a public resolver known to serve
++ *         DoH on the same address, talk DoH to those same resolvers.
++ * on:     use the configured DoH servers, plain DNS when they fail.
++ * strict: use the configured DoH servers, fail when they fail.
++ *
++ * Names that only the local network can resolve always use the
++ * network's servers in plain text.
++ */
+ 
+-	if (!domain)
+-		return;
++#define DOH_REQUEST_TIMEOUT 10	/* seconds, UDP clients */
++#define DOH_MAX_SERVERS 8
+ 
+-	for (GSList *list = server_list; list; list = list->next) {
+-		struct server_data *data = list->data;
+-		char *dom = NULL;
+-		bool dom_found = false;
++enum doh_mode {
++	DOH_MODE_OFF,
++	DOH_MODE_AUTO,
++	DOH_MODE_ON,
++	DOH_MODE_STRICT,
++};
+ 
+-		if (data->index < 0)
+-			continue;
+-		else if (data->index != index)
+-			continue;
++enum doh_state {
++	DOH_STATE_OFF,
++	DOH_STATE_INACTIVE,
++	DOH_STATE_ACTIVE,
++	DOH_STATE_UNAVAILABLE,
++};
+ 
+-		for (GList *dom_list = data->domains; dom_list;
+-				dom_list = dom_list->next) {
+-			dom = dom_list->data;
++static const char *doh_mode_names[] = { "off", "auto", "on", "strict" };
++static const char *doh_state_names[] = {
++	"off", "inactive", "active", "unavailable"
++};
+ 
+-			if (g_str_equal(dom, domain)) {
+-				dom_found = true;
+-				break;
+-			}
+-		}
++static const char *doh_local_domains[] = {
++	"local", "localhost", "localdomain", "lan", "home", "home.arpa",
++	"internal", "intranet", "corp", "private", NULL
++};
+ 
+-		if (!dom_found && append) {
+-			data->domains =
+-				g_list_append(data->domains, g_strdup(domain));
+-		} else if (dom_found && !append) {
+-			data->domains =
+-				g_list_remove(data->domains, dom);
+-			g_free(dom);
+-		}
+-	}
+-}
++static bool dnsproxy_running;
++static enum doh_mode doh_mode;
++static bool doh_mode_stored;		/* chosen over D-Bus */
++static enum doh_state doh_state;
++static char **doh_user_servers;		/* from D-Bus, empty: defaults */
++static GSList *doh_servers;		/* on and strict modes */
++static GHashTable *doh_auto_servers;	/* plain address -> server */
++static unsigned int doh_serial;
+ 
+-static void append_domain(int index, const char *domain)
++static void doh_reply(int err, const unsigned char *reply, size_t len,
++							void *user_data);
++
++static bool name_in_domain(const char *name, const char *domain)
+ {
+-	update_domain(index, domain, true);
++	size_t len = strlen(name), domain_len = strlen(domain);
++
++	if (domain_len && domain[domain_len - 1] == '.')
++		domain_len--;
++
++	if (!domain_len || len < domain_len)
++		return false;
++
++	if (g_ascii_strncasecmp(name + len - domain_len, domain,
++							domain_len) != 0)
++		return false;
++
++	return len == domain_len || name[len - domain_len - 1] == '.';
+ }
+ 
+-static void remove_domain(int index, const char *domain)
++static int label_number(const char *label)
+ {
+-	update_domain(index, domain, false);
++	char *end;
++	long value;
++
++	if (!g_ascii_isdigit(label[0]))
++		return -1;
++
++	value = strtol(label, &end, 10);
++	if (*end != '\0' || value > 255)
++		return -1;
++
++	return value;
+ }
+ 
+-static void flush_requests(struct server_data *server)
++/* Reverse lookups of private, link-local and loopback addresses */
++static bool is_private_reverse(const char *name)
+ {
+-	GSList *list = request_list;
+-	while (list) {
+-		struct request_data *req = list->data;
++	g_auto(GStrv) labels = NULL;
++	unsigned int count;
+ 
+-		list = list->next;
++	if (name_in_domain(name, "in-addr.arpa")) {
++		int first, second;
+ 
+-		if (ns_resolv(server, req, req->request, req->name)) {
+-			/*
+-			 * A cached result was sent,
+-			 * so the request can be released
+-			 */
+-			request_list =
+-				g_slist_remove(request_list, req);
+-			destroy_request_data(req);
+-			continue;
+-		}
++		labels = g_strsplit(name, ".", -1);
++		count = g_strv_length(labels);
++		if (count < 3)
++			return false;
+ 
+-		if (req->timeout > 0)
+-			g_source_remove(req->timeout);
++		first = label_number(labels[count - 3]);
++		if (first == 10 || first == 127)
++			return true;
+ 
+-		req->timeout = g_timeout_add_seconds(5, request_timeout, req);
++		if (count < 4)
++			return false;
++
++		second = label_number(labels[count - 4]);
++
++		return (first == 172 && second >= 16 && second <= 31) ||
++			(first == 192 && second == 168) ||
++			(first == 169 && second == 254) ||
++			(first == 100 && second >= 64 && second <= 127);
++	}
++
++	if (name_in_domain(name, "ip6.arpa")) {
++		labels = g_strsplit(name, ".", -1);
++		count = g_strv_length(labels);
++		if (count < 4 || g_strcmp0(labels[count - 3], "f") != 0)
++			return false;
++
++		/* fc00::/7 */
++		if (g_str_equal(labels[count - 4], "c") ||
++				g_str_equal(labels[count - 4], "d"))
++			return true;
++
++		/* fe80::/10 */
++		return count >= 5 && g_str_equal(labels[count - 4], "e") &&
++			strchr("89ab", labels[count - 5][0]) &&
++			labels[count - 5][0] && !labels[count - 5][1];
+ 	}
++
++	return false;
+ }
+ 
+-int __connman_dnsproxy_append(int index, const char *domain,
+-							const char *server)
++static bool doh_is_local(const char *query)
+ {
+-	struct server_data *data;
+-	DBG("index %d server %s", index, server);
++	g_autofree char *name = g_ascii_strdown(query, -1);
++	size_t len = strlen(name);
+ 
+-	if (!server) {
+-		if (!domain) {
+-			return -EINVAL;
+-		} else {
+-			append_domain(index, domain);
+-			return 0;
+-		}
+-	}
++	if (len && name[len - 1] == '.')
++		name[--len] = '\0';
+ 
+-	if (g_str_equal(server, "127.0.0.1"))
+-		return -ENODEV;
+-	else if (g_str_equal(server, "::1"))
+-		return -ENODEV;
++	/* Single label names are for the local network */
++	if (!strchr(name, '.'))
++		return true;
+ 
+-	data = find_server(index, server, IPPROTO_UDP);
+-	if (data) {
+-		append_domain(index, domain);
+-		return 0;
++	for (int i = 0; doh_local_domains[i]; i++) {
++		if (name_in_domain(name, doh_local_domains[i]))
++			return true;
+ 	}
+ 
+-	data = create_server(index, domain, server, IPPROTO_UDP);
+-	if (!data)
+-		return -EIO;
++	if (is_private_reverse(name))
++		return true;
+ 
+-	flush_requests(data);
++	/* Bootstrap lookups of the DoH servers themselves */
++	for (GSList *list = doh_servers; list; list = list->next) {
++		if (g_str_equal(name, __connman_doh_server_get_host(list->data)))
++			return true;
++	}
+ 
+-	return 0;
+-}
++	/*
++	 * Search domains handed out by the network. Strict mode does not
++	 * let the network decide what leaves the device unencrypted.
++	 */
++	if (doh_mode == DOH_MODE_STRICT)
++		return false;
+ 
+-static void remove_server(int index, const char *server, int protocol)
+-{
+-	struct server_data *data;
++	for (GSList *list = server_list; list; list = list->next) {
++		struct server_data *data = list->data;
+ 
+-	data = find_server(index, server, protocol);
+-	if (!data)
+-		return;
++		if (!data->enabled)
++			continue;
+ 
+-	destroy_server(data);
++		for (GList *dom = data->domains; dom; dom = dom->next) {
++			const char *domain = dom->data;
+ 
+-	if (get_enabled_server_number() == 0)
+-		enable_fallback(true);
++			/* Ignore top level domains such as "com" */
++			if (domain && strchr(domain, '.') &&
++					name_in_domain(name, domain))
++				return true;
++		}
++	}
++
++	return false;
+ }
+ 
+-int __connman_dnsproxy_remove(int index, const char *domain,
+-							const char *server)
++static struct doh_server *doh_auto_server(const char *address)
+ {
+-	DBG("index %d server %s", index, server);
++	struct doh_server *server;
+ 
+-	if (!server) {
+-		if (!domain) {
+-			return -EINVAL;
+-		} else {
+-			remove_domain(index, domain);
+-			return 0;
+-		}
+-	}
++	if (!doh_auto_servers)
++		doh_auto_servers = g_hash_table_new_full(g_str_hash,
++					g_str_equal, g_free,
++					(GDestroyNotify) __connman_doh_server_free);
+ 
+-	if (g_str_equal(server, "127.0.0.1"))
+-		return -ENODEV;
+-	else if (g_str_equal(server, "::1"))
+-		return -ENODEV;
++	/* Addresses of unknown resolvers are cached as NULL */
++	if (g_hash_table_lookup_extended(doh_auto_servers, address, NULL,
++							(gpointer *) &server))
++		return server;
+ 
+-	remove_server(index, server, IPPROTO_UDP);
+-	remove_server(index, server, IPPROTO_TCP);
++	server = __connman_doh_server_new_for_address(address);
++	g_hash_table_insert(doh_auto_servers, g_strdup(address), server);
+ 
+-	return 0;
++	return server;
+ }
+ 
+-static void dnsproxy_offline_mode(bool enabled)
++/* DoH servers to try for a query, in order of preference */
++static GSList *doh_current_servers(void)
+ {
+-	DBG("enabled %d", enabled);
++	GSList *servers = NULL;
++
++	if (doh_mode == DOH_MODE_ON || doh_mode == DOH_MODE_STRICT)
++		return g_slist_copy(doh_servers);
++
++	if (doh_mode != DOH_MODE_AUTO)
++		return NULL;
+ 
+ 	for (GSList *list = server_list; list; list = list->next) {
+ 		struct server_data *data = list->data;
++		struct doh_server *server;
+ 
+-		if (!enabled) {
+-			DBG("Enabling DNS server %s", data->server);
+-			data->enabled = true;
+-			cache_invalidate();
+-			cache_refresh();
+-		} else {
+-			DBG("Disabling DNS server %s", data->server);
+-			data->enabled = false;
+-			cache_invalidate();
++		if (data->protocol != IPPROTO_UDP || !data->enabled)
++			continue;
++
++		/* Only upgrade when no plain server would still be used */
++		server = doh_auto_server(data->server);
++		if (!server) {
++			g_slist_free(servers);
++			return NULL;
+ 		}
++
++		if (!g_slist_find(servers, server))
++			servers = g_slist_append(servers, server);
+ 	}
++
++	return servers;
+ }
+ 
+-static void dnsproxy_default_changed(struct connman_service *service)
++static void doh_set_state(enum doh_state state)
+ {
+-	bool any_server_enabled = false;
+-	int index, vpn_index;
++	DBusConnection *conn;
++	const char *str;
+ 
+-	DBG("service %p", service);
++	if (doh_state == state)
++		return;
+ 
+-	/* DNS has changed, invalidate the cache */
+-	cache_invalidate();
++	DBG("DNS over HTTPS %s -> %s", doh_state_names[doh_state],
++						doh_state_names[state]);
+ 
+-	if (!service) {
+-		/* When no services are active, then disable DNS proxying */
+-		dnsproxy_offline_mode(true);
+-		return;
+-	}
++	if (state == DOH_STATE_UNAVAILABLE)
++		connman_warn("DNS over HTTPS unavailable, %s",
++			doh_mode == DOH_MODE_STRICT ? "lookups will fail" :
++						"using plain DNS");
++	else if (state == DOH_STATE_ACTIVE)
++		connman_info("DNS over HTTPS active");
+ 
+-	index = __connman_service_get_index(service);
+-	if (index < 0)
++	doh_state = state;
++
++	conn = connman_dbus_get_connection();
++	if (!conn)
+ 		return;
+ 
+-	/*
+-	 * In case non-split-routed VPN is set as split routed the DNS servers
+-	 * the VPN must be enabled as well, when the transport becomes the
+-	 * default service.
+-	 */
++	str = doh_state_names[state];
++	connman_dbus_property_changed_basic(CONNMAN_MANAGER_PATH,
++				CONNMAN_MANAGER_INTERFACE, "DNSOverHTTPSState",
++				DBUS_TYPE_STRING, &str);
++
++	dbus_connection_unref(conn);
++}
++
++static void doh_update_state(bool reset)
++{
++	enum doh_state state = doh_state;
++	GSList *servers;
++
++	if (doh_mode == DOH_MODE_OFF) {
++		doh_set_state(DOH_STATE_OFF);
++		return;
++	}
++
++	servers = doh_current_servers();
++
++	/* Strict mode fails every lookup when it has no server */
++	if (!servers)
++		state = doh_mode == DOH_MODE_STRICT ?
++			DOH_STATE_UNAVAILABLE : DOH_STATE_INACTIVE;
++	else if (reset || state == DOH_STATE_OFF)
++		state = DOH_STATE_INACTIVE;	/* until it is used */
++
++	g_slist_free(servers);
++
++	doh_set_state(state);
++}
++
++/* Report the outcome of an exchange while DoH still applies */
++static void doh_report(enum doh_state state)
++{
++	GSList *servers = doh_current_servers();
++
++	if (servers)
++		doh_set_state(state);
++	else
++		doh_update_state(false);
++
++	g_slist_free(servers);
++}
++
++static bool doh_wanted(const char *name)
++{
++	GSList *servers;
++
++	if (doh_mode == DOH_MODE_OFF || doh_is_local(name))
++		return false;
++
++	if (doh_mode == DOH_MODE_STRICT)
++		return true;
++
++	servers = doh_current_servers();
++	g_slist_free(servers);
++
++	return servers != NULL;
++}
++
++/*
++ * Hand the request to the next DoH server not yet tried for it. Returns
++ * -EBUSY when the remaining servers are only overloaded and -ENODEV when
++ * none of them can be used.
++ */
++static int doh_forward(struct request_data *req)
++{
++	const size_t offset = protocol_offset(req->protocol);
++	GSList *servers = doh_current_servers(), *list;
++	unsigned int index = 0;
++	bool sent = false, busy = false;
++
++	for (list = servers; list && !sent; list = list->next, index++) {
++		struct doh_server *server = list->data;
++		int err;
++
++		if (index < req->doh_attempts)
++			continue;
++
++		req->doh_attempts = index + 1;
++
++		if (doh_mode != DOH_MODE_STRICT &&
++				!__connman_doh_server_is_available(server))
++			continue;
++
++		err = __connman_doh_send(server,
++				(unsigned char *) req->request + offset,
++				req->request_len - offset, doh_reply,
++				GUINT_TO_POINTER(req->doh_serial));
++		if (err == -EBUSY)
++			busy = true;
++		if (err < 0)
++			continue;
++
++		debug("req %p %s via %s", req, (char *) req->name,
++					__connman_doh_server_get_url(server));
++		sent = true;
++	}
++
++	g_slist_free(servers);
++
++	if (sent)
++		return 0;
++
++	return busy ? -EBUSY : -ENODEV;
++}
++
++static void doh_servfail(struct request_data *req)
++{
++	struct domain_hdr *hdr = (void *) ((char *) req->request +
++					protocol_offset(req->protocol));
++
++	hdr->id = req->srcid;
++
++	if (req->protocol == IPPROTO_UDP) {
++		int sk = get_req_udp_socket(req);
++
++		if (sk >= 0)
++			send_response(sk, req->request, req->request_len,
++					&req->sa, req->sa_len, IPPROTO_UDP);
++	} else {
++		send_response(req->client_sk, req->request, req->request_len,
++						NULL, 0, IPPROTO_TCP);
++	}
++
++	request_list = g_slist_remove(request_list, req);
++	destroy_request_data(req);
++}
++
++/* Forward the request in plain text, or fail it in strict mode */
++static void doh_fallback(struct request_data *req)
++{
++	bool sent = false;
++
++	req->doh = false;
++	req->numserv = 0;
++	req->numresp = 0;
++
++	if (doh_mode != DOH_MODE_STRICT) {
++		for (GSList *list = server_list; list; list = list->next) {
++			struct server_data *data = list->data;
++			int err;
++
++			if (data->protocol != IPPROTO_UDP || !data->enabled)
++				continue;
++
++			/* Sent once the TCP connection is established */
++			if (req->protocol == IPPROTO_TCP) {
++				if (create_server(data->index, NULL,
++						data->server, IPPROTO_TCP))
++					sent = true;
++				continue;
++			}
++
++			if (!data->channel && server_create_socket(data) < 0)
++				continue;
++
++			err = ns_resolv(data, req, req->request, req->name);
++			if (err > 0) {
++				/* answered from the cache */
++				request_list = g_slist_remove(request_list,
++									req);
++				destroy_request_data(req);
++				return;
++			}
++
++			if (err == 0)
++				sent = true;
++		}
++	}
++
++	if (!sent) {
++		debug("req %p %s failed", req, (char *) req->name);
++		doh_servfail(req);
++		return;
++	}
++
++	debug("req %p %s falls back to plain DNS", req, (char *) req->name);
++
++	if (req->timeout > 0)
++		g_source_remove(req->timeout);
++
++	req->timeout = g_timeout_add_seconds(
++				req->protocol == IPPROTO_TCP ? 30 : 5,
++				request_timeout, req);
++}
++
++/*
++ * Send the request to the next DoH server. Overloaded servers fail only
++ * this request; unusable ones make it fall back to plain DNS, or fail
++ * in strict mode.
++ */
++static void doh_retry(struct request_data *req)
++{
++	int err = doh_forward(req);
++
++	if (err == 0)
++		return;
++
++	if (err == -EBUSY) {
++		req->doh = false;
++		doh_servfail(req);
++		return;
++	}
++
++	doh_report(DOH_STATE_UNAVAILABLE);
++	doh_fallback(req);
++}
++
++/* Takes over a request that is already on the request list */
++static void doh_dispatch(struct request_data *req)
++{
++	req->doh = true;
++	req->doh_attempts = 0;
++	req->numserv = 1;
++
++	if (++doh_serial == 0)
++		doh_serial = 1;
++	req->doh_serial = doh_serial;
++
++	doh_retry(req);
++}
++
++static size_t dns_question_end(const unsigned char *msg, size_t len)
++{
++	size_t pos = DNS_HEADER_SIZE;
++
++	while (pos < len && msg[pos]) {
++		if ((msg[pos] & NS_CMPRSFLGS) == NS_CMPRSFLGS) {
++			pos += 1;
++			break;
++		}
++
++		pos += msg[pos] + 1;
++	}
++
++	pos += 1 + DNS_QTYPE_QCLASS_SIZE;
++
++	return pos <= len ? pos : 0;
++}
++
++/* Largest UDP response the client accepts (RFC 6891) */
++static size_t request_udp_size(const struct request_data *req)
++{
++	const unsigned char *msg = req->request;
++	const struct domain_hdr *hdr = req->request;
++	size_t pos = dns_question_end(msg, req->request_len);
++	size_t size;
++
++	if (!pos || !hdr->arcount || pos + 11 > req->request_len ||
++			msg[pos] != 0 || msg[pos + 1] != 0 ||
++			msg[pos + 2] != ns_t_opt)
++		return 512;
++
++	size = msg[pos + 3] << 8 | msg[pos + 4];
++
++	return MAX(size, 512);
++}
++
++static void doh_deliver(struct request_data *req, const unsigned char *reply,
++								size_t len)
++{
++	const size_t offset = protocol_offset(req->protocol);
++	g_autofree char *buf = g_malloc(offset + len);
++
++	if (offset) {
++		const uint16_t msg_len = htons(len);
++
++		memcpy(buf, &msg_len, sizeof(msg_len));
++	}
++	memcpy(buf + offset, reply, len);
++
++	req->numresp++;
++
++	if (req->protocol == IPPROTO_UDP && len > request_udp_size(req)) {
++		struct domain_hdr *hdr = (void *) buf;
++		size_t question = dns_question_end(reply, len);
++		int sk = get_req_udp_socket(req);
++
++		/* Make the client retry over TCP */
++		cache_update(IPPROTO_UDP, (unsigned char *) buf, len);
++
++		hdr->id = req->srcid;
++		hdr->tc = 1;
++		hdr->ancount = 0;
++		hdr->nscount = 0;
++		hdr->arcount = 0;
++
++		if (question && sk >= 0 && sendto(sk, buf, question,
++				MSG_NOSIGNAL, &req->sa, req->sa_len) < 0)
++			debug("Cannot send truncated reply: %s",
++							strerror(errno));
++	} else {
++		forward_dns_reply(buf, offset + len, req->protocol, req);
++	}
++
++	request_list = g_slist_remove(request_list, req);
++	destroy_request_data(req);
++}
++
++static void doh_reply(int err, const unsigned char *reply, size_t len,
++							void *user_data)
++{
++	const unsigned int serial = GPOINTER_TO_UINT(user_data);
++	struct request_data *req = NULL;
++
++	for (GSList *list = request_list; list; list = list->next) {
++		struct request_data *data = list->data;
++
++		if (data->doh && data->doh_serial == serial) {
++			req = data;
++			break;
++		}
++	}
++
++	/* Timed out or answered already */
++	if (!req)
++		return;
++
++	if (err == 0 && !reply_matches_request(req, reply, len,
++							IPPROTO_UDP))
++		err = -EBADMSG;
++
++	if (err < 0) {
++		debug("req %p %s failed: %s", req, (char *) req->name,
++							strerror(-err));
++		doh_retry(req);
++		return;
++	}
++
++	doh_report(DOH_STATE_ACTIVE);
++	doh_deliver(req, reply, len);
++}
++
++/* A root NS query checks a new configuration without leaking names */
++static const unsigned char doh_probe_query[] = {
++	0x00, 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x01,
++};
++
++static void doh_probe(unsigned int index);
++
++static void doh_probe_reply(int err, const unsigned char *reply,
++					size_t len, void *user_data)
++{
++	if (err < 0)
++		doh_probe(GPOINTER_TO_UINT(user_data) + 1);
++	else
++		doh_report(DOH_STATE_ACTIVE);
++}
++
++/* Updates the state soon after the servers were changed over D-Bus */
++static void doh_probe(unsigned int index)
++{
++	struct doh_server *server;
++
++	if (doh_mode != DOH_MODE_ON && doh_mode != DOH_MODE_STRICT)
++		return;
++
++	for (; (server = g_slist_nth_data(doh_servers, index)); index++) {
++		if (__connman_doh_send(server, doh_probe_query,
++				sizeof(doh_probe_query), doh_probe_reply,
++				GUINT_TO_POINTER(index)) == 0)
++			return;
++	}
++
++	if (doh_servers)
++		doh_report(DOH_STATE_UNAVAILABLE);
++}
++
++static void doh_free_servers(void)
++{
++	g_slist_free_full(doh_servers,
++			(GDestroyNotify) __connman_doh_server_free);
++	doh_servers = NULL;
++
++	if (doh_auto_servers) {
++		g_hash_table_destroy(doh_auto_servers);
++		doh_auto_servers = NULL;
++	}
++}
++
++/* Retry backed off servers, e.g. after moving to another network */
++static void doh_reset_servers(void)
++{
++	GHashTableIter iter;
++	gpointer server;
++
++	for (GSList *list = doh_servers; list; list = list->next)
++		__connman_doh_server_reset(list->data);
++
++	if (!doh_auto_servers)
++		return;
++
++	g_hash_table_iter_init(&iter, doh_auto_servers);
++	while (g_hash_table_iter_next(&iter, NULL, &server)) {
++		if (server)
++			__connman_doh_server_reset(server);
++	}
++}
++
++/* (Re)create the servers after a configuration change */
++static void doh_apply(void)
++{
++	char **urls = doh_user_servers;
++
++	if (!urls || !urls[0])
++		urls = connman_setting_get_string_list("DNSOverHTTPSServers");
++
++	doh_free_servers();
++
++	if (doh_mode == DOH_MODE_ON || doh_mode == DOH_MODE_STRICT) {
++		for (int i = 0; urls && urls[i]; i++) {
++			struct doh_server *server;
++
++			server = __connman_doh_server_new(urls[i]);
++			if (!server) {
++				connman_warn("Invalid DNS over HTTPS server %s",
++								urls[i]);
++				continue;
++			}
++
++			doh_servers = g_slist_append(doh_servers, server);
++		}
++
++		if (!doh_servers)
++			connman_warn("DNS over HTTPS is %s but no server is "
++				"configured", doh_mode_names[doh_mode]);
++	}
++
++	/* Requests sent to the old servers need a new home */
++	for (GSList *list = request_list; list; ) {
++		struct request_data *req = list->data;
++
++		list = list->next;
++
++		if (!req->doh)
++			continue;
++
++		req->doh_attempts = 0;
++		if (doh_mode == DOH_MODE_OFF)
++			doh_fallback(req);
++		else
++			doh_retry(req);
++	}
++
++	cache_invalidate();
++
++	doh_update_state(true);
++}
++
++static bool string2doh_mode(const char *str, enum doh_mode *mode)
++{
++	for (size_t i = 0; i < NUM_ARRAY_ELEMENTS(doh_mode_names); i++) {
++		if (g_strcmp0(str, doh_mode_names[i]) == 0) {
++			*mode = i;
++			return true;
++		}
++	}
++
++	return false;
++}
++
++static bool doh_valid_servers(char **servers)
++{
++	if (servers && g_strv_length(servers) > DOH_MAX_SERVERS)
++		return false;
++
++	for (int i = 0; servers && servers[i]; i++) {
++		if (!__connman_doh_url_is_valid(servers[i]))
++			return false;
++	}
++
++	return true;
++}
++
++static void doh_load(void)
++{
++	GKeyFile *keyfile;
++	char **servers;
++	char *str;
++
++	if (!string2doh_mode(connman_setting_get_string("DNSOverHTTPS"),
++								&doh_mode))
++		doh_mode = DOH_MODE_OFF;
++
++	keyfile = __connman_storage_load_global();
++	if (!keyfile)
++		return;
++
++	str = g_key_file_get_string(keyfile, "global", "DNSOverHTTPS", NULL);
++	if (str && string2doh_mode(str, &doh_mode))
++		doh_mode_stored = true;
++	else if (str)
++		connman_warn("Invalid stored DNSOverHTTPS mode %s", str);
++	g_free(str);
++
++	servers = g_key_file_get_string_list(keyfile, "global",
++					"DNSOverHTTPSServers", NULL, NULL);
++	if (doh_valid_servers(servers))
++		doh_user_servers = servers;
++	else
++		g_strfreev(servers);
++
++	g_key_file_free(keyfile);
++}
++
++static void doh_save(void)
++{
++	GKeyFile *keyfile;
++
++	keyfile = __connman_storage_load_global();
++	if (!keyfile)
++		keyfile = g_key_file_new();
++
++	/* Values not chosen over D-Bus follow main.conf */
++	if (doh_mode_stored)
++		g_key_file_set_string(keyfile, "global", "DNSOverHTTPS",
++						doh_mode_names[doh_mode]);
++	else
++		g_key_file_remove_key(keyfile, "global", "DNSOverHTTPS",
++									NULL);
++
++	if (doh_user_servers && doh_user_servers[0])
++		g_key_file_set_string_list(keyfile, "global",
++				"DNSOverHTTPSServers",
++				(const gchar * const *) doh_user_servers,
++				g_strv_length(doh_user_servers));
++	else
++		g_key_file_remove_key(keyfile, "global",
++					"DNSOverHTTPSServers", NULL);
++
++	__connman_storage_save_global(keyfile);
++
++	g_key_file_free(keyfile);
++}
++
++static void append_doh_servers(DBusMessageIter *iter, void *user_data)
++{
++	for (int i = 0; doh_user_servers && doh_user_servers[i]; i++)
++		dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
++							&doh_user_servers[i]);
++}
++
++const char *__connman_dnsproxy_get_doh_mode(void)
++{
++	return dnsproxy_running ? doh_mode_names[doh_mode] : "off";
++}
++
++const char *__connman_dnsproxy_get_doh_state(void)
++{
++	return dnsproxy_running ? doh_state_names[doh_state] : "off";
++}
++
++void __connman_dnsproxy_append_doh_servers(DBusMessageIter *iter,
++							void *user_data)
++{
++	append_doh_servers(iter, user_data);
++}
++
++/* Apply a configuration without storing it, e.g. for testing */
++int __connman_dnsproxy_configure_doh(const char *mode, char **servers)
++{
++	enum doh_mode new_mode;
++
++	if (!dnsproxy_running)
++		return -EOPNOTSUPP;
++
++	if (!string2doh_mode(mode, &new_mode) || !doh_valid_servers(servers))
++		return -EINVAL;
++
++	doh_mode = new_mode;
++
++	g_strfreev(doh_user_servers);
++	doh_user_servers = g_strdupv(servers);
++
++	doh_apply();
++
++	return 0;
++}
++
++int __connman_dnsproxy_set_doh_mode(const char *mode)
++{
++	DBusConnection *conn;
++	enum doh_mode new_mode;
++	const char *str;
++
++	if (!dnsproxy_running)
++		return -EOPNOTSUPP;
++
++	if (!string2doh_mode(mode, &new_mode))
++		return -EINVAL;
++
++	doh_mode_stored = true;
++
++	if (new_mode == doh_mode) {
++		doh_save();
++		return 0;
++	}
++
++	doh_mode = new_mode;
++	doh_save();
++	doh_apply();
++	doh_probe(0);
++
++	conn = connman_dbus_get_connection();
++	if (conn) {
++		str = doh_mode_names[doh_mode];
++		connman_dbus_property_changed_basic(CONNMAN_MANAGER_PATH,
++				CONNMAN_MANAGER_INTERFACE, "DNSOverHTTPS",
++				DBUS_TYPE_STRING, &str);
++		dbus_connection_unref(conn);
++	}
++
++	return 0;
++}
++
++static bool doh_same_servers(char **a, char **b)
++{
++	unsigned int len_a = a ? g_strv_length(a) : 0;
++	unsigned int len_b = b ? g_strv_length(b) : 0;
++
++	if (len_a != len_b)
++		return false;
++
++	for (unsigned int i = 0; i < len_a; i++) {
++		if (!g_str_equal(a[i], b[i]))
++			return false;
++	}
++
++	return true;
++}
++
++int __connman_dnsproxy_set_doh_servers(char **servers)
++{
++	DBusConnection *conn;
++
++	if (!dnsproxy_running)
++		return -EOPNOTSUPP;
++
++	if (!doh_valid_servers(servers))
++		return -EINVAL;
++
++	if (doh_same_servers(servers, doh_user_servers))
++		return 0;
++
++	g_strfreev(doh_user_servers);
++	doh_user_servers = g_strdupv(servers);
++
++	doh_save();
++	doh_apply();
++	doh_probe(0);
++
++	conn = connman_dbus_get_connection();
++	if (conn) {
++		connman_dbus_property_changed_array(CONNMAN_MANAGER_PATH,
++				CONNMAN_MANAGER_INTERFACE,
++				"DNSOverHTTPSServers", DBUS_TYPE_STRING,
++				append_doh_servers, NULL);
++		dbus_connection_unref(conn);
++	}
++
++	return 0;
++}
++
++static void update_domain(int index, const char *domain, bool append)
++{
++	DBG("index %d domain %s", index, domain);
++
++	if (!domain)
++		return;
++
++	for (GSList *list = server_list; list; list = list->next) {
++		struct server_data *data = list->data;
++		char *dom = NULL;
++		bool dom_found = false;
++
++		if (data->index < 0)
++			continue;
++		else if (data->index != index)
++			continue;
++
++		for (GList *dom_list = data->domains; dom_list;
++				dom_list = dom_list->next) {
++			dom = dom_list->data;
++
++			if (g_str_equal(dom, domain)) {
++				dom_found = true;
++				break;
++			}
++		}
++
++		if (!dom_found && append) {
++			data->domains =
++				g_list_append(data->domains, g_strdup(domain));
++		} else if (dom_found && !append) {
++			data->domains =
++				g_list_remove(data->domains, dom);
++			g_free(dom);
++		}
++	}
++}
++
++static void append_domain(int index, const char *domain)
++{
++	update_domain(index, domain, true);
++}
++
++static void remove_domain(int index, const char *domain)
++{
++	update_domain(index, domain, false);
++}
++
++static void flush_requests(struct server_data *server)
++{
++	GSList *list = request_list;
++	while (list) {
++		struct request_data *req = list->data;
++
++		list = list->next;
++
++		if (req->doh)
++			continue;
++
++		if (ns_resolv(server, req, req->request, req->name)) {
++			/*
++			 * A cached result was sent,
++			 * so the request can be released
++			 */
++			request_list =
++				g_slist_remove(request_list, req);
++			destroy_request_data(req);
++			continue;
++		}
++
++		if (req->timeout > 0)
++			g_source_remove(req->timeout);
++
++		req->timeout = g_timeout_add_seconds(5, request_timeout, req);
++	}
++}
++
++int __connman_dnsproxy_append(int index, const char *domain,
++							const char *server)
++{
++	struct server_data *data;
++	DBG("index %d server %s", index, server);
++
++	if (!server) {
++		if (!domain) {
++			return -EINVAL;
++		} else {
++			append_domain(index, domain);
++			return 0;
++		}
++	}
++
++	if (g_str_equal(server, "127.0.0.1"))
++		return -ENODEV;
++	else if (g_str_equal(server, "::1"))
++		return -ENODEV;
++
++	data = find_server(index, server, IPPROTO_UDP);
++	if (data) {
++		append_domain(index, domain);
++		return 0;
++	}
++
++	data = create_server(index, domain, server, IPPROTO_UDP);
++	if (!data)
++		return -EIO;
++
++	flush_requests(data);
++	doh_update_state(false);
++
++	return 0;
++}
++
++static void remove_server(int index, const char *server, int protocol)
++{
++	struct server_data *data;
++
++	data = find_server(index, server, protocol);
++	if (!data)
++		return;
++
++	destroy_server(data);
++
++	if (get_enabled_server_number() == 0)
++		enable_fallback(true);
++}
++
++int __connman_dnsproxy_remove(int index, const char *domain,
++							const char *server)
++{
++	DBG("index %d server %s", index, server);
++
++	if (!server) {
++		if (!domain) {
++			return -EINVAL;
++		} else {
++			remove_domain(index, domain);
++			return 0;
++		}
++	}
++
++	if (g_str_equal(server, "127.0.0.1"))
++		return -ENODEV;
++	else if (g_str_equal(server, "::1"))
++		return -ENODEV;
++
++	remove_server(index, server, IPPROTO_UDP);
++	remove_server(index, server, IPPROTO_TCP);
++	doh_update_state(false);
++
++	return 0;
++}
++
++static void dnsproxy_offline_mode(bool enabled)
++{
++	DBG("enabled %d", enabled);
++
++	for (GSList *list = server_list; list; list = list->next) {
++		struct server_data *data = list->data;
++
++		if (!enabled) {
++			DBG("Enabling DNS server %s", data->server);
++			data->enabled = true;
++			cache_invalidate();
++			cache_refresh();
++		} else {
++			DBG("Disabling DNS server %s", data->server);
++			data->enabled = false;
++			cache_invalidate();
++		}
++	}
++}
++
++static void dnsproxy_default_changed(struct connman_service *service)
++{
++	bool any_server_enabled = false;
++	int index, vpn_index;
++
++	DBG("service %p", service);
++
++	/* DNS has changed, invalidate the cache */
++	cache_invalidate();
++
++	doh_reset_servers();
++
++	if (!service) {
++		/* When no services are active, then disable DNS proxying */
++		dnsproxy_offline_mode(true);
++		doh_update_state(false);
++		return;
++	}
++
++	index = __connman_service_get_index(service);
++	if (index < 0)
++		return;
++
++	/*
++	 * In case non-split-routed VPN is set as split routed the DNS servers
++	 * the VPN must be enabled as well, when the transport becomes the
++	 * default service.
++	 */
+ 	vpn_index = __connman_gateway_get_vpn_index(index);
+ 
+ 	for (GSList *list = server_list; list; list = list->next) {
+@@ -3059,6 +4124,8 @@ static void dnsproxy_default_changed(struct connman_service *service)
+ 	if (!any_server_enabled)
+ 		enable_fallback(true);
+ 
++	doh_update_state(false);
++
+ 	cache_refresh();
+ }
+ 
+@@ -3286,7 +4353,7 @@ read_another:
+ 
+ 	err = parse_request(client->buf + DNS_HEADER_TCP_EXTRA_BYTES,
+ 			msg_len, query, sizeof(query));
+-	if (err < 0 || (g_slist_length(server_list) == 0)) {
++	if (err < 0 || (!server_list && !doh_wanted(query))) {
+ 		send_response(client_sk, client->buf,
+ 			msg_len + DNS_HEADER_TCP_EXTRA_BYTES,
+ 			NULL, 0, IPPROTO_TCP);
+@@ -3344,6 +4411,26 @@ read_another:
+ 			debug("data missing, ignoring cache for this query");
+ 	}
+ 
++	if (doh_wanted(query)) {
++		req->request = g_try_malloc0(req->request_len);
++		req->name = g_try_malloc0(sizeof(query));
++		if (!req->request || !req->name) {
++			send_response(client_sk, client->buf,
++				req->request_len, NULL, 0, IPPROTO_TCP);
++			g_free(req->request);
++			g_free(req->name);
++			g_free(req);
++			goto out;
++		}
++		memcpy(req->request, client->buf, req->request_len);
++		memcpy(req->name, query, sizeof(query));
++		req->timeout = g_timeout_add_seconds(30, request_timeout, req);
++		request_list = g_slist_append(request_list, req);
++
++		doh_dispatch(req);
++		goto out;
++	}
++
+ 	for (GSList *list = server_list; list; list = list->next) {
+ 		struct server_data *data = list->data;
+ 
+@@ -3711,7 +4798,7 @@ static bool udp_listener_event(GIOChannel *channel, GIOCondition condition,
+ 	debug("Received %d bytes (id 0x%04x)", len, buf[0] | buf[1] << 8);
+ 
+ 	err = parse_request(buf, len, query, sizeof(query));
+-	if (err < 0 || (g_slist_length(server_list) == 0)) {
++	if (err < 0 || (!server_list && !doh_wanted(query))) {
+ 		send_response(sk, buf, len, client_addr,
+ 				*client_addr_len, IPPROTO_UDP);
+ 		return true;
+@@ -3740,6 +4827,23 @@ static bool udp_listener_event(GIOChannel *channel, GIOCondition condition,
+ 	req->ifdata = ifdata;
+ 	req->append_domain = false;
+ 
++	if (doh_wanted(query)) {
++		if (ns_try_resolv_from_cache(req, buf, query) > 0) {
++			g_free(req);
++			return true;
++		}
++
++		req->name = g_strdup(query);
++		req->request = g_malloc(len);
++		memcpy(req->request, buf, len);
++		req->timeout = g_timeout_add_seconds(DOH_REQUEST_TIMEOUT,
++							request_timeout, req);
++		request_list = g_slist_append(request_list, req);
++
++		doh_dispatch(req);
++		return true;
++	}
++
+ 	if (resolv(req, buf, query)) {
+ 		/* a cached result was sent, so the request can be released */
+ 	        g_free(req);
+@@ -4113,8 +5217,13 @@ int __connman_dnsproxy_init(void)
+ 
+ 	index = connman_inet_ifindex("lo");
+ 	err = __connman_dnsproxy_add_listener(index);
+-	if (err < 0)
++	if (err < 0) {
++		g_hash_table_destroy(listener_table);
++		listener_table = NULL;
++		g_hash_table_destroy(partial_tcp_req_table);
++		partial_tcp_req_table = NULL;
+ 		return err;
++	}
+ 
+ 	err = connman_notifier_register(&dnsproxy_notifier);
+ 	if (err < 0) {
+@@ -4125,6 +5234,14 @@ int __connman_dnsproxy_init(void)
+ 		return err;
+ 	}
+ 
++	if (__connman_doh_init(dns_listen_port) < 0)
++		connman_error("Failed to initialize DNS over HTTPS");
++
++	dnsproxy_running = true;
++
++	doh_load();
++	doh_apply();
++
+ 	return 0;
+ }
+ 
+@@ -4159,6 +5276,13 @@ void __connman_dnsproxy_cleanup(void)
+ 		g_resolv_unref(ipv4_resolve);
+ 	if (ipv6_resolve)
+ 		g_resolv_unref(ipv6_resolve);
++
++	dnsproxy_running = false;
++
++	doh_free_servers();
++	g_strfreev(doh_user_servers);
++	doh_user_servers = NULL;
++	__connman_doh_cleanup();
+ }
+ 
+ void __connman_dnsproxy_set_listen_port(unsigned int port)
+diff --git a/src/main.c b/src/main.c
+index 99f3c221..43bfce76 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -138,6 +138,8 @@ static struct {
+ 	char *localtime;
+ 	bool regdom_follows_timezone;
+ 	char *resolv_conf;
++	char *dns_over_https;
++	char **dns_over_https_servers;
+ } connman_settings  = {
+ 	.bg_scan = true,
+ 	.pref_timeservers = NULL,
+@@ -175,6 +177,8 @@ static struct {
+ 	.use_gateways_as_timeservers = false,
+ 	.localtime = NULL,
+ 	.resolv_conf = NULL,
++	.dns_over_https = NULL,
++	.dns_over_https_servers = NULL,
+ };
+ 
+ #define CONF_BG_SCAN                    "BackgroundScanning"
+@@ -212,6 +216,8 @@ static struct {
+ #define CONF_LOCALTIME                  "Localtime"
+ #define CONF_REGDOM_FOLLOWS_TIMEZONE    "RegdomFollowsTimezone"
+ #define CONF_RESOLV_CONF                "ResolvConf"
++#define CONF_DNS_OVER_HTTPS             "DNSOverHTTPS"
++#define CONF_DNS_OVER_HTTPS_SERVERS     "DNSOverHTTPSServers"
+ 
+ static const char *supported_options[] = {
+ 	CONF_BG_SCAN,
+@@ -249,6 +255,8 @@ static const char *supported_options[] = {
+ 	CONF_LOCALTIME,
+ 	CONF_REGDOM_FOLLOWS_TIMEZONE,
+ 	CONF_RESOLV_CONF,
++	CONF_DNS_OVER_HTTPS,
++	CONF_DNS_OVER_HTTPS_SERVERS,
+ 	NULL
+ };
+ 
+@@ -852,6 +860,31 @@ static void parse_config(GKeyFile *config, const char *file)
+ 
+ 	g_clear_error(&error);
+ 
++	string = __connman_config_get_string(config, GENERAL_GROUP,
++				CONF_DNS_OVER_HTTPS, &error);
++	if (!error && (g_str_equal(string, "off") ||
++			g_str_equal(string, "auto") ||
++			g_str_equal(string, "on") ||
++			g_str_equal(string, "strict"))) {
++		connman_settings.dns_over_https = string;
++	} else {
++		if (!error)
++			connman_warn("Invalid %s [%s]", CONF_DNS_OVER_HTTPS,
++								string);
++		g_free(string);
++	}
++
++	g_clear_error(&error);
++
++	str_list = __connman_config_get_string_list(config, GENERAL_GROUP,
++			CONF_DNS_OVER_HTTPS_SERVERS, &len, &error);
++	if (!error)
++		connman_settings.dns_over_https_servers = str_list;
++	else
++		g_strfreev(str_list);
++
++	g_clear_error(&error);
++
+ 	online_check_settings_log();
+ }
+ 
+@@ -1063,6 +1096,9 @@ char *connman_setting_get_string(const char *key)
+ 	if (g_str_equal(key, CONF_ONLINE_CHECK_INTERVAL_STYLE))
+ 		return connman_settings.online_check_interval_style;
+ 
++	if (g_str_equal(key, CONF_DNS_OVER_HTTPS))
++		return connman_settings.dns_over_https;
++
+ 	return NULL;
+ }
+ 
+@@ -1138,6 +1174,9 @@ char **connman_setting_get_string_list(const char *key)
+ 	if (g_str_equal(key, CONF_FALLBACK_NAMESERVERS))
+ 		return connman_settings.fallback_nameservers;
+ 
++	if (g_str_equal(key, CONF_DNS_OVER_HTTPS_SERVERS))
++		return connman_settings.dns_over_https_servers;
++
+ 	if (g_str_equal(key, CONF_BLACKLISTED_INTERFACES))
+ 		return connman_settings.blacklisted_interfaces;
+ 
+@@ -1358,6 +1397,8 @@ int main(int argc, char *argv[])
+ 	g_free(connman_settings.online_check_ipv4_url);
+ 	g_free(connman_settings.online_check_ipv6_url);
+ 	g_free(connman_settings.localtime);
++	g_free(connman_settings.dns_over_https);
++	g_strfreev(connman_settings.dns_over_https_servers);
+ 
+ 	g_free(option_debug);
+ 	g_free(option_wifi);
+diff --git a/src/main.conf b/src/main.conf
+index da1307d9..77287d69 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -42,6 +42,16 @@
+ # names are ignored.
+ # FallbackNameservers =
+ 
++# How the DNS proxy uses DNS over HTTPS: off, auto (use it when the
++# DNS servers in use are public resolvers known to support it), on (use
++# DNSOverHTTPSServers, plain DNS when they fail) or strict (use
++# DNSOverHTTPSServers, never plain DNS). Default value is off.
++# DNSOverHTTPS = off
++
++# List of DNS over HTTPS servers for the on and strict modes,
++# separated by ",", e.g. https://dns.quad9.net/dns-query.
++# DNSOverHTTPSServers =
++
+ # List of technologies that are marked autoconnectable
+ # by default, separated by commas ",". The default value
+ # for this entry when empty is ethernet,wifi,cellular.
+-- 
+2.34.1
+

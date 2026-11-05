@@ -1,7 +1,13 @@
-From 3fd8377d4a35ed817746283384f46835a9075172 Mon Sep 17 00:00:00 2001
+From ebe9a29b1d0191faebacf813d6b091ee57acfcf5 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Fri, 8 Dec 2017 17:26:22 +0000
-Subject: [PATCH] Do not set tmpfiles directory for symlinked resolv config
+Subject: [PATCH] build: Do not install the resolv.conf tmpfiles.d snippet
+
+Upstream installs connman_resolvconf.conf for systemd-tmpfiles, which
+creates /etc/resolv.conf as a symlink to /run/connman/resolv.conf when
+the file is missing (OSMC image builds remove it). On OSMC ConnMan
+writes /etc/resolv.conf directly (see the ResolvConf default), so the
+symlink must not be created.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -9,10 +15,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 3 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index 97f1c87..b5221ec 100644
+index b7d61c7b..2d93b958 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -70,9 +70,6 @@ if SYSTEMD
+@@ -76,9 +76,6 @@ if SYSTEMD
  systemdunitdir = @SYSTEMD_UNITDIR@
  systemdunit_DATA = src/connman.service src/connman-wait-online.service
  
@@ -23,5 +29,5 @@ index 97f1c87..b5221ec 100644
  systemdunit_DATA += vpn/connman-vpn.service
  endif
 -- 
-2.7.4
+2.34.1
 

@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="1.41"
+VERSION="2.0"
 pull_source "git://git.kernel.org/pub/scm/network/connman/connman.git" "$(pwd)/src" "${VERSION}"
 if [ $? != 0 ]; then echo -e "Error fetching connman source" && exit 1; fi
 # Build in native environment
@@ -27,13 +27,14 @@ then
 	handle_dep "automake"
 	handle_dep "libtool"
 	handle_dep "libmnl-dev"
+	handle_dep "libnghttp2-dev"
 	sed '/Package/d' -i files/DEBIAN/control
 	echo "Package: ${1}-connman-osmc" >> files/DEBIAN/control
 	pushd src
 	install_patch "../patches" "all"
 	aclocal
 	autoreconf -vif .
-	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-openvpn
+	./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --enable-openvpn --disable-pacrunner
 	if [ $? != 0 ]; then echo -e "Configure failed!" && umount /proc/ > /dev/null 2>&1 && exit 1; fi
 	$BUILD
 	if [ $? != 0 ]; then echo -e "Build failed!" && exit 1; fi

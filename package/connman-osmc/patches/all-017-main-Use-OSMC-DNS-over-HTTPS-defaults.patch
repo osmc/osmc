@@ -1,0 +1,65 @@
+From 34a533fa3ee3f0b7954efc22c21d79b6243afcde Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:42:22 +0000
+Subject: [PATCH] main: Use OSMC DNS over HTTPS defaults
+
+Default to the "auto" DNS over HTTPS mode, which encrypts queries only
+when the network's DNS servers are public resolvers known to support
+it and therefore never changes who answers them. Pi-hole, router names
+and parental filters keep working.
+
+Provide Quad9 with Cloudflare as a second operator as the default
+servers for the "on" and "strict" modes, i.e. the "OSMC default
+server" choice in My OSMC. Both are in the provider table, so no plain
+text lookup is needed to reach them. Users who have not chosen their
+own servers follow changes to this list, for example when OSMC hosts
+its own resolver.
+---
+ src/main.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 43bfce76..d57b5388 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -68,6 +68,15 @@
+ 
+ #define DEFAULT_RESOLV_CONF "/etc/resolv.conf"
+ 
++#define DEFAULT_DNS_OVER_HTTPS "auto"
++
++/* The "OSMC default server" choice in My OSMC */
++static char *default_dns_over_https_servers[] = {
++	"https://dns.quad9.net/dns-query",
++	"https://cloudflare-dns.com/dns-query",
++	NULL
++};
++
+ #define MAINFILE "main.conf"
+ #define CONFIGMAINFILE CONFIGDIR "/" MAINFILE
+ 
+@@ -1097,7 +1106,9 @@ char *connman_setting_get_string(const char *key)
+ 		return connman_settings.online_check_interval_style;
+ 
+ 	if (g_str_equal(key, CONF_DNS_OVER_HTTPS))
+-		return connman_settings.dns_over_https;
++		return connman_settings.dns_over_https ?
++			connman_settings.dns_over_https :
++			DEFAULT_DNS_OVER_HTTPS;
+ 
+ 	return NULL;
+ }
+@@ -1175,7 +1186,9 @@ char **connman_setting_get_string_list(const char *key)
+ 		return connman_settings.fallback_nameservers;
+ 
+ 	if (g_str_equal(key, CONF_DNS_OVER_HTTPS_SERVERS))
+-		return connman_settings.dns_over_https_servers;
++		return connman_settings.dns_over_https_servers ?
++			connman_settings.dns_over_https_servers :
++			default_dns_over_https_servers;
+ 
+ 	if (g_str_equal(key, CONF_BLACKLISTED_INTERFACES))
+ 		return connman_settings.blacklisted_interfaces;
+-- 
+2.34.1
+

@@ -1,0 +1,32 @@
+From e83b0af408551e675606032651a949d60329417a Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Tue, 29 Sep 2015 00:16:17 +0100
+Subject: [PATCH] wifi: Try harder to connect to known networks
+
+Raise FAVORITE_MAXIMUM_RETRIES from 2 to 4. For a favourite network a
+failed 4-way handshake is retried up to this many times before ConnMan
+concludes the passphrase is wrong and reports invalid-key. Some WiFi
+drivers shipped on OSMC devices fail the handshake transiently,
+especially straight after boot, and two attempts are not enough.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ plugins/wifi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 9ce7b5a3..8660cd88 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -63,7 +63,7 @@
+ 
+ #define CLEANUP_TIMEOUT   8	/* in seconds */
+ #define INACTIVE_TIMEOUT  12	/* in seconds */
+-#define FAVORITE_MAXIMUM_RETRIES 2
++#define FAVORITE_MAXIMUM_RETRIES 4
+ 
+ #define BGSCAN_DEFAULT "simple:30:-65:300"
+ #define AUTOSCAN_EXPONENTIAL "exponential:3:300"
+-- 
+2.34.1
+

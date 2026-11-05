@@ -1,0 +1,165 @@
+From 4a915ed1dd195ec5a839e0f78ba0cd23ca6e3789 Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:41:04 +0000
+Subject: [PATCH] manager: Add DNS over HTTPS properties
+
+Expose the DNS over HTTPS mode, server list and state on the Manager
+interface. The mode and servers are writable and stored in the global
+settings, taking precedence over main.conf. An empty server list
+selects the servers from main.conf, so a distribution can update its
+defaults without overriding a user's choice.
+---
+ doc/manager-api.txt | 60 ++++++++++++++++++++++++++++++++++++++++++++
+ src/manager.c       | 61 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 121 insertions(+)
+
+diff --git a/doc/manager-api.txt b/doc/manager-api.txt
+index 6eaa0a38..409f6cea 100644
+--- a/doc/manager-api.txt
++++ b/doc/manager-api.txt
+@@ -319,3 +319,63 @@ Properties	string State [readonly]
+ 			and does not affect ConnMan in any way.
+ 
+ 			The default value is false.
++
++		string DNSOverHTTPS [readwrite]
++
++			How the DNS proxy uses DNS over HTTPS (RFC 8484).
++			Possible values are:
++
++			"off": queries are forwarded in plain text.
++
++			"auto": when every DNS server in use is a public
++			resolver known to offer DNS over HTTPS on the same
++			address, queries are sent to those resolvers over
++			HTTPS instead. Otherwise, or if that fails, plain
++			text is used. This never changes which resolver
++			answers.
++
++			"on": queries are sent to DNSOverHTTPSServers.
++			Plain text DNS of the network is used while none
++			of them can be reached.
++
++			"strict": like "on", but queries fail instead of
++			falling back to plain text.
++
++			In every mode, names that only the local network
++			can resolve are sent to the network's DNS servers
++			in plain text: single label names, names in the
++			local, lan, home, home.arpa, internal and similar
++			domains, reverse lookups of private addresses and,
++			except in "strict" mode, names in the search domains
++			provided by the network.
++
++			Setting this property fails with NotSupported when
++			the DNS proxy is disabled. The default value comes
++			from the DNSOverHTTPS setting of main.conf; a value
++			set through this property is stored and used
++			instead.
++
++		array{string} DNSOverHTTPSServers [readwrite]
++
++			The DNS over HTTPS servers used by the "on" and
++			"strict" modes, in order of preference, as
++			https://host[:port][/path] URLs. The host can be a
++			host name or an IP address; IPv6 addresses must be
++			in brackets. When the path is missing, /dns-query
++			is used. Servers must support HTTP/2.
++
++			An empty list selects the servers of the
++			DNSOverHTTPSServers setting of main.conf. Setting
++			this property fails with NotSupported when the DNS
++			proxy is disabled.
++
++		string DNSOverHTTPSState [readonly]
++
++			The state of DNS over HTTPS. Possible values are
++			"off", "inactive" (enabled, but not used yet or not
++			applicable, e.g. "auto" while using a resolver that
++			does not support it), "active" (the last query over
++			HTTPS succeeded) and "unavailable" (no DNS over HTTPS
++			server could be reached, or "strict" mode has no
++			server; depending on the mode plain text DNS is used
++			or queries fail).
+diff --git a/src/manager.c b/src/manager.c
+index 892d3a42..9bd9f90a 100644
+--- a/src/manager.c
++++ b/src/manager.c
+@@ -64,6 +64,18 @@ static DBusMessage *get_properties(DBusConnection *conn,
+ 					DBUS_TYPE_BOOLEAN,
+ 					&sessionmode);
+ 
++	str = __connman_dnsproxy_get_doh_mode();
++	connman_dbus_dict_append_basic(&dict, "DNSOverHTTPS",
++					DBUS_TYPE_STRING, &str);
++
++	connman_dbus_dict_append_array(&dict, "DNSOverHTTPSServers",
++				DBUS_TYPE_STRING,
++				__connman_dnsproxy_append_doh_servers, NULL);
++
++	str = __connman_dnsproxy_get_doh_state();
++	connman_dbus_dict_append_basic(&dict, "DNSOverHTTPSState",
++					DBUS_TYPE_STRING, &str);
++
+ 	connman_dbus_dict_close(&array, &dict);
+ 
+ 	return reply;
+@@ -110,6 +122,55 @@ static DBusMessage *set_property(DBusConnection *conn,
+ 
+ 		dbus_message_iter_get_basic(&value, &sessionmode);
+ 
++	} else if (g_str_equal(name, "DNSOverHTTPS")) {
++		const char *mode;
++		int err;
++
++		if (type != DBUS_TYPE_STRING)
++			return __connman_error_invalid_arguments(msg);
++
++		dbus_message_iter_get_basic(&value, &mode);
++
++		err = __connman_dnsproxy_set_doh_mode(mode);
++		if (err == -EOPNOTSUPP)
++			return __connman_error_not_supported(msg);
++		if (err < 0)
++			return __connman_error_invalid_arguments(msg);
++
++	} else if (g_str_equal(name, "DNSOverHTTPSServers")) {
++		DBusMessageIter entry;
++		GPtrArray *servers;
++		int err;
++
++		if (type != DBUS_TYPE_ARRAY ||
++				dbus_message_iter_get_element_type(&value) !=
++							DBUS_TYPE_STRING)
++			return __connman_error_invalid_arguments(msg);
++
++		servers = g_ptr_array_new();
++
++		dbus_message_iter_recurse(&value, &entry);
++		while (dbus_message_iter_get_arg_type(&entry) ==
++							DBUS_TYPE_STRING) {
++			const char *val;
++
++			dbus_message_iter_get_basic(&entry, &val);
++			g_ptr_array_add(servers, (gpointer) val);
++			dbus_message_iter_next(&entry);
++		}
++		g_ptr_array_add(servers, NULL);
++
++		err = __connman_dnsproxy_set_doh_servers(
++						(char **) servers->pdata);
++		g_ptr_array_free(servers, TRUE);
++
++		if (err == -EOPNOTSUPP)
++			return __connman_error_not_supported(msg);
++		if (err < 0)
++			return __connman_error_invalid_arguments(msg);
++
++	} else if (g_str_equal(name, "DNSOverHTTPSState")) {
++		return __connman_error_permission_denied(msg);
+ 	} else
+ 		return __connman_error_invalid_property(msg);
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,37 @@
+From 7cc3c3753761acc01de939db1905bef6c3851ad1 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 16 Nov 2017 00:00:00 +0000
+Subject: [PATCH] service: Do not add host routes for nameservers
+
+ConnMan adds a host route for every nameserver that is not on the local
+subnet via the service's gateway. When OSMC users run a VPN that ConnMan
+does not know about (for example OpenVPN started outside ConnMan), these
+routes bypass the tunnel and leak DNS queries. Never add them.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/service.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/src/service.c b/src/service.c
+index d5869b14..cb6b6e85 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -1512,6 +1512,14 @@ void __connman_service_nameserver_clear(struct connman_service *service)
+ static void add_nameserver_route(int family, int index, const char *nameserver,
+ 				const char *gw)
+ {
++	/*
++	 * OSMC: never pin nameservers to an interface with host routes.
++	 * When a VPN that ConnMan does not manage (e.g. OpenVPN started
++	 * by the user) owns the default route, such routes would send
++	 * DNS queries around the tunnel.
++	 */
++	return;
++
+ 	DBG("family %d index %d nameserver %s gw %s",
+ 		family, index, nameserver, gw);
+ 
+-- 
+2.34.1
+

@@ -1,0 +1,33 @@
+From d643dbf46627a4336289014e33e8a7dc8f13db81 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 26 Feb 2015 05:51:28 +0000
+Subject: [PATCH] timeserver: Do not synchronise time from any timeserver
+
+OSMC keeps system time with ntpd/systemd-timesyncd and an HTTP Date
+header fallback (http-time.service), so ConnMan must not also step or
+slew the clock. Return an empty timeserver list unconditionally so
+ConnMan never starts its own NTP client, regardless of the TimeUpdates
+clock setting, DHCP-provided timeservers or FallbackTimeservers.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/timeserver.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/timeserver.c b/src/timeserver.c
+index d364f728..25936865 100644
+--- a/src/timeserver.c
++++ b/src/timeserver.c
+@@ -245,8 +245,7 @@ GSList *__connman_timeserver_get_all(const struct connman_service *service)
+ 	char **fallback_ts;
+ 	int index, i;
+ 
+-	if (__connman_clock_timeupdates() == TIME_UPDATES_MANUAL)
+-		return NULL;
++	return NULL;
+ 
+ 	service_ts_config = connman_service_get_timeservers_config(service);
+ 
+-- 
+2.34.1
+

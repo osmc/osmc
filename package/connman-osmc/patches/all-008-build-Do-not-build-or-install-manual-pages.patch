@@ -1,7 +1,10 @@
-From 0cf36fee372f4a56fa6270a60956d463ebb29935 Mon Sep 17 00:00:00 2001
+From c12bb3357d792f6bbf1f500bee681028f0345758 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 5 Dec 2017 18:25:42 +0000
-Subject: [PATCH] Don't include manual pages
+Subject: [PATCH] build: Do not build or install manual pages
+
+OSMC images do not ship manual pages, so skip generating and installing
+them.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -9,10 +12,10 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 5 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index e67a7a5..27e813f 100644
+index 1e44314f..b7d61c7b 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -430,11 +430,6 @@ EXTRA_DIST += src/main.conf \
+@@ -480,11 +480,6 @@ EXTRA_DIST += src/main.conf \
  		src/eduroam.config \
  		scripts/connman_resolvconf.conf.in
  
@@ -25,5 +28,5 @@ index e67a7a5..27e813f 100644
  
  pkgconfigdir = $(libdir)/pkgconfig
 -- 
-2.7.4
+2.34.1
 

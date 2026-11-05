@@ -1,0 +1,43 @@
+From a03344aa2efd5acede25dfc5dd0ec98da469ba45 Mon Sep 17 00:00:00 2001
+From: "YAN Chao (BCSC/EPA2, Smart Home)" <chao.yan2@bosch.com>
+Date: Mon, 15 Dec 2025 18:04:31 +0800
+Subject: [PATCH] wifi: Detect invalid key with auth challenge failed
+
+Signed-off-by: YAN Chao (BCSC/EPA2, Smart Home) <chao.yan2@bosch.com>
+Link: https://patchwork.kernel.org/project/connman/patch/20251215100431.1867291-1-chao.yan2@bosch.com/
+
+[OSMC: IEEE 802.11 status code 15 is "authentication rejected because
+of challenge failure"; an AP answers a WPA3-SAE confirm computed from
+the wrong password this way. Treat it like the existing authentication
+timeout case so a wrong passphrase is reported as invalid-key instead
+of a generic connect failure. Whitespace fixed up.]
+---
+ plugins/wifi.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 8660cd88..767d0e6f 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -75,6 +75,7 @@
+ #define P2P_LISTEN_PERIOD 500
+ #define P2P_LISTEN_INTERVAL 2000
+ 
++#define ASSOC_STATUS_AUTH_CHALLENGE_FAILED 15
+ #define ASSOC_STATUS_AUTH_TIMEOUT 16
+ #define ASSOC_STATUS_NO_CLIENT 17
+ #define LOAD_SHAPING_MAX_RETRIES 3
+@@ -2507,7 +2508,9 @@ static bool handle_4way_handshake_failure(GSupplicantInterface *interface,
+ 
+ 	if ((wifi->state != G_SUPPLICANT_STATE_4WAY_HANDSHAKE) &&
+ 			!((wifi->state == G_SUPPLICANT_STATE_ASSOCIATING) &&
+-				(wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT)))
++				(wifi->assoc_code == ASSOC_STATUS_AUTH_TIMEOUT ||
++				wifi->assoc_code ==
++					ASSOC_STATUS_AUTH_CHALLENGE_FAILED)))
+ 		return false;
+ 
+ 	if (wifi->connected)
+-- 
+2.34.1
+

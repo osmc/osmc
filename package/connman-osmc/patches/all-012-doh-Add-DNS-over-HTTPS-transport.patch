@@ -1,0 +1,1998 @@
+From d2f4d3d73aef6335d645906afdf97b1b6063c2fd Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:41:04 +0000
+Subject: [PATCH] doh: Add DNS over HTTPS transport
+
+Add an RFC 8484 client for the DNS proxy. Queries are POSTed as
+application/dns-message on a single HTTP/2 connection per server,
+using nghttp2 for the HTTP/2 framing and GnuTLS for TLS 1.2 or newer.
+HTTP/2 is required: Quad9, Mullvad, DNS4EU and CIRA refuse DoH over
+HTTP/1.1, while every public resolver tested supports HTTP/2.
+
+The server certificate is verified against the system trust store,
+including IP address SANs for URLs such as https://1.1.1.1/dns-query,
+on every handshake and before any query is sent. Devices without a
+real time clock boot with a stale time and need DNS to fix it, so
+while the kernel clock is not synchronised a certificate that is only
+outside its validity period is accepted once the chain and the name
+have been verified again with time checks disabled. Such sessions are
+not kept for resumption.
+
+Servers are backed off from 30 seconds up to 30 minutes when they
+cannot be reached, stop responding on a connection or answer with an
+HTTP 5xx or 429 status; a slow or rejected query on its own does not
+count against the server. Requests lost on a reused connection that
+the server closed, or refused by a GOAWAY, are retried once. Host
+names without known addresses are resolved through the DNS proxy
+itself, which forwards those lookups in plain text.
+
+A table of public resolvers known to serve DoH on the same addresses
+as their plain DNS service allows upgrading a server configured by
+address to DoH without changing who answers the queries. All entries
+were checked to answer DoH over HTTP/2 with a valid certificate.
+
+GnuTLS 3.4.2 and nghttp2 1.33.0 or newer are now required by the
+internal DNS backend; older nghttp2 releases cannot attach data to
+requests that are still queued.
+---
+ Makefile.am   |    6 +-
+ configure.ac  |    9 +
+ src/connman.h |   19 +
+ src/doh.c     | 1865 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 1896 insertions(+), 3 deletions(-)
+ create mode 100644 src/doh.c
+
+diff --git a/Makefile.am b/Makefile.am
+index 2d93b958..d8e0ffea 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -129,7 +129,7 @@ src_connmand_SOURCES = $(gdhcp_sources) $(gweb_sources) $(stats_sources) \
+ 			src/acd.c
+ 
+ if INTERNAL_DNS_BACKEND
+-src_connmand_SOURCES += src/dnsproxy.c
++src_connmand_SOURCES += src/dnsproxy.c src/doh.c
+ endif
+ if SYSTEMD_RESOLVED_DNS_BACKEND
+ src_connmand_SOURCES += src/dns-systemd-resolved.c
+@@ -137,7 +137,7 @@ endif
+ 
+ src_connmand_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
+ 			@GIO_LIBS@ @GLIB_LIBS@ @DBUS_LIBS@ @GNUTLS_LIBS@ \
+-			-lresolv -ldl -lrt
++			@NGHTTP2_LIBS@ -lresolv -ldl -lrt
+ 
+ src_connmand_LDFLAGS = -Wl,--export-dynamic \
+ 				-Wl,--version-script=$(srcdir)/src/connman.ver
+@@ -249,7 +249,7 @@ AM_CPPFLAGS = -I$(builddir)/include -I$(builddir)/src -I$(srcdir)/gdbus
+ endif
+ 
+ src_connmand_CFLAGS = @DBUS_CFLAGS@ @GLIB_CFLAGS@ \
+-				@GNUTLS_CFLAGS@ $(builtin_cflags) \
++				@GNUTLS_CFLAGS@ @NGHTTP2_CFLAGS@ $(builtin_cflags) \
+ 				-DCONNMAN_PLUGIN_BUILTIN \
+ 				-DSTATEDIR=\""$(statedir)"\" \
+ 				-DPLUGINDIR=\""$(build_plugindir)"\" \
+diff --git a/configure.ac b/configure.ac
+index 8a254224..074daa4c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -550,5 +550,14 @@ AM_CONDITIONAL(INTERNAL_DNS_BACKEND, test "${dns_backend}" = "internal")
+ AM_CONDITIONAL(SYSTEMD_RESOLVED_DNS_BACKEND, test "${dns_backend}" = "systemd-resolved")
+ AC_MSG_RESULT(${dns_backend})
+ 
++if (test "${dns_backend}" = "internal"); then
++	PKG_CHECK_MODULES(GNUTLS, gnutls >= 3.4.2, dummy=yes,
++		AC_MSG_ERROR(GnuTLS >= 3.4.2 is required for DNS over HTTPS))
++	PKG_CHECK_MODULES(NGHTTP2, libnghttp2 >= 1.33.0, dummy=yes,
++		AC_MSG_ERROR(nghttp2 library is required for DNS over HTTPS))
++fi
++AC_SUBST(NGHTTP2_CFLAGS)
++AC_SUBST(NGHTTP2_LIBS)
++
+ AC_CONFIG_FILES(Makefile include/version.h connman.pc)
+ AC_OUTPUT
+diff --git a/src/connman.h b/src/connman.h
+index 7ebda7af..73532b66 100644
+--- a/src/connman.h
++++ b/src/connman.h
+@@ -1025,6 +1025,25 @@ int __connman_dnsproxy_remove(int index, const char *domain, const char *server)
+ int __connman_dnsproxy_set_mdns(int index, bool enabled);
+ void __connman_dnsproxy_set_listen_port(unsigned int port);
+ 
++struct doh_server;
++
++typedef void (*connman_doh_reply_cb_t)(int err, const unsigned char *reply,
++					size_t len, void *user_data);
++
++int __connman_doh_init(unsigned int dns_port);
++void __connman_doh_cleanup(void);
++bool __connman_doh_url_is_valid(const char *url);
++struct doh_server *__connman_doh_server_new(const char *url);
++struct doh_server *__connman_doh_server_new_for_address(const char *address);
++void __connman_doh_server_free(struct doh_server *server);
++const char *__connman_doh_server_get_url(const struct doh_server *server);
++const char *__connman_doh_server_get_host(const struct doh_server *server);
++bool __connman_doh_server_is_available(const struct doh_server *server);
++void __connman_doh_server_reset(struct doh_server *server);
++int __connman_doh_send(struct doh_server *server, const unsigned char *msg,
++				size_t len, connman_doh_reply_cb_t callback,
++				void *user_data);
++
+ int __connman_6to4_probe(struct connman_service *service);
+ void __connman_6to4_remove(struct connman_ipconfig *ipconfig);
+ int __connman_6to4_check(struct connman_ipconfig *ipconfig);
+diff --git a/src/doh.c b/src/doh.c
+new file mode 100644
+index 00000000..c3eba6d4
+--- /dev/null
++++ b/src/doh.c
+@@ -0,0 +1,1865 @@
++/*
++ *
++ *  Connection Manager
++ *
++ *  Copyright (C) 2026  Sam G Nazarko. All rights reserved.
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License version 2 as
++ *  published by the Free Software Foundation.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++/*
++ * DNS over HTTPS (RFC 8484) transport used by the DNS proxy.
++ *
++ * Queries are sent as POST requests with the application/dns-message
++ * media type over a single HTTP/2 connection per server. The connection
++ * is protected by TLS 1.2 or newer and the server certificate is verified
++ * against the system trust store before any query is sent.
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <arpa/inet.h>
++#include <netinet/in.h>
++#include <netinet/tcp.h>
++#include <sys/socket.h>
++#include <sys/timex.h>
++
++#include <glib.h>
++#include <gnutls/gnutls.h>
++#include <gnutls/x509.h>
++#include <nghttp2/nghttp2.h>
++
++#include <gweb/gresolv.h>
++
++#include "connman.h"
++
++#define DOH_PORT		443
++#define DOH_PATH		"/dns-query"
++#define DOH_MAX_URL		512
++#define DOH_MAX_QUEUED		128
++#define DOH_MAX_MESSAGE		65535
++#define DOH_MAX_BUFFERED	65536
++#define DOH_TLS_CHUNK		16384
++#define DOH_QUERY_TIMEOUT	3	/* seconds */
++#define DOH_CONNECT_TIMEOUT	3	/* seconds */
++#define DOH_IDLE_TIMEOUT	30	/* seconds */
++#define DOH_BACKOFF_MIN		30	/* seconds */
++#define DOH_BACKOFF_MAX		(30 * 60)
++#define DOH_RESOLVE_INTERVAL	(60 * 60)
++#define DOH_RESOLVE_RETRY	60
++#define DOH_DNS_HEADER_SIZE	12
++
++#define DOH_PRIORITY "NORMAL:-VERS-ALL:+VERS-TLS1.3:+VERS-TLS1.2"
++
++#if NGHTTP2_VERSION_NUM >= 0x013e00
++typedef nghttp2_ssize doh_ssize_t;
++typedef nghttp2_data_provider2 doh_data_provider;
++#define doh_h2_set_send_callback nghttp2_session_callbacks_set_send_callback2
++#define doh_h2_mem_recv nghttp2_session_mem_recv2
++#define doh_h2_submit_request nghttp2_submit_request2
++#else
++typedef ssize_t doh_ssize_t;
++typedef nghttp2_data_provider doh_data_provider;
++#define doh_h2_set_send_callback nghttp2_session_callbacks_set_send_callback
++#define doh_h2_mem_recv nghttp2_session_mem_recv
++#define doh_h2_submit_request nghttp2_submit_request
++#endif
++
++/*
++ * Public resolvers known to serve DoH on the same addresses as their
++ * plain DNS service, so that a server configured by address can be
++ * upgraded without changing who resolves the queries. The table also
++ * provides bootstrap addresses for these host names.
++ */
++static const struct doh_provider {
++	const char *host;
++	const char *path;
++	const char *addresses[5];
++} doh_providers[] = {
++	{ "cloudflare-dns.com", "/dns-query",
++		{ "1.1.1.1", "1.0.0.1",
++		  "2606:4700:4700::1111", "2606:4700:4700::1001" } },
++	{ "security.cloudflare-dns.com", "/dns-query",
++		{ "1.1.1.2", "1.0.0.2",
++		  "2606:4700:4700::1112", "2606:4700:4700::1002" } },
++	{ "family.cloudflare-dns.com", "/dns-query",
++		{ "1.1.1.3", "1.0.0.3",
++		  "2606:4700:4700::1113", "2606:4700:4700::1003" } },
++	{ "dns.google", "/dns-query",
++		{ "8.8.8.8", "8.8.4.4",
++		  "2001:4860:4860::8888", "2001:4860:4860::8844" } },
++	{ "dns.quad9.net", "/dns-query",
++		{ "9.9.9.9", "149.112.112.112",
++		  "2620:fe::fe", "2620:fe::9" } },
++	{ "dns10.quad9.net", "/dns-query",
++		{ "9.9.9.10", "149.112.112.10",
++		  "2620:fe::10", "2620:fe::fe:10" } },
++	{ "dns11.quad9.net", "/dns-query",
++		{ "9.9.9.11", "149.112.112.11",
++		  "2620:fe::11", "2620:fe::fe:11" } },
++	{ "dns.adguard-dns.com", "/dns-query",
++		{ "94.140.14.14", "94.140.15.15",
++		  "2a10:50c0::ad1:ff", "2a10:50c0::ad2:ff" } },
++	{ "family.adguard-dns.com", "/dns-query",
++		{ "94.140.14.15", "94.140.15.16",
++		  "2a10:50c0::bad1:ff", "2a10:50c0::bad2:ff" } },
++	{ "unfiltered.adguard-dns.com", "/dns-query",
++		{ "94.140.14.140", "94.140.14.141",
++		  "2a10:50c0::1:ff", "2a10:50c0::2:ff" } },
++	{ "doh.opendns.com", "/dns-query",
++		{ "208.67.222.222", "208.67.220.220",
++		  "2620:119:35::35", "2620:119:53::53" } },
++	{ "doh.familyshield.opendns.com", "/dns-query",
++		{ "208.67.222.123", "208.67.220.123",
++		  "2620:119:35::123", "2620:119:53::123" } },
++	{ "doh.cleanbrowsing.org", "/doh/family-filter/",
++		{ "185.228.168.168", "185.228.169.168",
++		  "2a0d:2a00:1::", "2a0d:2a00:2::" } },
++	{ "doh.cleanbrowsing.org", "/doh/adult-filter/",
++		{ "185.228.168.10", "185.228.169.11",
++		  "2a0d:2a00:1::1", "2a0d:2a00:2::1" } },
++	{ "doh.cleanbrowsing.org", "/doh/security-filter/",
++		{ "185.228.168.9", "185.228.169.9",
++		  "2a0d:2a00:1::2", "2a0d:2a00:2::2" } },
++	{ "protective.joindns4.eu", "/dns-query",
++		{ "86.54.11.1", "86.54.11.201",
++		  "2a13:1001::86:54:11:1", "2a13:1001::86:54:11:201" } },
++	{ "unfiltered.joindns4.eu", "/dns-query",
++		{ "86.54.11.100", "86.54.11.200",
++		  "2a13:1001::86:54:11:100", "2a13:1001::86:54:11:200" } },
++};
++
++enum doh_conn_state {
++	DOH_CONN_CONNECTING,
++	DOH_CONN_HANDSHAKE,
++	DOH_CONN_READY,
++	DOH_CONN_CLOSING,	/* GOAWAY received, no new streams */
++};
++
++struct doh_server {
++	char *url;
++	char *host;		/* DNS name or numeric address */
++	char *authority;	/* :authority pseudo-header */
++	char *path;		/* :path pseudo-header */
++	uint16_t port;
++	bool numeric;		/* host is an address: no SNI */
++	char **addresses;	/* numeric addresses to connect to */
++	bool fixed_addresses;	/* from the URL or the provider table */
++	gint64 addresses_expire;
++	guint resolve_id;
++	unsigned int next_address;
++	unsigned int connect_failures;
++	GSList *conns;
++	GQueue *queue;		/* queries waiting for a connection */
++	guint kick;
++	unsigned int failures;
++	gint64 retry_after;
++	gnutls_datum_t session_data;
++};
++
++struct doh_conn {
++	struct doh_server *server;
++	enum doh_conn_state state;
++	int fd;
++	GIOChannel *channel;
++	guint watch;
++	guint timer;
++	gnutls_session_t session;
++	nghttp2_session *h2;
++	GByteArray *out;	/* HTTP/2 output not yet given to TLS */
++	uint8_t *pending;	/* chunk GnuTLS is currently writing */
++	size_t pending_len;
++	size_t pending_off;
++	GSList *queries;
++	unsigned int replies;
++	gint64 last_rx;		/* monotonic, microseconds */
++	bool time_tolerated;	/* certificate outside its validity */
++};
++
++struct doh_query {
++	struct doh_server *server;
++	struct doh_conn *conn;
++	int32_t stream_id;
++	uint8_t *msg;
++	size_t msg_len;
++	size_t msg_sent;
++	uint8_t id[2];
++	GByteArray *reply;
++	unsigned int status;
++	bool dns_message;
++	bool retried;
++	gint64 started;		/* monotonic, microseconds */
++	guint timeout;
++	connman_doh_reply_cb_t callback;
++	void *user_data;
++};
++
++static gnutls_certificate_credentials_t credentials;
++static nghttp2_session_callbacks *h2_callbacks;
++static GResolv *bootstrap;
++static uint16_t bootstrap_port = 53;
++
++static void server_schedule(struct doh_server *server);
++static void conn_failed(struct doh_conn *conn, int err);
++static void conn_update(struct doh_conn *conn);
++
++static gint64 now_seconds(void)
++{
++	return g_get_monotonic_time() / G_USEC_PER_SEC;
++}
++
++static bool same_address(const char *a, const char *b)
++{
++	unsigned char addr_a[sizeof(struct in6_addr)];
++	unsigned char addr_b[sizeof(struct in6_addr)];
++
++	if (inet_pton(AF_INET, a, addr_a) == 1)
++		return inet_pton(AF_INET, b, addr_b) == 1 &&
++			memcmp(addr_a, addr_b, sizeof(struct in_addr)) == 0;
++
++	if (inet_pton(AF_INET6, a, addr_a) == 1)
++		return inet_pton(AF_INET6, b, addr_b) == 1 &&
++			memcmp(addr_a, addr_b, sizeof(struct in6_addr)) == 0;
++
++	return false;
++}
++
++static bool is_address(const char *str)
++{
++	struct in6_addr addr;
++
++	return inet_pton(AF_INET, str, &addr) == 1 ||
++		inet_pton(AF_INET6, str, &addr) == 1;
++}
++
++static const struct doh_provider *provider_by_address(const char *address,
++						unsigned int *index)
++{
++	for (size_t i = 0; i < G_N_ELEMENTS(doh_providers); i++) {
++		const struct doh_provider *provider = &doh_providers[i];
++
++		for (unsigned int j = 0; j < G_N_ELEMENTS(provider->addresses) &&
++					provider->addresses[j]; j++) {
++			if (same_address(provider->addresses[j], address)) {
++				*index = j;
++				return provider;
++			}
++		}
++	}
++
++	return NULL;
++}
++
++static const struct doh_provider *provider_by_host(const char *host)
++{
++	for (size_t i = 0; i < G_N_ELEMENTS(doh_providers); i++) {
++		if (g_ascii_strcasecmp(doh_providers[i].host, host) == 0)
++			return &doh_providers[i];
++	}
++
++	return NULL;
++}
++
++static char **provider_addresses(const struct doh_provider *provider,
++					unsigned int first)
++{
++	GPtrArray *addresses = g_ptr_array_new();
++
++	g_ptr_array_add(addresses, g_strdup(provider->addresses[first]));
++
++	for (unsigned int i = 0; i < G_N_ELEMENTS(provider->addresses) &&
++					provider->addresses[i]; i++) {
++		if (i != first)
++			g_ptr_array_add(addresses,
++					g_strdup(provider->addresses[i]));
++	}
++
++	g_ptr_array_add(addresses, NULL);
++
++	return (char **) g_ptr_array_free(addresses, FALSE);
++}
++
++static bool valid_host_name(const char *host)
++{
++	size_t len = strlen(host), label = 0;
++
++	if (len == 0 || len > 253)
++		return false;
++
++	for (size_t i = 0; i < len; i++) {
++		if (host[i] == '.') {
++			if (label == 0)
++				return false;
++			label = 0;
++			continue;
++		}
++
++		if (!g_ascii_isalnum(host[i]) && host[i] != '-' &&
++							host[i] != '_')
++			return false;
++
++		if (++label > 63)
++			return false;
++	}
++
++	return label > 0;
++}
++
++static bool valid_path(const char *path)
++{
++	if (path[0] != '/')
++		return false;
++
++	for (; *path; path++) {
++		if (*path <= ' ' || *path >= 0x7f || *path == '#')
++			return false;
++	}
++
++	return true;
++}
++
++/*
++ * Parse https://host[:port][/path] into the server. The RFC 8484 URI
++ * template variable {?dns} is accepted and ignored since only POST is
++ * used.
++ */
++static int parse_url(struct doh_server *server, const char *url)
++{
++	g_autofree char *copy = NULL;
++	const char *authority, *host_end, *port_str = NULL;
++	char *path, *template, *host;
++	unsigned long port = DOH_PORT;
++
++	if (!url || strlen(url) > DOH_MAX_URL ||
++			g_ascii_strncasecmp(url, "https://", 8) != 0)
++		return -EINVAL;
++
++	copy = g_strdup(url + 8);
++
++	template = strstr(copy, "{?dns}");
++	if (template) {
++		if (template[6] != '\0')
++			return -EINVAL;
++		*template = '\0';
++	}
++
++	path = strchr(copy, '/');
++	if (path) {
++		if (!valid_path(path))
++			return -EINVAL;
++		server->path = g_strdup(path);
++		*path = '\0';
++	} else {
++		server->path = g_strdup(DOH_PATH);
++	}
++
++	authority = copy;
++	if (strpbrk(authority, "@?#"))
++		return -EINVAL;
++
++	if (authority[0] == '[') {
++		host_end = strchr(authority, ']');
++		if (!host_end)
++			return -EINVAL;
++
++		host = g_strndup(authority + 1, host_end - authority - 1);
++		if (host_end[1] == ':')
++			port_str = host_end + 2;
++		else if (host_end[1] != '\0') {
++			g_free(host);
++			return -EINVAL;
++		}
++
++		server->host = host;
++
++		if (!strchr(host, ':') || !is_address(host))
++			return -EINVAL;
++	} else {
++		host_end = strchr(authority, ':');
++		if (host_end) {
++			port_str = host_end + 1;
++			host = g_strndup(authority, host_end - authority);
++		} else {
++			host = g_strdup(authority);
++		}
++
++		server->host = g_ascii_strdown(host, -1);
++		g_free(host);
++
++		if (server->host[0] &&
++			server->host[strlen(server->host) - 1] == '.')
++			server->host[strlen(server->host) - 1] = '\0';
++
++		if (strchr(server->host, ':') ||
++				(!is_address(server->host) &&
++				!valid_host_name(server->host)))
++			return -EINVAL;
++	}
++
++	if (port_str) {
++		char *end;
++
++		if (!g_ascii_isdigit(port_str[0]))
++			return -EINVAL;
++
++		port = strtoul(port_str, &end, 10);
++		if (*end != '\0' || port == 0 || port > 65535)
++			return -EINVAL;
++	}
++
++	server->port = port;
++	server->numeric = is_address(server->host);
++
++	if (strchr(server->host, ':'))
++		server->authority = port == DOH_PORT ?
++			g_strdup_printf("[%s]", server->host) :
++			g_strdup_printf("[%s]:%lu", server->host, port);
++	else
++		server->authority = port == DOH_PORT ?
++			g_strdup(server->host) :
++			g_strdup_printf("%s:%lu", server->host, port);
++
++	server->url = g_strdup_printf("https://%s%s", server->authority,
++							server->path);
++
++	return 0;
++}
++
++bool __connman_doh_url_is_valid(const char *url)
++{
++	struct doh_server server = { 0 };
++	int err = parse_url(&server, url);
++
++	g_free(server.url);
++	g_free(server.host);
++	g_free(server.authority);
++	g_free(server.path);
++
++	return err == 0;
++}
++
++static bool load_credentials(void)
++{
++	gnutls_certificate_credentials_t creds;
++	int ret;
++
++	if (credentials)
++		return true;
++
++	if (gnutls_certificate_allocate_credentials(&creds) < 0)
++		return false;
++
++	ret = gnutls_certificate_set_x509_system_trust(creds);
++	if (ret <= 0) {
++		connman_error("DNS over HTTPS: no trusted CA certificates: %s",
++				ret < 0 ? gnutls_strerror(ret) : "none found");
++		gnutls_certificate_free_credentials(creds);
++		return false;
++	}
++
++	DBG("loaded %d trusted CA certificates", ret);
++
++	credentials = creds;
++
++	return true;
++}
++
++static bool clock_synchronized(void)
++{
++	struct timex tx;
++	int state;
++
++	memset(&tx, 0, sizeof(tx));
++
++	state = adjtimex(&tx);
++	if (state < 0)
++		return true;
++
++	return state != TIME_ERROR && !(tx.status & STA_UNSYNC);
++}
++
++/*
++ * Verify the peer's chain and name against the system trust store with
++ * the validity periods ignored. A status of GNUTLS_CERT_INVALID alone
++ * may also mean that a signature could not be checked at all, so the
++ * time related status bits must not be trusted on their own.
++ */
++static int verify_ignoring_time(struct doh_conn *conn)
++{
++	gnutls_typed_vdata_st name = {
++		.type = GNUTLS_DT_DNS_HOSTNAME,
++		.data = (unsigned char *) conn->server->host,
++	};
++	gnutls_x509_trust_list_t trust;
++	const gnutls_datum_t *peers;
++	gnutls_x509_crt_t *chain;
++	unsigned int count = 0, status = 1, i;
++
++	peers = gnutls_certificate_get_peers(conn->session, &count);
++	if (!peers || count == 0)
++		return -EACCES;
++
++	gnutls_certificate_get_trust_list(credentials, &trust);
++
++	chain = g_new0(gnutls_x509_crt_t, count);
++
++	for (i = 0; i < count; i++) {
++		if (gnutls_x509_crt_init(&chain[i]) < 0 ||
++				gnutls_x509_crt_import(chain[i], &peers[i],
++						GNUTLS_X509_FMT_DER) < 0)
++			goto out;
++	}
++
++	if (gnutls_x509_trust_list_verify_crt2(trust, chain, count, &name, 1,
++				GNUTLS_VERIFY_DISABLE_TIME_CHECKS |
++				GNUTLS_VERIFY_DISABLE_TRUSTED_TIME_CHECKS,
++				&status, NULL) < 0)
++		status = 1;
++
++out:
++	for (i = 0; i < count; i++) {
++		if (chain[i])
++			gnutls_x509_crt_deinit(chain[i]);
++	}
++	g_free(chain);
++
++	return status == 0 ? 0 : -EACCES;
++}
++
++/* Every handshake is verified, including resumed sessions */
++static int conn_verify(struct doh_conn *conn)
++{
++	struct doh_server *server = conn->server;
++	unsigned int status = 0;
++	gnutls_datum_t out;
++	int ret;
++
++	ret = gnutls_certificate_verify_peers3(conn->session, server->host,
++								&status);
++	if (ret < 0) {
++		connman_warn("DNS over HTTPS: cannot verify %s: %s",
++					server->host, gnutls_strerror(ret));
++		return -EACCES;
++	}
++
++	if (status == 0)
++		return 0;
++
++	/*
++	 * Devices without a real time clock boot with a stale time and
++	 * cannot synchronise it without DNS. Until the kernel clock is
++	 * synchronised accept a certificate that is only outside of its
++	 * validity period, after checking the chain and the name again.
++	 * Such sessions are never resumed later.
++	 */
++	if (!(status & ~(GNUTLS_CERT_INVALID | GNUTLS_CERT_EXPIRED |
++					GNUTLS_CERT_NOT_ACTIVATED)) &&
++			(status & (GNUTLS_CERT_EXPIRED |
++					GNUTLS_CERT_NOT_ACTIVATED)) &&
++			!clock_synchronized() &&
++			verify_ignoring_time(conn) == 0) {
++		connman_warn_once("DNS over HTTPS: system clock not "
++			"synchronised, ignoring certificate validity period");
++
++		conn->time_tolerated = true;
++		gnutls_free(server->session_data.data);
++		server->session_data.data = NULL;
++		server->session_data.size = 0;
++
++		return 0;
++	}
++
++	if (gnutls_certificate_verification_status_print(status,
++				gnutls_certificate_type_get(conn->session),
++				&out, 0) == 0) {
++		connman_warn("DNS over HTTPS: certificate of %s rejected: %s",
++					server->host, (const char *) out.data);
++		gnutls_free(out.data);
++	}
++
++	return -EACCES;
++}
++
++static void query_free(struct doh_query *query)
++{
++	if (query->timeout)
++		g_source_remove(query->timeout);
++
++	g_byte_array_free(query->reply, TRUE);
++	g_free(query->msg);
++	g_free(query);
++}
++
++static void query_complete(struct doh_query *query, int err)
++{
++	const unsigned char *reply = NULL;
++	size_t len = 0;
++
++	if (!err) {
++		memcpy(query->reply->data, query->id, sizeof(query->id));
++		reply = query->reply->data;
++		len = query->reply->len;
++	}
++
++	query->callback(err, reply, len, query->user_data);
++	query_free(query);
++}
++
++static void query_reset(struct doh_query *query)
++{
++	g_byte_array_set_size(query->reply, 0);
++	query->msg_sent = 0;
++	query->status = 0;
++	query->dns_message = false;
++}
++
++static void query_detach(struct doh_query *query)
++{
++	struct doh_conn *conn = query->conn;
++
++	if (!conn)
++		return;
++
++	conn->queries = g_slist_remove(conn->queries, query);
++
++	if (conn->h2 && query->stream_id > 0)
++		nghttp2_session_set_stream_user_data(conn->h2,
++						query->stream_id, NULL);
++
++	query->conn = NULL;
++	query->stream_id = 0;
++}
++
++static void server_succeeded(struct doh_server *server)
++{
++	if (server->failures)
++		connman_info("DNS over HTTPS server %s is reachable again",
++								server->url);
++
++	server->failures = 0;
++	server->retry_after = 0;
++}
++
++/* Back off from the server and fail every query waiting for it */
++static void server_failed(struct doh_server *server, int err)
++{
++	struct doh_query *query;
++	unsigned int delay;
++	GQueue *queue;
++
++	server->failures++;
++
++	delay = DOH_BACKOFF_MIN << MIN(server->failures - 1, 6);
++	if (delay > DOH_BACKOFF_MAX)
++		delay = DOH_BACKOFF_MAX;
++
++	server->retry_after = now_seconds() + delay;
++
++	if (server->failures == 1)
++		connman_warn("DNS over HTTPS server %s failed: %s",
++					server->url, strerror(-err));
++
++	DBG("server %s failures %u retry in %u s", server->url,
++						server->failures, delay);
++
++	/*
++	 * The callbacks may send new queries to this server, so complete
++	 * a detached copy of the queue.
++	 */
++	queue = server->queue;
++	server->queue = g_queue_new();
++
++	while ((query = g_queue_pop_head(queue)))
++		query_complete(query, err);
++
++	g_queue_free(queue);
++}
++
++static void conn_close(struct doh_conn *conn)
++{
++	struct doh_server *server = conn->server;
++	GSList *list;
++
++	DBG("conn %p server %s", conn, server->host);
++
++	server->conns = g_slist_remove(server->conns, conn);
++
++	/* Queries still owned by the connection go back to the queue */
++	for (list = conn->queries; list; list = list->next) {
++		struct doh_query *query = list->data;
++
++		query->conn = NULL;
++		query->stream_id = 0;
++		query_reset(query);
++		g_queue_push_head(server->queue, query);
++	}
++	g_slist_free(conn->queries);
++
++	if (conn->watch)
++		g_source_remove(conn->watch);
++
++	if (conn->timer)
++		g_source_remove(conn->timer);
++
++	if (conn->h2)
++		nghttp2_session_del(conn->h2);
++
++	if (conn->session) {
++		if (conn->state == DOH_CONN_READY ||
++				conn->state == DOH_CONN_CLOSING)
++			gnutls_bye(conn->session, GNUTLS_SHUT_WR);
++
++		gnutls_deinit(conn->session);
++	}
++
++	if (conn->channel)
++		g_io_channel_unref(conn->channel);
++
++	close(conn->fd);
++
++	g_byte_array_free(conn->out, TRUE);
++	g_free(conn->pending);
++	g_free(conn);
++}
++
++static gboolean conn_setup_timeout(gpointer user_data)
++{
++	struct doh_conn *conn = user_data;
++
++	conn->timer = 0;
++
++	conn_failed(conn, -ETIMEDOUT);
++
++	return FALSE;
++}
++
++static gboolean conn_idle_timeout(gpointer user_data)
++{
++	struct doh_conn *conn = user_data;
++
++	conn->timer = 0;
++
++	DBG("closing idle connection to %s", conn->server->host);
++
++	conn_close(conn);
++
++	return FALSE;
++}
++
++static void conn_failed(struct doh_conn *conn, int err)
++{
++	struct doh_server *server = conn->server;
++	bool established = conn->state == DOH_CONN_READY ||
++				conn->state == DOH_CONN_CLOSING;
++	bool reused = conn->replies > 0;
++	GSList *queries = conn->queries, *failed = NULL, *retry = NULL, *list;
++	unsigned int count;
++
++	DBG("conn %p server %s err %d", conn, server->host, err);
++
++	conn->queries = NULL;
++	conn_close(conn);
++
++	if (!established) {
++		count = g_strv_length(server->addresses);
++
++		server->next_address++;
++
++		/* Try the remaining addresses before giving up */
++		if (++server->connect_failures < count) {
++			server_schedule(server);
++			return;
++		}
++
++		server->connect_failures = 0;
++		server_failed(server, err);
++		return;
++	}
++
++	for (list = queries; list; list = list->next) {
++		struct doh_query *query = list->data;
++
++		query->conn = NULL;
++		query->stream_id = 0;
++
++		/*
++		 * A reused connection may have been closed by the server
++		 * just as the query was sent; retry once on a new one.
++		 */
++		if (reused && !query->retried && query->reply->len == 0) {
++			query->retried = true;
++			query_reset(query);
++			retry = g_slist_prepend(retry, query);
++		} else {
++			failed = g_slist_prepend(failed, query);
++		}
++	}
++	g_slist_free(queries);
++
++	/* Back off only when queries were lost, before queueing retries */
++	if (failed) {
++		server_failed(server, err);
++
++		for (list = failed; list; list = list->next)
++			query_complete(list->data, err);
++
++		g_slist_free(failed);
++	}
++
++	for (list = retry; list; list = list->next)
++		g_queue_push_head(server->queue, list->data);
++	g_slist_free(retry);
++
++	server_schedule(server);
++}
++
++static gboolean query_timeout(gpointer user_data)
++{
++	struct doh_query *query = user_data;
++	struct doh_server *server = query->server;
++	struct doh_conn *conn = query->conn;
++
++	query->timeout = 0;
++
++	DBG("query %p timed out on %s", query, server->host);
++
++	if (conn) {
++		bool unresponsive = conn->last_rx < query->started;
++
++		nghttp2_submit_rst_stream(conn->h2, NGHTTP2_FLAG_NONE,
++					query->stream_id, NGHTTP2_CANCEL);
++		query_detach(query);
++
++		/*
++		 * Nothing was received since the query was sent, so the
++		 * connection is dead; conn_failed() retries or fails the
++		 * other queries and backs off when needed. Otherwise only
++		 * this name is slow and the server is fine.
++		 */
++		if (unresponsive)
++			conn_failed(conn, -ETIMEDOUT);
++		else
++			conn_update(conn);
++	} else {
++		g_queue_remove(server->queue, query);
++	}
++
++	query_complete(query, -ETIMEDOUT);
++
++	return FALSE;
++}
++
++static doh_ssize_t h2_send(nghttp2_session *session, const uint8_t *data,
++				size_t length, int flags, void *user_data)
++{
++	struct doh_conn *conn = user_data;
++
++	if (conn->out->len >= DOH_MAX_BUFFERED)
++		return NGHTTP2_ERR_WOULDBLOCK;
++
++	g_byte_array_append(conn->out, data, length);
++
++	return length;
++}
++
++static doh_ssize_t h2_read_body(nghttp2_session *session, int32_t stream_id,
++				uint8_t *buf, size_t length,
++				uint32_t *data_flags,
++				nghttp2_data_source *source, void *user_data)
++{
++	struct doh_query *query;
++	size_t len;
++
++	query = nghttp2_session_get_stream_user_data(session, stream_id);
++	if (!query)
++		return NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE;
++
++	len = MIN(length, query->msg_len - query->msg_sent);
++	memcpy(buf, query->msg + query->msg_sent, len);
++	query->msg_sent += len;
++
++	if (query->msg_sent == query->msg_len)
++		*data_flags |= NGHTTP2_DATA_FLAG_EOF;
++
++	return len;
++}
++
++static int h2_on_header(nghttp2_session *session, const nghttp2_frame *frame,
++			const uint8_t *name, size_t namelen,
++			const uint8_t *value, size_t valuelen,
++			uint8_t flags, void *user_data)
++{
++	static const char media_type[] = "application/dns-message";
++	const size_t media_len = sizeof(media_type) - 1;
++	struct doh_query *query;
++
++	if (frame->hd.type != NGHTTP2_HEADERS)
++		return 0;
++
++	query = nghttp2_session_get_stream_user_data(session,
++							frame->hd.stream_id);
++	if (!query)
++		return 0;
++
++	if (namelen == 7 && memcmp(name, ":status", 7) == 0) {
++		query->status = 0;
++
++		if (valuelen == 3 && g_ascii_isdigit(value[0]) &&
++				g_ascii_isdigit(value[1]) &&
++				g_ascii_isdigit(value[2]))
++			query->status = (value[0] - '0') * 100 +
++				(value[1] - '0') * 10 + (value[2] - '0');
++	} else if (namelen == 12 && memcmp(name, "content-type", 12) == 0) {
++		query->dns_message = valuelen >= media_len &&
++			g_ascii_strncasecmp((const char *) value, media_type,
++							media_len) == 0 &&
++			(valuelen == media_len || value[media_len] == ';' ||
++					value[media_len] == ' ');
++	}
++
++	return 0;
++}
++
++static int h2_on_data_chunk(nghttp2_session *session, uint8_t flags,
++				int32_t stream_id, const uint8_t *data,
++				size_t len, void *user_data)
++{
++	struct doh_query *query;
++
++	query = nghttp2_session_get_stream_user_data(session, stream_id);
++	if (!query)
++		return 0;
++
++	if (query->reply->len + len > DOH_MAX_MESSAGE) {
++		nghttp2_submit_rst_stream(session, NGHTTP2_FLAG_NONE,
++					stream_id, NGHTTP2_CANCEL);
++		query->status = 0;
++		return 0;
++	}
++
++	g_byte_array_append(query->reply, data, len);
++
++	return 0;
++}
++
++static int h2_on_frame_recv(nghttp2_session *session,
++				const nghttp2_frame *frame, void *user_data)
++{
++	struct doh_conn *conn = user_data;
++
++	if (frame->hd.type == NGHTTP2_GOAWAY &&
++				conn->state == DOH_CONN_READY) {
++		DBG("GOAWAY from %s", conn->server->host);
++
++		conn->state = DOH_CONN_CLOSING;
++		server_schedule(conn->server);
++	}
++
++	return 0;
++}
++
++static int h2_on_stream_close(nghttp2_session *session, int32_t stream_id,
++				uint32_t error_code, void *user_data)
++{
++	struct doh_conn *conn = user_data;
++	struct doh_server *server = conn->server;
++	struct doh_query *query;
++	const uint8_t *reply;
++	int err = 0;
++
++	query = nghttp2_session_get_stream_user_data(session, stream_id);
++	if (!query)
++		return 0;
++
++	query_detach(query);
++
++	/* The server did not process the stream, so it is safe to retry */
++	if (error_code == NGHTTP2_REFUSED_STREAM && !query->retried) {
++		query->retried = true;
++		query_reset(query);
++		g_queue_push_head(server->queue, query);
++		server_schedule(server);
++		return 0;
++	}
++
++	reply = query->reply->data;
++
++	if (error_code != NGHTTP2_NO_ERROR)
++		err = -ECONNRESET;
++	else if (query->status != 200 || !query->dns_message)
++		err = -EPROTO;
++	else if (query->reply->len < DOH_DNS_HEADER_SIZE ||
++						!(reply[2] & 0x80))
++		err = -EBADMSG;
++
++	if (err) {
++		DBG("query %p on %s failed: status %u error %u", query,
++				server->host, query->status, error_code);
++
++		/* Other errors are about this query, not the server */
++		if (query->status >= 500 || query->status == 429)
++			server_failed(server, err);
++
++		query_complete(query, err);
++		return 0;
++	}
++
++	conn->replies++;
++	server_succeeded(server);
++	query_complete(query, 0);
++
++	return 0;
++}
++
++static void conn_store_session(struct doh_conn *conn)
++{
++	struct doh_server *server = conn->server;
++	gnutls_datum_t data;
++
++	if (conn->time_tolerated)
++		return;
++
++	if (gnutls_session_get_data2(conn->session, &data) < 0)
++		return;
++
++	gnutls_free(server->session_data.data);
++	server->session_data = data;
++}
++
++static int conn_flush(struct doh_conn *conn)
++{
++	ssize_t ret;
++
++	while (conn->pending || conn->out->len) {
++		if (!conn->pending) {
++			conn->pending_len = MIN(conn->out->len, DOH_TLS_CHUNK);
++			conn->pending = g_malloc(conn->pending_len);
++			memcpy(conn->pending, conn->out->data,
++						conn->pending_len);
++			conn->pending_off = 0;
++			g_byte_array_remove_range(conn->out, 0,
++						conn->pending_len);
++		}
++
++		/*
++		 * GnuTLS needs exactly the same arguments again after
++		 * GNUTLS_E_AGAIN, hence the separate pending chunk.
++		 */
++		ret = gnutls_record_send(conn->session,
++				conn->pending + conn->pending_off,
++				conn->pending_len - conn->pending_off);
++		if (ret == GNUTLS_E_AGAIN || ret == GNUTLS_E_INTERRUPTED)
++			return 0;
++		if (ret < 0) {
++			DBG("send to %s failed: %s", conn->server->host,
++						gnutls_strerror(ret));
++			return -EIO;
++		}
++
++		conn->pending_off += ret;
++		if (conn->pending_off == conn->pending_len) {
++			g_free(conn->pending);
++			conn->pending = NULL;
++		}
++	}
++
++	return 0;
++}
++
++static int conn_write(struct doh_conn *conn)
++{
++	int ret;
++
++	ret = nghttp2_session_send(conn->h2);
++	if (ret != 0) {
++		DBG("HTTP/2 send error: %s", nghttp2_strerror(ret));
++		return -EPROTO;
++	}
++
++	return conn_flush(conn);
++}
++
++static int conn_read(struct doh_conn *conn)
++{
++	uint8_t buf[4096];
++
++	while (true) {
++		ssize_t len = gnutls_record_recv(conn->session, buf,
++								sizeof(buf));
++		if (len > 0) {
++			doh_ssize_t ret;
++
++			conn->last_rx = g_get_monotonic_time();
++
++			ret = doh_h2_mem_recv(conn->h2, buf, len);
++			if (ret < 0) {
++				DBG("HTTP/2 error: %s",
++					nghttp2_strerror((int) ret));
++				return -EPROTO;
++			}
++
++			continue;
++		}
++
++		if (len == GNUTLS_E_AGAIN)
++			return 0;
++
++		if (len == 0 || len == GNUTLS_E_PREMATURE_TERMINATION)
++			return -ECONNRESET;
++
++		if (!gnutls_error_is_fatal(len))
++			continue;
++
++		DBG("receive from %s failed: %s", conn->server->host,
++						gnutls_strerror(len));
++		return -EIO;
++	}
++}
++
++static gboolean conn_event(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data);
++
++static void conn_watch(struct doh_conn *conn, GIOCondition cond)
++{
++	if (conn->watch)
++		g_source_remove(conn->watch);
++
++	conn->watch = g_io_add_watch(conn->channel,
++				cond | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++				conn_event, conn);
++}
++
++/*
++ * Flush pending output and decide what to wait for next. Closes the
++ * connection once HTTP/2 has nothing left to do on it.
++ */
++static void conn_update(struct doh_conn *conn)
++{
++	GIOCondition cond = G_IO_IN;
++	int err;
++
++	err = conn_write(conn);
++	if (err < 0) {
++		conn_failed(conn, err);
++		return;
++	}
++
++	if (!nghttp2_session_want_read(conn->h2) &&
++			!nghttp2_session_want_write(conn->h2) &&
++			!conn->pending && !conn->out->len) {
++		struct doh_server *server = conn->server;
++
++		/* The session ended, e.g. after a protocol error */
++		if (conn->queries) {
++			conn_failed(conn, -EPROTO);
++			return;
++		}
++
++		conn_close(conn);
++		server_schedule(server);
++		return;
++	}
++
++	if (conn->pending || conn->out->len ||
++			nghttp2_session_want_write(conn->h2))
++		cond |= G_IO_OUT;
++
++	if (conn->state == DOH_CONN_READY) {
++		if (conn->queries && conn->timer) {
++			g_source_remove(conn->timer);
++			conn->timer = 0;
++		} else if (!conn->queries && !conn->timer) {
++			conn->timer = g_timeout_add_seconds(DOH_IDLE_TIMEOUT,
++						conn_idle_timeout, conn);
++		}
++	}
++
++	conn_watch(conn, cond);
++}
++
++static void set_header(nghttp2_nv *header, const char *name,
++							const char *value)
++{
++	header->name = (uint8_t *) name;
++	header->value = (uint8_t *) value;
++	header->namelen = strlen(name);
++	header->valuelen = strlen(value);
++	header->flags = NGHTTP2_NV_FLAG_NONE;
++}
++
++static int conn_submit(struct doh_conn *conn, struct doh_query *query)
++{
++	struct doh_server *server = conn->server;
++	doh_data_provider provider = {
++		.read_callback = h2_read_body,
++	};
++	nghttp2_nv headers[7];
++	char length[8];
++	int32_t stream_id;
++
++	snprintf(length, sizeof(length), "%zu", query->msg_len);
++
++	set_header(&headers[0], ":method", "POST");
++	set_header(&headers[1], ":scheme", "https");
++	set_header(&headers[2], ":authority", server->authority);
++	set_header(&headers[3], ":path", server->path);
++	set_header(&headers[4], "accept", "application/dns-message");
++	set_header(&headers[5], "content-type", "application/dns-message");
++	set_header(&headers[6], "content-length", length);
++
++	stream_id = doh_h2_submit_request(conn->h2, NULL, headers,
++				G_N_ELEMENTS(headers), &provider, query);
++	if (stream_id < 0) {
++		DBG("cannot submit request to %s: %s", server->host,
++					nghttp2_strerror(stream_id));
++		return -EIO;
++	}
++
++	query->conn = conn;
++	query->stream_id = stream_id;
++	query->started = g_get_monotonic_time();
++	conn->queries = g_slist_prepend(conn->queries, query);
++
++	return 0;
++}
++
++static struct doh_conn *server_current_conn(struct doh_server *server)
++{
++	for (GSList *list = server->conns; list; list = list->next) {
++		struct doh_conn *conn = list->data;
++
++		if (conn->state != DOH_CONN_CLOSING)
++			return conn;
++	}
++
++	return NULL;
++}
++
++static int conn_start_tls(struct doh_conn *conn)
++{
++	struct doh_server *server = conn->server;
++	gnutls_datum_t alpn = { (unsigned char *) "h2", 2 };
++	int ret;
++
++	if (!load_credentials())
++		return -ENOKEY;
++
++	ret = gnutls_init(&conn->session, GNUTLS_CLIENT | GNUTLS_NONBLOCK |
++							GNUTLS_NO_SIGNAL);
++	if (ret < 0) {
++		conn->session = NULL;
++		return -ENOMEM;
++	}
++
++	if (gnutls_priority_set_direct(conn->session, DOH_PRIORITY,
++								NULL) < 0)
++		gnutls_set_default_priority(conn->session);
++
++	gnutls_credentials_set(conn->session, GNUTLS_CRD_CERTIFICATE,
++								credentials);
++
++	if (!server->numeric)
++		gnutls_server_name_set(conn->session, GNUTLS_NAME_DNS,
++					server->host, strlen(server->host));
++
++	gnutls_alpn_set_protocols(conn->session, &alpn, 1,
++						GNUTLS_ALPN_MANDATORY);
++
++	if (server->session_data.size)
++		gnutls_session_set_data(conn->session,
++					server->session_data.data,
++					server->session_data.size);
++
++	gnutls_handshake_set_timeout(conn->session,
++					GNUTLS_INDEFINITE_TIMEOUT);
++	gnutls_transport_set_int(conn->session, conn->fd);
++
++	return 0;
++}
++
++static int conn_start_h2(struct doh_conn *conn)
++{
++	nghttp2_settings_entry settings[] = {
++		{ NGHTTP2_SETTINGS_ENABLE_PUSH, 0 },
++		{ NGHTTP2_SETTINGS_MAX_CONCURRENT_STREAMS, 100 },
++	};
++
++	if (nghttp2_session_client_new(&conn->h2, h2_callbacks, conn) != 0)
++		return -ENOMEM;
++
++	if (nghttp2_submit_settings(conn->h2, NGHTTP2_FLAG_NONE, settings,
++					G_N_ELEMENTS(settings)) != 0)
++		return -EIO;
++
++	return 0;
++}
++
++/* Hand the queued queries to a ready connection */
++static void conn_submit_queued(struct doh_conn *conn)
++{
++	struct doh_server *server = conn->server;
++	struct doh_query *query;
++
++	while ((query = g_queue_pop_head(server->queue))) {
++		if (conn_submit(conn, query) < 0) {
++			g_queue_push_head(server->queue, query);
++			conn->state = DOH_CONN_CLOSING;
++			server_schedule(server);
++			break;
++		}
++	}
++}
++
++static void conn_handshake(struct doh_conn *conn)
++{
++	struct doh_server *server = conn->server;
++	gnutls_datum_t alpn;
++	int ret, err;
++
++	do {
++		ret = gnutls_handshake(conn->session);
++	} while (ret < 0 && ret != GNUTLS_E_AGAIN &&
++					!gnutls_error_is_fatal(ret));
++
++	if (ret == GNUTLS_E_AGAIN) {
++		conn_watch(conn, gnutls_record_get_direction(conn->session) ?
++							G_IO_OUT : G_IO_IN);
++		return;
++	}
++
++	if (ret < 0) {
++		connman_warn("DNS over HTTPS: TLS handshake with %s failed: "
++				"%s", server->host, gnutls_strerror(ret));
++		conn_failed(conn, -ECONNABORTED);
++		return;
++	}
++
++	err = conn_verify(conn);
++	if (err < 0) {
++		conn_failed(conn, err);
++		return;
++	}
++
++	if (gnutls_alpn_get_selected_protocol(conn->session, &alpn) < 0 ||
++			alpn.size != 2 || memcmp(alpn.data, "h2", 2) != 0) {
++		connman_warn("DNS over HTTPS: %s does not support HTTP/2",
++								server->host);
++		conn_failed(conn, -EPROTONOSUPPORT);
++		return;
++	}
++
++	err = conn_start_h2(conn);
++	if (err < 0) {
++		conn_failed(conn, err);
++		return;
++	}
++
++	DBG("connected to %s%s", server->host,
++		gnutls_session_is_resumed(conn->session) ? " (resumed)" : "");
++
++	g_source_remove(conn->timer);
++	conn->timer = 0;
++	conn->state = DOH_CONN_READY;
++	conn->last_rx = g_get_monotonic_time();
++	server->connect_failures = 0;
++
++	conn_submit_queued(conn);
++	conn_update(conn);
++}
++
++static void conn_connected(struct doh_conn *conn)
++{
++	socklen_t len = sizeof(int);
++	int err = 0;
++
++	if (getsockopt(conn->fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0)
++		err = errno;
++
++	if (err) {
++		DBG("connect to %s failed: %s", conn->server->host,
++							strerror(err));
++		conn_failed(conn, -err);
++		return;
++	}
++
++	err = conn_start_tls(conn);
++	if (err < 0) {
++		conn_failed(conn, err);
++		return;
++	}
++
++	conn->state = DOH_CONN_HANDSHAKE;
++	conn_handshake(conn);
++}
++
++static gboolean conn_event(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
++{
++	struct doh_conn *conn = user_data;
++	unsigned int replies;
++	int err;
++
++	conn->watch = 0;
++
++	switch (conn->state) {
++	case DOH_CONN_CONNECTING:
++		conn_connected(conn);
++		break;
++	case DOH_CONN_HANDSHAKE:
++		conn_handshake(conn);
++		break;
++	case DOH_CONN_READY:
++	case DOH_CONN_CLOSING:
++		replies = conn->replies;
++
++		/*
++		 * Completing a query may send new ones but never frees
++		 * this connection.
++		 */
++		err = conn_read(conn);
++		if (err < 0) {
++			conn_failed(conn, err);
++			break;
++		}
++
++		/* TLS 1.3 tickets arrive after the handshake */
++		if (replies == 0 && conn->replies > 0)
++			conn_store_session(conn);
++
++		conn_update(conn);
++		break;
++	}
++
++	return FALSE;
++}
++
++static void conn_open(struct doh_server *server)
++{
++	unsigned int count = g_strv_length(server->addresses);
++	const char *address = server->addresses[server->next_address % count];
++	union {
++		struct sockaddr sa;
++		struct sockaddr_in sin;
++		struct sockaddr_in6 sin6;
++	} addr;
++	socklen_t addr_len;
++	struct doh_conn *conn;
++	int fd, err, on = 1;
++
++	memset(&addr, 0, sizeof(addr));
++
++	if (inet_pton(AF_INET, address, &addr.sin.sin_addr) == 1) {
++		addr.sin.sin_family = AF_INET;
++		addr.sin.sin_port = htons(server->port);
++		addr_len = sizeof(addr.sin);
++	} else if (inet_pton(AF_INET6, address, &addr.sin6.sin6_addr) == 1) {
++		addr.sin6.sin6_family = AF_INET6;
++		addr.sin6.sin6_port = htons(server->port);
++		addr_len = sizeof(addr.sin6);
++	} else {
++		err = -EINVAL;
++		goto failed;
++	}
++
++	fd = socket(addr.sa.sa_family, SOCK_STREAM | SOCK_NONBLOCK |
++						SOCK_CLOEXEC, IPPROTO_TCP);
++	if (fd < 0) {
++		err = -errno;
++		goto failed;
++	}
++
++	setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
++
++	if (connect(fd, &addr.sa, addr_len) < 0 && errno != EINPROGRESS) {
++		err = -errno;
++		close(fd);
++		goto failed;
++	}
++
++	DBG("connecting to %s (%s)", server->host, address);
++
++	conn = g_new0(struct doh_conn, 1);
++	conn->server = server;
++	conn->state = DOH_CONN_CONNECTING;
++	conn->fd = fd;
++	conn->out = g_byte_array_new();
++	conn->channel = g_io_channel_unix_new(fd);
++	conn->timer = g_timeout_add_seconds(DOH_CONNECT_TIMEOUT,
++						conn_setup_timeout, conn);
++
++	server->conns = g_slist_prepend(server->conns, conn);
++
++	conn_watch(conn, G_IO_OUT);
++
++	return;
++
++failed:
++	DBG("cannot connect to %s (%s): %s", server->host, address,
++							strerror(-err));
++
++	server->next_address++;
++
++	if (++server->connect_failures < count) {
++		server_schedule(server);
++		return;
++	}
++
++	server->connect_failures = 0;
++	server_failed(server, err);
++}
++
++static void resolve_result(GResolvResultStatus status, char **results,
++							gpointer user_data)
++{
++	struct doh_server *server = user_data;
++
++	server->resolve_id = 0;
++
++	if (status != G_RESOLV_RESULT_STATUS_SUCCESS || !results ||
++							!results[0]) {
++		DBG("cannot resolve %s (status %d)", server->host, status);
++
++		if (!server->addresses) {
++			server_failed(server, -EHOSTUNREACH);
++			return;
++		}
++
++		/* Keep using the addresses resolved earlier */
++		server->addresses_expire = now_seconds() + DOH_RESOLVE_RETRY;
++		server_schedule(server);
++		return;
++	}
++
++	g_strfreev(server->addresses);
++	server->addresses = g_strdupv(results);
++	server->addresses_expire = now_seconds() + DOH_RESOLVE_INTERVAL;
++	server->next_address = 0;
++	server->connect_failures = 0;
++
++	DBG("resolved %s to %s", server->host, server->addresses[0]);
++
++	server_schedule(server);
++}
++
++/*
++ * Server names without a known address are resolved through the DNS
++ * proxy itself, which forwards queries for them in plain text.
++ */
++static void server_resolve(struct doh_server *server)
++{
++	guint id;
++
++	if (server->resolve_id)
++		return;
++
++	if (!bootstrap) {
++		bootstrap = g_resolv_new(0);
++		if (!bootstrap) {
++			server_failed(server, -ENOMEM);
++			return;
++		}
++
++		if (!g_resolv_add_nameserver(bootstrap, "127.0.0.1",
++							bootstrap_port, 0)) {
++			g_resolv_unref(bootstrap);
++			bootstrap = NULL;
++			server_failed(server, -EIO);
++			return;
++		}
++	}
++
++	DBG("resolving %s", server->host);
++
++	/* Failures are returned as a negative errno cast to guint */
++	id = g_resolv_lookup_hostname(bootstrap, server->host,
++						resolve_result, server);
++	if ((gint) id <= 0) {
++		server_failed(server, -EIO);
++		return;
++	}
++
++	server->resolve_id = id;
++}
++
++static bool server_has_addresses(struct doh_server *server)
++{
++	if (!server->addresses || !server->addresses[0])
++		return false;
++
++	/* Refresh resolved addresses while still using the old ones */
++	if (!server->fixed_addresses &&
++			now_seconds() >= server->addresses_expire)
++		server_resolve(server);
++
++	return true;
++}
++
++static void server_dispatch(struct doh_server *server)
++{
++	struct doh_conn *conn;
++
++	if (g_queue_is_empty(server->queue))
++		return;
++
++	conn = server_current_conn(server);
++	if (!conn) {
++		if (server_has_addresses(server))
++			conn_open(server);
++		else
++			server_resolve(server);
++		return;
++	}
++
++	if (conn->state != DOH_CONN_READY)
++		return;
++
++	conn_submit_queued(conn);
++	conn_update(conn);
++}
++
++static gboolean server_kick(gpointer user_data)
++{
++	struct doh_server *server = user_data;
++
++	server->kick = 0;
++
++	server_dispatch(server);
++
++	return FALSE;
++}
++
++static void server_schedule(struct doh_server *server)
++{
++	if (!server->kick)
++		server->kick = g_idle_add(server_kick, server);
++}
++
++static struct doh_server *server_new(void)
++{
++	struct doh_server *server = g_new0(struct doh_server, 1);
++
++	server->queue = g_queue_new();
++
++	return server;
++}
++
++struct doh_server *__connman_doh_server_new(const char *url)
++{
++	const struct doh_provider *provider;
++	struct doh_server *server = server_new();
++
++	if (parse_url(server, url) < 0) {
++		__connman_doh_server_free(server);
++		return NULL;
++	}
++
++	if (server->numeric) {
++		server->addresses = g_new0(char *, 2);
++		server->addresses[0] = g_strdup(server->host);
++		server->fixed_addresses = true;
++	} else {
++		provider = provider_by_host(server->host);
++		if (provider) {
++			server->addresses = provider_addresses(provider, 0);
++			server->fixed_addresses = true;
++		}
++	}
++
++	DBG("server %s", server->url);
++
++	return server;
++}
++
++struct doh_server *__connman_doh_server_new_for_address(const char *address)
++{
++	const struct doh_provider *provider;
++	struct doh_server *server;
++	g_autofree char *url = NULL;
++	unsigned int index;
++
++	provider = provider_by_address(address, &index);
++	if (!provider)
++		return NULL;
++
++	url = g_strdup_printf("https://%s%s", provider->host, provider->path);
++
++	server = server_new();
++	if (parse_url(server, url) < 0) {
++		__connman_doh_server_free(server);
++		return NULL;
++	}
++
++	/* Use the address the network (or user) chose first */
++	server->addresses = provider_addresses(provider, index);
++	server->fixed_addresses = true;
++
++	DBG("address %s server %s", address, server->url);
++
++	return server;
++}
++
++/*
++ * Pending queries are dropped without calling their callbacks. Must not
++ * be called from a reply callback.
++ */
++void __connman_doh_server_free(struct doh_server *server)
++{
++	struct doh_query *query;
++
++	if (!server)
++		return;
++
++	if (server->kick)
++		g_source_remove(server->kick);
++
++	if (server->resolve_id)
++		g_resolv_cancel_lookup(bootstrap, server->resolve_id);
++
++	while (server->conns) {
++		struct doh_conn *conn = server->conns->data;
++		GSList *list;
++
++		for (list = conn->queries; list; list = list->next)
++			query_free(list->data);
++		g_slist_free(conn->queries);
++		conn->queries = NULL;
++
++		conn_close(conn);
++	}
++
++	while ((query = g_queue_pop_head(server->queue)))
++		query_free(query);
++	g_queue_free(server->queue);
++
++	g_strfreev(server->addresses);
++	gnutls_free(server->session_data.data);
++	g_free(server->url);
++	g_free(server->host);
++	g_free(server->authority);
++	g_free(server->path);
++	g_free(server);
++}
++
++const char *__connman_doh_server_get_url(const struct doh_server *server)
++{
++	return server->url;
++}
++
++const char *__connman_doh_server_get_host(const struct doh_server *server)
++{
++	return server->host;
++}
++
++bool __connman_doh_server_is_available(const struct doh_server *server)
++{
++	return now_seconds() >= server->retry_after;
++}
++
++/* Forget past failures, e.g. after moving to another network */
++void __connman_doh_server_reset(struct doh_server *server)
++{
++	server->failures = 0;
++	server->retry_after = 0;
++	server->connect_failures = 0;
++}
++
++/*
++ * Send a DNS query. The reply callback is called exactly once, never
++ * from within this function, unless an error is returned.
++ */
++int __connman_doh_send(struct doh_server *server, const unsigned char *msg,
++				size_t len, connman_doh_reply_cb_t callback,
++				void *user_data)
++{
++	struct doh_query *query;
++
++	if (!server || !msg || !callback || len < DOH_DNS_HEADER_SIZE ||
++						len > DOH_MAX_MESSAGE)
++		return -EINVAL;
++
++	if (g_queue_get_length(server->queue) >= DOH_MAX_QUEUED)
++		return -EBUSY;
++
++	query = g_new0(struct doh_query, 1);
++	query->server = server;
++	query->msg = g_malloc(len);
++	query->msg_len = len;
++	query->reply = g_byte_array_new();
++	query->callback = callback;
++	query->user_data = user_data;
++	query->started = g_get_monotonic_time();
++
++	/* RFC 8484 4.1: use DNS ID 0, the original is restored on reply */
++	memcpy(query->msg, msg, len);
++	memcpy(query->id, msg, sizeof(query->id));
++	memset(query->msg, 0, sizeof(query->id));
++
++	query->timeout = g_timeout_add_seconds(DOH_QUERY_TIMEOUT,
++						query_timeout, query);
++
++	g_queue_push_tail(server->queue, query);
++	server_schedule(server);
++
++	return 0;
++}
++
++int __connman_doh_init(unsigned int dns_port)
++{
++	DBG("");
++
++	bootstrap_port = dns_port;
++
++	if (nghttp2_session_callbacks_new(&h2_callbacks) != 0)
++		return -ENOMEM;
++
++	doh_h2_set_send_callback(h2_callbacks, h2_send);
++	nghttp2_session_callbacks_set_on_header_callback(h2_callbacks,
++							h2_on_header);
++	nghttp2_session_callbacks_set_on_data_chunk_recv_callback(h2_callbacks,
++							h2_on_data_chunk);
++	nghttp2_session_callbacks_set_on_frame_recv_callback(h2_callbacks,
++							h2_on_frame_recv);
++	nghttp2_session_callbacks_set_on_stream_close_callback(h2_callbacks,
++							h2_on_stream_close);
++
++	return 0;
++}
++
++void __connman_doh_cleanup(void)
++{
++	DBG("");
++
++	if (bootstrap) {
++		g_resolv_unref(bootstrap);
++		bootstrap = NULL;
++	}
++
++	if (h2_callbacks) {
++		nghttp2_session_callbacks_del(h2_callbacks);
++		h2_callbacks = NULL;
++	}
++
++	if (credentials) {
++		gnutls_certificate_free_credentials(credentials);
++		credentials = NULL;
++	}
++}
+-- 
+2.34.1
+

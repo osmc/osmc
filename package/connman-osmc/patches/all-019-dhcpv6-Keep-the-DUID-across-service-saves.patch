@@ -1,0 +1,258 @@
+From d5bf86134318414d898a0ec3b822d1ed71ac1ab0 Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:53:36 +0000
+Subject: [PATCH] dhcpv6: Keep the DUID across service saves
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+set_duid() stores a newly created DUID-LLT as IPv6.DHCP.DUID by editing
+the service's settings file directly. Since commit 0f9e6af61527
+("service: Store configuration in empty keyfile", 1.38) service_save()
+writes every service from an empty keyfile, so the next save drops the
+DUID. The following DHCPv6 start then creates a new DUID-LLT, and as
+DUID-LLT contains the current time the client presents a different
+DUID after every restart or reconnect. DHCPv6 servers hand out a new
+lease each time and can run out of addresses. RFC 8415, section 11.2
+requires a DUID-LLT to be kept in stable storage and reused.
+
+Keep the DUID with the service's IPv6 configuration instead, so that
+it is loaded and saved with the other IPv6 settings under the same
+IPv6.DHCP.DUID key, and carry it over when a change of
+IPv6.Configuration replaces that configuration. Existing stored DUIDs
+keep being used, and a stored value that is not a DUID of 3 to 130
+octets in hex is replaced.
+
+Switching to DUID-LL, as proposed on the OSMC forum, also avoids the
+changing DUID but the type must not be used where the interface may
+be removable (RFC 8415, section 11.4), and the persistence bug would
+remain.
+
+Reported on the OSMC forum by Benjamin Réveillé.
+---
+ src/connman.h  |  4 +++
+ src/dhcpv6.c   | 70 ++++++++++++++++++++++++++------------------------
+ src/ipconfig.c | 26 +++++++++++++++++++
+ src/service.c  |  9 +++++--
+ 4 files changed, 74 insertions(+), 35 deletions(-)
+
+diff --git a/src/connman.h b/src/connman.h
+index 4f609a39..7fbb4910 100644
+--- a/src/connman.h
++++ b/src/connman.h
+@@ -446,6 +446,10 @@ char *__connman_ipconfig_get_dhcp_address(struct connman_ipconfig *ipconfig);
+ void __connman_ipconfig_set_dhcpv6_prefixes(struct connman_ipconfig *ipconfig,
+ 					char **prefixes);
+ char **__connman_ipconfig_get_dhcpv6_prefixes(struct connman_ipconfig *ipconfig);
++void __connman_ipconfig_set_dhcpv6_duid(struct connman_ipconfig *ipconfig,
++					const char *duid);
++const char *__connman_ipconfig_get_dhcpv6_duid(
++					struct connman_ipconfig *ipconfig);
+ 
+ void __connman_ipconfig_load(struct connman_ipconfig *ipconfig,
+ 		GKeyFile *keyfile, const char *identifier, const char *prefix);
+diff --git a/src/dhcpv6.c b/src/dhcpv6.c
+index 0e6b1084..9acdc9ed 100644
+--- a/src/dhcpv6.c
++++ b/src/dhcpv6.c
+@@ -183,71 +183,75 @@ static gchar *convert_to_hex(unsigned char *buf, int len)
+ 	return ret;
+ }
+ 
++/* A DUID is 3 to 130 octets long (RFC 8415, section 11.1) */
++static bool valid_hex_duid(const char *hex)
++{
++	size_t len = hex ? strlen(hex) : 0;
++	size_t i;
++
++	if (len < 6 || len > 260 || len % 2)
++		return false;
++
++	for (i = 0; i < len; i++) {
++		if (!g_ascii_isxdigit(hex[i]))
++			return false;
++	}
++
++	return true;
++}
++
+ /*
+- * DUID should not change over time so save it to file.
+- * See RFC 3315 chapter 9 for details.
++ * DUID should not change over time (RFC 8415, section 11), so it is kept
++ * with the service's IPv6 configuration and saved with the service.
+  */
+ static int set_duid(struct connman_service *service,
+ 			struct connman_network *network,
+ 			GDHCPClient *dhcp_client, int index)
+ {
+-	GKeyFile *keyfile;
+-	const char *ident;
+-	char *hex_duid;
++	struct connman_ipconfig *ipconfig;
++	const char *hex_duid;
+ 	unsigned char *duid;
+ 	int duid_len;
+ 
+-	ident = connman_service_get_identifier(service);
+-
+-	keyfile = connman_storage_load_service(ident);
+-	if (!keyfile)
++	ipconfig = __connman_service_get_ip6config(service);
++	if (!ipconfig)
+ 		return -EINVAL;
+ 
+-	hex_duid = g_key_file_get_string(keyfile, ident, "IPv6.DHCP.DUID",
+-					NULL);
+-	if (hex_duid) {
+-		unsigned int i, j = 0, hex;
++	hex_duid = __connman_ipconfig_get_dhcpv6_duid(ipconfig);
++	if (valid_hex_duid(hex_duid)) {
+ 		size_t hex_duid_len = strlen(hex_duid);
++		size_t i;
+ 
+ 		duid = g_try_malloc0(hex_duid_len / 2);
+-		if (!duid) {
+-			g_key_file_free(keyfile);
+-			g_free(hex_duid);
++		if (!duid)
+ 			return -ENOMEM;
+-		}
+ 
+-		for (i = 0; i < hex_duid_len; i += 2) {
+-			sscanf(hex_duid + i, "%02x", &hex);
+-			duid[j++] = hex;
+-		}
++		for (i = 0; i < hex_duid_len; i += 2)
++			duid[i / 2] = g_ascii_xdigit_value(hex_duid[i]) << 4 |
++				g_ascii_xdigit_value(hex_duid[i + 1]);
+ 
+ 		duid_len = hex_duid_len / 2;
+ 	} else {
+ 		int ret;
+ 		int type = __connman_ipconfig_get_type_from_index(index);
++		char *hex;
+ 
+ 		ret = g_dhcpv6_create_duid(G_DHCPV6_DUID_LLT, index, type,
+ 					&duid, &duid_len);
+-		if (ret < 0) {
+-			g_key_file_free(keyfile);
++		if (ret < 0)
+ 			return ret;
+-		}
+ 
+-		hex_duid = convert_to_hex(duid, duid_len);
+-		if (!hex_duid) {
++		hex = convert_to_hex(duid, duid_len);
++		if (!hex) {
+ 			g_free(duid);
+-			g_key_file_free(keyfile);
+ 			return -ENOMEM;
+ 		}
+ 
+-		g_key_file_set_string(keyfile, ident, "IPv6.DHCP.DUID",
+-				hex_duid);
++		__connman_ipconfig_set_dhcpv6_duid(ipconfig, hex);
++		g_free(hex);
+ 
+-		__connman_storage_save_service(keyfile, ident);
++		__connman_service_save(service);
+ 	}
+-	g_free(hex_duid);
+-
+-	g_key_file_free(keyfile);
+ 
+ 	g_dhcpv6_client_set_duid(dhcp_client, duid, duid_len);
+ 
+diff --git a/src/ipconfig.c b/src/ipconfig.c
+index 3915bf42..a582449d 100644
+--- a/src/ipconfig.c
++++ b/src/ipconfig.c
+@@ -63,6 +63,7 @@ struct connman_ipconfig {
+ 	int ipv6_privacy_config;
+ 	char *last_dhcp_address;
+ 	char **last_dhcpv6_prefixes;
++	char *dhcpv6_duid;
+ };
+ 
+ struct connman_ipdevice {
+@@ -1574,6 +1575,7 @@ void __connman_ipconfig_unref_debug(struct connman_ipconfig *ipconfig,
+ 	connman_ipaddress_free(ipconfig->address);
+ 	g_free(ipconfig->last_dhcp_address);
+ 	g_strfreev(ipconfig->last_dhcpv6_prefixes);
++	g_free(ipconfig->dhcpv6_duid);
+ 	g_free(ipconfig);
+ }
+ 
+@@ -1800,6 +1802,25 @@ char **__connman_ipconfig_get_dhcpv6_prefixes(struct connman_ipconfig *ipconfig)
+ 	return ipconfig->last_dhcpv6_prefixes;
+ }
+ 
++void __connman_ipconfig_set_dhcpv6_duid(struct connman_ipconfig *ipconfig,
++					const char *duid)
++{
++	if (!ipconfig)
++		return;
++
++	g_free(ipconfig->dhcpv6_duid);
++	ipconfig->dhcpv6_duid = g_strdup(duid);
++}
++
++const char *__connman_ipconfig_get_dhcpv6_duid(
++					struct connman_ipconfig *ipconfig)
++{
++	if (!ipconfig)
++		return NULL;
++
++	return ipconfig->dhcpv6_duid;
++}
++
+ static void disable_ipv6(struct connman_ipconfig *ipconfig)
+ {
+ 	struct connman_ipdevice *ipdevice;
+@@ -2544,6 +2565,9 @@ void __connman_ipconfig_load(struct connman_ipconfig *ipconfig,
+ 		g_strfreev(ipconfig->last_dhcpv6_prefixes);
+ 		ipconfig->last_dhcpv6_prefixes =
+ 			store_get_strs(&is, "DHCP.LastPrefixes");
++
++		g_free(ipconfig->dhcpv6_duid);
++		ipconfig->dhcpv6_duid = store_get_str(&is, "DHCP.DUID");
+ 	}
+ 
+ 
+@@ -2620,6 +2644,8 @@ void __connman_ipconfig_save(struct connman_ipconfig *ipconfig,
+ 
+ 		store_set_strs(&is, "DHCP.LastPrefixes",
+ 				ipconfig->last_dhcpv6_prefixes);
++
++		store_set_str(&is, "DHCP.DUID", ipconfig->dhcpv6_duid);
+ 	}
+ 
+ 	switch (ipconfig->method) {
+diff --git a/src/service.c b/src/service.c
+index cb6b6e85..f581020f 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -6343,12 +6343,17 @@ int __connman_service_reset_ipconfig(struct connman_service *service,
+ 	old_method = __connman_ipconfig_get_method(ipconfig);
+ 	index = __connman_ipconfig_get_index(ipconfig);
+ 
+-	if (type == CONNMAN_IPCONFIG_TYPE_IPV4)
++	if (type == CONNMAN_IPCONFIG_TYPE_IPV4) {
+ 		new_ipconfig = create_ip4config(service, index,
+ 				CONNMAN_IPCONFIG_METHOD_UNKNOWN);
+-	else
++	} else {
+ 		new_ipconfig = create_ip6config(service, index);
+ 
++		/* The DHCPv6 DUID belongs to the service, keep it */
++		__connman_ipconfig_set_dhcpv6_duid(new_ipconfig,
++				__connman_ipconfig_get_dhcpv6_duid(ipconfig));
++	}
++
+ 	if (array) {
+ 		err = __connman_ipconfig_set_config(new_ipconfig, array);
+ 		if (err < 0) {
+-- 
+2.34.1
+

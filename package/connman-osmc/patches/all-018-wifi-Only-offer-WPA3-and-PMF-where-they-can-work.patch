@@ -1,0 +1,403 @@
+From 48f146cd2af4fe8e1780e2e517153300028c3769 Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:49:47 +0000
+Subject: [PATCH] wifi: Only offer WPA3 and PMF where they can work
+
+Since 1.45 every PSK network is configured with key_mgmt
+"SAE WPA-PSK WPA-PSK-SHA256" and ieee80211w=1, and 1.41 already
+offered SAE with ieee80211w=1 to WPA2/WPA3 transition networks. After
+OSMC moved to 1.41, Vero 4K/4K+ devices could no longer join
+transition networks and OSMC removed WPA3 support again (June 2023
+update). Several things go wrong on OSMC hardware:
+
+- wpa_supplicant (2.9 in Debian Bullseye) honours an explicit
+  ieee80211w=1 even when the driver lacks BIP, so PMF is negotiated
+  with PMF-capable access points and the connection fails, even for
+  plain WPA2. Its own "no BIP, no PMF" safeguard only covers the
+  default setting. The Raspberry Pi 3B/Zero W firmware has no MFP.
+
+- Drivers may claim support their firmware lacks. The Vero 4K bcmdhd
+  driver is built with MFP and advertises AES-CMAC, but its firmware
+  (7.45.69.0) has no MFP feature. Transition networks always offer
+  PMF, so they fail.
+
+- The Vero V RTL8822CS driver always advertises NL80211_FEATURE_SAE
+  but only builds its external authentication support for Android, so
+  wpa_supplicant picks SAE for transition networks and cannot complete
+  it.
+
+So offer PMF (ieee80211w=1, WPA-PSK-SHA256) and SAE only when the new
+EnableWPA3 setting is true and the interface reports a group
+management cipher in wpa_supplicant's GroupMgmt capability (2.9 and
+later; wpa_supplicant 2.9 never reports SAE support itself).
+EnableWPA3 defaults to false, which keeps the WPA2-PSK configuration
+without PMF that OSMC has shipped since June 2023. A PSK network none
+of whose access points offers WPA2-Personal then fails immediately with
+a clear log message instead of timing out, also when the connection
+first has to wait for another network to disconnect. WPA2 and
+WPA3-only access points with the same name form one network, so the
+key management of all of them is considered and refreshed after each
+scan. SAE authentication failures are only treated as an invalid key
+when SAE was offered.
+
+Access points created for tethering are WPA2-PSK.
+
+This replaces the OSMC patch that removed WPA3 support entirely, which
+also caused WPA3-only networks to be listed as WEP.
+---
+ doc/connman.conf.5.in     |  8 ++++++
+ gsupplicant/gsupplicant.h |  2 ++
+ gsupplicant/supplicant.c  | 59 ++++++++++++++++++++++++++++++++++++---
+ plugins/wifi.c            | 52 +++++++++++++++++++++++++++++++---
+ src/main.c                | 14 ++++++++++
+ src/main.conf             |  6 ++++
+ 6 files changed, 133 insertions(+), 8 deletions(-)
+
+diff --git a/doc/connman.conf.5.in b/doc/connman.conf.5.in
+index ea2dfefa..54e20984 100644
+--- a/doc/connman.conf.5.in
++++ b/doc/connman.conf.5.in
+@@ -70,6 +70,14 @@ to the list of nameservers given by the service. The
+ nameserver entries must be in numeric format, host
+ names are ignored.
+ .TP
++.BI EnableWPA3= true\ \fR|\fB\ false
++Offer WPA3-Personal (SAE) and management frame protection (PMF) when
++connecting to WiFi networks, provided the WiFi driver reports support
++for management frame protection. When disabled, WPA2/WPA3 transition
++networks are joined with WPA2 without PMF and WPA3-only networks cannot
++be used. Some drivers claim PMF or SAE support that their firmware does
++not have, which breaks transition networks. Default value is false.
++.TP
+ .BI DNSOverHTTPS= off\ \fR|\fB\ auto\ \fR|\fB\ on\ \fR|\fB\ strict
+ How the DNS proxy uses DNS over HTTPS (RFC 8484). With auto, queries
+ are sent over HTTPS when every DNS server in use is a public resolver
+diff --git a/gsupplicant/gsupplicant.h b/gsupplicant/gsupplicant.h
+index eab6293f..8656a79a 100644
+--- a/gsupplicant/gsupplicant.h
++++ b/gsupplicant/gsupplicant.h
+@@ -164,6 +164,7 @@ struct _GSupplicantSSID {
+ 	const char *bgscan;
+ 	unsigned int keymgmt;
+ 	GSupplicantMfpOptions ieee80211w;
++	bool sae;
+ };
+ 
+ typedef struct _GSupplicantSSID GSupplicantSSID;
+@@ -305,6 +306,7 @@ int g_supplicant_interface_set_country(GSupplicantInterface *interface,
+ 							const char *alpha2,
+ 							void *user_data);
+ bool g_supplicant_interface_has_p2p(GSupplicantInterface *interface);
++bool g_supplicant_interface_has_mfp(GSupplicantInterface *interface);
+ int g_supplicant_interface_set_p2p_device_config(GSupplicantInterface *interface,
+ 						const char *device_name,
+ 						const char *primary_dev_type);
+diff --git a/gsupplicant/supplicant.c b/gsupplicant/supplicant.c
+index 5e289953..764aef77 100644
+--- a/gsupplicant/supplicant.c
++++ b/gsupplicant/supplicant.c
+@@ -170,6 +170,7 @@ struct _GSupplicantInterface {
+ 	unsigned int scan_capa;
+ 	unsigned int mode_capa;
+ 	unsigned int max_scan_ssids;
++	bool mfp_support;
+ 	bool p2p_support;
+ 	bool p2p_finding;
+ 	bool ap_create_in_progress;
+@@ -865,6 +866,18 @@ static void interface_capability_keymgmt(DBusMessageIter *iter, void *user_data)
+ 		}
+ }
+ 
++/* Any group management cipher means the driver supports BIP and so PMF */
++static void interface_capability_group_mgmt(DBusMessageIter *iter,
++							void *user_data)
++{
++	GSupplicantInterface *interface = user_data;
++	const char *str = NULL;
++
++	dbus_message_iter_get_basic(iter, &str);
++	if (str && *str)
++		interface->mfp_support = true;
++}
++
+ static void interface_capability_authalg(DBusMessageIter *iter, void *user_data)
+ {
+ 	GSupplicantInterface *interface = user_data;
+@@ -991,6 +1004,9 @@ static void interface_capability(const char *key, DBusMessageIter *iter,
+ 	else if (g_strcmp0(key, "Group") == 0)
+ 		supplicant_dbus_array_foreach(iter,
+ 				interface_capability_group, interface);
++	else if (g_strcmp0(key, "GroupMgmt") == 0)
++		supplicant_dbus_array_foreach(iter,
++				interface_capability_group_mgmt, interface);
+ 	else if (g_strcmp0(key, "Scan") == 0)
+ 		supplicant_dbus_array_foreach(iter,
+ 				interface_capability_scan, interface);
+@@ -1456,12 +1472,29 @@ bool g_supplicant_peer_has_requested_connection(GSupplicantPeer *peer)
+ 	return peer->connection_requested;
+ }
+ 
++/* Key management supported by any access point of the network */
+ unsigned int g_supplicant_network_get_keymgmt(GSupplicantNetwork *network)
+ {
++	GHashTableIter iter;
++	gpointer value;
++	unsigned int keymgmt;
++
+ 	if (!network)
+ 		return 0;
+ 
+-	return network->keymgmt;
++	keymgmt = network->keymgmt;
++
++	if (!network->bss_table)
++		return keymgmt;
++
++	g_hash_table_iter_init(&iter, network->bss_table);
++	while (g_hash_table_iter_next(&iter, NULL, &value)) {
++		struct g_supplicant_bss *bss = value;
++
++		keymgmt |= bss->keymgmt;
++	}
++
++	return keymgmt;
+ }
+ 
+ static void merge_network(GSupplicantNetwork *network)
+@@ -3793,6 +3826,14 @@ bool g_supplicant_interface_has_p2p(GSupplicantInterface *interface)
+ 	return interface->p2p_support;
+ }
+ 
++bool g_supplicant_interface_has_mfp(GSupplicantInterface *interface)
++{
++	if (!interface)
++		return false;
++
++	return interface->mfp_support;
++}
++
+ struct supplicant_p2p_dev_config {
+ 	char *device_name;
+ 	char *dev_type;
+@@ -4955,9 +4996,19 @@ static void add_network_security(DBusMessageIter *dict, GSupplicantSSID *ssid)
+ 		add_network_security_ciphers(dict, ssid);
+ 		break;
+ 	case G_SUPPLICANT_SECURITY_PSK:
+-		key_mgmt = "SAE WPA-PSK WPA-PSK-SHA256";
+-		ieee80211w = G_SUPPLICANT_MFP_OPTIONAL;
+-		add_network_ieee80211w(dict, ssid, ieee80211w);
++		/*
++		 * PMF, and with it SAE and PSK-SHA256, only when the caller
++		 * found the driver able to do it. wpa_supplicant enables PMF
++		 * for an explicit ieee80211w=1 even without driver support.
++		 */
++		if (ssid->ieee80211w != G_SUPPLICANT_MFP_NONE) {
++			key_mgmt = ssid->sae ? "SAE WPA-PSK WPA-PSK-SHA256" :
++						"WPA-PSK WPA-PSK-SHA256";
++			ieee80211w = ssid->ieee80211w;
++			add_network_ieee80211w(dict, ssid, ieee80211w);
++		} else {
++			key_mgmt = "WPA-PSK";
++		}
+ 		add_network_security_psk(dict, ssid);
+ 		add_network_security_ciphers(dict, ssid);
+ 		add_network_security_proto(dict, ssid);
+diff --git a/plugins/wifi.c b/plugins/wifi.c
+index 767d0e6f..44dcaea6 100644
+--- a/plugins/wifi.c
++++ b/plugins/wifi.c
+@@ -170,6 +170,7 @@ struct wifi_data {
+ 
+ struct wifi_network {
+ 	unsigned int keymgmt;
++	bool sae;		/* WPA3-Personal offered on connect */
+ };
+ 
+ struct disconnect_data {
+@@ -2240,9 +2241,11 @@ static void ssid_init(GSupplicantSSID *ssid, struct connman_network *network)
+ static int network_connect(struct connman_network *network)
+ {
+ 	struct connman_device *device = connman_network_get_device(network);
++	struct wifi_network *network_data = connman_network_get_data(network);
+ 	struct wifi_data *wifi;
+ 	GSupplicantInterface *interface;
+ 	GSupplicantSSID *ssid;
++	bool enabled, wpa3;
+ 
+ 	DBG("network %p", network);
+ 
+@@ -2253,18 +2256,46 @@ static int network_connect(struct connman_network *network)
+ 	if (!wifi)
+ 		return -ENODEV;
+ 
++	interface = wifi->interface;
++
++	/*
++	 * WPA3-Personal needs PMF, which needs BIP support from the driver.
++	 * Drivers may claim PMF or SAE support that the firmware lacks, so
++	 * both are only offered when enabled in main.conf. Without them
++	 * WPA2/WPA3 transition networks use WPA2, and PSK networks without
++	 * any WPA2-Personal access point fail straight away, also when the
++	 * connection would otherwise wait for a disconnection.
++	 */
++	enabled = connman_setting_get_bool("EnableWPA3");
++	wpa3 = enabled && g_supplicant_interface_has_mfp(interface);
++
++	if (!wpa3 && g_strcmp0(connman_network_get_string(network,
++						"WiFi.Security"), "psk") == 0 &&
++			(network_data->keymgmt & G_SUPPLICANT_KEYMGMT_SAE) &&
++			!(network_data->keymgmt & G_SUPPLICANT_KEYMGMT_WPA_PSK)) {
++		connman_warn("%s requires WPA3-Personal, which is %s",
++				connman_network_get_string(network, "Name"),
++				enabled ? "not supported by the WiFi driver" :
++				"disabled (EnableWPA3)");
++		return -EOPNOTSUPP;
++	}
++
+ 	ssid = g_try_malloc0(sizeof(GSupplicantSSID));
+ 	if (!ssid)
+ 		return -ENOMEM;
+ 
+-	interface = wifi->interface;
+-
+ 	if (wifi->disconnecting) {
+ 		wifi->pending_network = network;
+ 		g_free(ssid);
+ 	} else {
+ 		ssid_init(ssid, network);
+ 
++		if (!wpa3)
++			ssid->ieee80211w = G_SUPPLICANT_MFP_NONE;
++
++		ssid->sae = wpa3;
++		network_data->sae = wpa3;
++
+ 		wifi->network = connman_network_ref(network);
+ 		wifi->retries = 0;
+ 
+@@ -2310,8 +2341,13 @@ static void disconnect_callback(int result, GSupplicantInterface *interface,
+ 	wifi->connected = false;
+ 
+ 	if (wifi->pending_network) {
+-		network_connect(wifi->pending_network);
++		struct connman_network *pending = wifi->pending_network;
++
+ 		wifi->pending_network = NULL;
++
++		if (network_connect(pending) < 0)
++			connman_network_set_error(pending,
++					CONNMAN_NETWORK_ERROR_CONNECT_FAIL);
+ 	}
+ 
+ 	start_autoscan(wifi->device);
+@@ -2538,7 +2574,8 @@ static bool handle_sae_authentication_failure(struct connman_network *network,
+ {
+ 	struct wifi_network *network_data = connman_network_get_data(network);
+ 
+-	if (!(network_data->keymgmt & G_SUPPLICANT_KEYMGMT_SAE))
++	if (!network_data->sae ||
++			!(network_data->keymgmt & G_SUPPLICANT_KEYMGMT_SAE))
+ 		return false;
+ 
+ 	if (wifi->state != G_SUPPLICANT_STATE_AUTHENTICATING)
+@@ -2996,6 +3033,7 @@ static void network_removed(GSupplicantNetwork *network)
+ static void network_changed(GSupplicantNetwork *network, const char *property)
+ {
+ 	GSupplicantInterface *interface;
++	struct wifi_network *network_data;
+ 	struct wifi_data *wifi;
+ 	const char *name, *identifier;
+ 	struct connman_network *connman_network;
+@@ -3015,6 +3053,12 @@ static void network_changed(GSupplicantNetwork *network, const char *property)
+ 	if (!connman_network)
+ 		return;
+ 
++	/* The access points of the network may have changed */
++	network_data = connman_network_get_data(connman_network);
++	if (network_data)
++		network_data->keymgmt =
++			g_supplicant_network_get_keymgmt(network);
++
+ 	if (g_str_equal(property, "WPSCapabilities")) {
+ 		bool wps;
+ 		bool wps_pbc;
+diff --git a/src/main.c b/src/main.c
+index d57b5388..95d5144f 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -149,6 +149,7 @@ static struct {
+ 	char *resolv_conf;
+ 	char *dns_over_https;
+ 	char **dns_over_https_servers;
++	bool enable_wpa3;
+ } connman_settings  = {
+ 	.bg_scan = true,
+ 	.pref_timeservers = NULL,
+@@ -188,6 +189,7 @@ static struct {
+ 	.resolv_conf = NULL,
+ 	.dns_over_https = NULL,
+ 	.dns_over_https_servers = NULL,
++	.enable_wpa3 = false,
+ };
+ 
+ #define CONF_BG_SCAN                    "BackgroundScanning"
+@@ -227,6 +229,7 @@ static struct {
+ #define CONF_RESOLV_CONF                "ResolvConf"
+ #define CONF_DNS_OVER_HTTPS             "DNSOverHTTPS"
+ #define CONF_DNS_OVER_HTTPS_SERVERS     "DNSOverHTTPSServers"
++#define CONF_ENABLE_WPA3                "EnableWPA3"
+ 
+ static const char *supported_options[] = {
+ 	CONF_BG_SCAN,
+@@ -266,6 +269,7 @@ static const char *supported_options[] = {
+ 	CONF_RESOLV_CONF,
+ 	CONF_DNS_OVER_HTTPS,
+ 	CONF_DNS_OVER_HTTPS_SERVERS,
++	CONF_ENABLE_WPA3,
+ 	NULL
+ };
+ 
+@@ -491,6 +495,13 @@ static void parse_config(GKeyFile *config, const char *file)
+ 
+ 	g_clear_error(&error);
+ 
++	boolean = __connman_config_get_bool(config, GENERAL_GROUP,
++						CONF_ENABLE_WPA3, &error);
++	if (!error)
++		connman_settings.enable_wpa3 = boolean;
++
++	g_clear_error(&error);
++
+ 	timeservers = __connman_config_get_string_list(config, GENERAL_GROUP,
+ 					CONF_PREF_TIMESERVERS, NULL, &error);
+ 	if (!error)
+@@ -1118,6 +1129,9 @@ bool connman_setting_get_bool(const char *key)
+ 	if (g_str_equal(key, CONF_BG_SCAN))
+ 		return connman_settings.bg_scan;
+ 
++	if (g_str_equal(key, CONF_ENABLE_WPA3))
++		return connman_settings.enable_wpa3;
++
+ 	if (g_str_equal(key, CONF_ALLOW_HOSTNAME_UPDATES))
+ 		return connman_settings.allow_hostname_updates;
+ 
+diff --git a/src/main.conf b/src/main.conf
+index 77287d69..7b192d53 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -42,6 +42,12 @@
+ # names are ignored.
+ # FallbackNameservers =
+ 
++# Offer WPA3-Personal (SAE) and management frame protection (PMF) to
++# WiFi networks when the driver reports PMF support. When false,
++# WPA2/WPA3 transition networks are joined with WPA2 without PMF and
++# WPA3-only networks cannot be used. Default value is false.
++# EnableWPA3 = false
++
+ # How the DNS proxy uses DNS over HTTPS: off, auto (use it when the
+ # DNS servers in use are public resolvers known to support it), on (use
+ # DNSOverHTTPSServers, plain DNS when they fail) or strict (use
+-- 
+2.34.1
+

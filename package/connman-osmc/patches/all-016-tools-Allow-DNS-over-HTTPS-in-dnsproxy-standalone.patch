@@ -1,0 +1,73 @@
+From d3d26097e798c2f736145b59cd86e0c9c1557dc2 Mon Sep 17 00:00:00 2001
+From: Sam G Nazarko <email@samnazarko.co.uk>
+Date: Wed, 4 Nov 2026 21:41:05 +0000
+Subject: [PATCH] tools: Allow DNS over HTTPS in dnsproxy-standalone
+
+Accept an optional DNS over HTTPS mode and server URLs, and log to
+stderr with debug output selected by the CONNMAN_DEBUG environment
+variable, to test DoH without a full connmand.
+---
+ tools/dnsproxy-standalone.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/tools/dnsproxy-standalone.c b/tools/dnsproxy-standalone.c
+index 1b9698bd..64056f4f 100644
+--- a/tools/dnsproxy-standalone.c
++++ b/tools/dnsproxy-standalone.c
+@@ -19,7 +19,8 @@ static GMainLoop *main_loop = NULL;
+ 
+ static void usage(const char *prog)
+ {
+-	fprintf(stderr, "%s: <listen-port> <dns-domain> <dns-server>\n", prog);
++	fprintf(stderr, "%s: <listen-port> <dns-domain> <dns-server> "
++			"[off|auto|on|strict [<doh-url>...]]\n", prog);
+ 	exit(1);
+ }
+ 
+@@ -109,13 +110,17 @@ int main(int argc, const char **argv)
+ 	const char *server = argv[3];
+ 	guint signal = 0;
+ 
+-	if (argc != 4)
++	if (argc < 4)
+ 	{
+ 		usage(argv[0]);
+ 	}
+ 
+ 	port = to_uint(argv[1]);
+ 
++	/* Log to stderr, with debug output selected like connmand -d */
++	__connman_log_init(argv[0], getenv("CONNMAN_DEBUG"), FALSE, FALSE,
++					"dnsproxy-standalone", "test");
++
+ 	__connman_util_init();
+ 	printf("Listening on local port %u\n", port);
+ 	__connman_dnsproxy_set_listen_port(port);
+@@ -141,6 +146,16 @@ int main(int argc, const char **argv)
+ 	__connman_dnsproxy_append(15, domain, server);
+ 	__connman_dnsproxy_remove(15, domain, server);
+ 
++	if (argc > 4) {
++		printf("Using DNS over HTTPS mode %s\n", argv[4]);
++
++		if (__connman_dnsproxy_configure_doh(argv[4],
++						(char **) argv + 5) < 0) {
++			fprintf(stderr, "invalid DNS over HTTPS settings\n");
++			return 1;
++		}
++	}
++
+ 	signal = setup_signalfd();
+ 
+ 	main_loop = g_main_loop_new(NULL, FALSE);
+@@ -150,6 +165,7 @@ int main(int argc, const char **argv)
+ 	__connman_dnsproxy_cleanup();
+ 	__connman_util_cleanup();
+ 	g_source_remove(signal);
++	__connman_log_cleanup(FALSE);
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
+

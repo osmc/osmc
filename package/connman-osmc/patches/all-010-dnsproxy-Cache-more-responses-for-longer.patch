@@ -1,9 +1,18 @@
-From 9d1fad6cb8b0a66f16c89576c285a9660ebd28d0 Mon Sep 17 00:00:00 2001
+From 8a47d809b151416f0aa4928cce108f4875c6ea9b Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Wed, 26 Apr 2023 02:01:24 +0100
-Subject: [PATCH] dnsproxy: store each DNS response for at least 30 mins. As
- per systemd-resolve, store each response for a maximum of 2 hours and store
- up to 4096 DNS responses.
+Subject: [PATCH] dnsproxy: Cache more responses for longer
+
+Allow up to 4096 cached responses instead of 256 and keep them for up
+to two hours instead of 30 minutes, which matches systemd-resolved's
+limits and saves repeated lookups on slow networks. Answers with a TTL
+below one minute are cached for one minute instead of 30 seconds; a
+TTL of zero is still never cached.
+
+OSMC previously cached every answer for at least 30 minutes. Short
+TTLs are used for load balancing and failover, so a minimum that long
+can keep clients on a CDN node or an address that has gone away; one
+minute still absorbs bursts of repeated lookups.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
@@ -11,7 +20,7 @@ Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/dnsproxy.c b/src/dnsproxy.c
-index 7ebffbc..48372a2 100644
+index 1dd2f7f5..3297484d 100644
 --- a/src/dnsproxy.c
 +++ b/src/dnsproxy.c
 @@ -212,11 +212,11 @@ struct domain_rr {
@@ -22,10 +31,10 @@ index 7ebffbc..48372a2 100644
 +#define MAX_CACHE_TTL (60 * 60 * 2)
  /*
 - * Also limit the other end, cache at least for 30 seconds.
-+ * Also limit the other end, cache at least for 30 minutes.
++ * Also limit the other end, cache at least for a minute.
   */
 -#define MIN_CACHE_TTL (30)
-+#define MIN_CACHE_TTL (60 * 30)
++#define MIN_CACHE_TTL (60)
  
  /*
   * We limit the cache size to some sane value so that cached data does
@@ -39,5 +48,5 @@ index 7ebffbc..48372a2 100644
  #define DNS_HEADER_SIZE sizeof(struct domain_hdr)
  #define DNS_HEADER_TCP_EXTRA_BYTES 2
 -- 
-2.7.4
+2.34.1
 

@@ -1,0 +1,63 @@
+From cc5c570392d66af4b0ccf24bee2cf3e6a1a29336 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Thu, 3 Sep 2015 16:58:42 +0100
+Subject: [PATCH] main: Add --noresolvmodify option to leave resolv.conf alone
+
+OSMC installations that boot from NFS get their resolver configuration
+from the kernel (ip= / /proc/net/pnp) and start-network writes it to
+/etc/resolv.conf before starting ConnMan with --nodnsproxy. ConnMan must
+not overwrite that file, but the same /etc/connman.conf is used for
+local and NFS installations, so this cannot be a config file setting.
+
+Add -s/--noresolvmodify, which makes the ResolvConf setting read as
+/dev/null, the value upstream already treats as "do not write".
+
+Rebased for ConnMan 2.0 on top of the ResolvConf setting instead of
+patching resolvfile_export() directly.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/main.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/src/main.c b/src/main.c
+index c8880892..99f3c221 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -956,6 +956,7 @@ static gchar *option_noplugin = NULL;
+ static gchar *option_wifi = NULL;
+ static gboolean option_detach = TRUE;
+ static gboolean option_dnsproxy = TRUE;
++static gboolean option_allowresolvmodify = TRUE;
+ static gboolean option_backtrace = TRUE;
+ static gboolean option_version = FALSE;
+ 
+@@ -1017,6 +1018,10 @@ static GOptionEntry options[] = {
+ 	{ "nodnsproxy", 'r', G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_dnsproxy,
+ 				"Don't support DNS resolving" },
++	{ "noresolvmodify", 's', G_OPTION_FLAG_REVERSE,
++				G_OPTION_ARG_NONE, &option_allowresolvmodify,
++				"Don't modify resolv.conf (same as ResolvConf="
++				"/dev/null)" },
+ 	{ "nobacktrace", 0, G_OPTION_FLAG_REVERSE,
+ 				G_OPTION_ARG_NONE, &option_backtrace,
+ 				"Don't print out backtrace information" },
+@@ -1047,9 +1052,13 @@ char *connman_setting_get_string(const char *key)
+ 		return connman_settings.localtime ?
+ 			connman_settings.localtime : DEFAULT_LOCALTIME;
+ 
+-	if (g_str_equal(key, CONF_RESOLV_CONF))
++	if (g_str_equal(key, CONF_RESOLV_CONF)) {
++		if (!option_allowresolvmodify)
++			return "/dev/null";
++
+ 		return connman_settings.resolv_conf ?
+ 			connman_settings.resolv_conf : DEFAULT_RESOLV_CONF;
++	}
+ 
+ 	if (g_str_equal(key, CONF_ONLINE_CHECK_INTERVAL_STYLE))
+ 		return connman_settings.online_check_interval_style;
+-- 
+2.34.1
+

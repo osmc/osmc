@@ -1,0 +1,47 @@
+From ed01ea0b2f25ea715d85b377e5428921fbcd1159 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Mon, 2 Nov 2026 11:17:09 +0000
+Subject: [PATCH] main: Default ResolvConf to /etc/resolv.conf
+
+On OSMC /etc/resolv.conf is a regular file that ConnMan owns; it is not
+a symlink into /run/connman. Since ConnMan 1.31 the resolver writes to
+/run/connman/resolv.conf whenever that directory exists, which left
+/etc/resolv.conf stale on OSMC.
+
+ConnMan 1.42 added the ResolvConf setting, so instead of patching the
+resolver (as OSMC did since 1.31) make /etc/resolv.conf the default
+value of that setting, the same way Localtime defaults to
+/etc/localtime. An explicit ResolvConf in connman.conf still wins,
+including /dev/null to disable writing altogether.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ src/main.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/main.c b/src/main.c
+index 70909264..c8880892 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -66,6 +66,8 @@
+ 
+ #define DEFAULT_LOCALTIME "/etc/localtime"
+ 
++#define DEFAULT_RESOLV_CONF "/etc/resolv.conf"
++
+ #define MAINFILE "main.conf"
+ #define CONFIGMAINFILE CONFIGDIR "/" MAINFILE
+ 
+@@ -1046,7 +1048,8 @@ char *connman_setting_get_string(const char *key)
+ 			connman_settings.localtime : DEFAULT_LOCALTIME;
+ 
+ 	if (g_str_equal(key, CONF_RESOLV_CONF))
+-		return connman_settings.resolv_conf;
++		return connman_settings.resolv_conf ?
++			connman_settings.resolv_conf : DEFAULT_RESOLV_CONF;
+ 
+ 	if (g_str_equal(key, CONF_ONLINE_CHECK_INTERVAL_STYLE))
+ 		return connman_settings.online_check_interval_style;
+-- 
+2.34.1
+

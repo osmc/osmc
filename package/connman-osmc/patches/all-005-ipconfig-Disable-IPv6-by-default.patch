@@ -1,17 +1,22 @@
-From e73329930d1f4098d075766f59cd4fd7801c25fc Mon Sep 17 00:00:00 2001
+From 78c7226e067ab04e143d6fbc39a776b3fdbf3b9a Mon Sep 17 00:00:00 2001
 From: Stefan Saraev <stefan@saraev.ca>
 Date: Tue, 23 Jul 2013 11:28:10 +0300
-Subject: [PATCH] ipv6 disabled by default
+Subject: [PATCH] ipconfig: Disable IPv6 by default
 
+New services start with IPv6.method=off instead of auto. Users can
+still enable IPv6 per service (connmanctl config <service> --ipv6 auto
+or via My OSMC); existing services keep their stored setting.
+
+Carried by OSMC since 2015.
 ---
  src/ipconfig.c | 5 +----
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/ipconfig.c b/src/ipconfig.c
-index 0dc702b..94ba2d0 100644
+index c2d7d2bc..3915bf42 100644
 --- a/src/ipconfig.c
 +++ b/src/ipconfig.c
-@@ -1117,10 +1117,7 @@ static struct connman_ipconfig *create_ipv6config(int index)
+@@ -1467,10 +1467,7 @@ static struct connman_ipconfig *create_ipv6config(int index)
  	ipv6config->index = index;
  	ipv6config->type = CONNMAN_IPCONFIG_TYPE_IPV6;
  
@@ -24,5 +29,5 @@ index 0dc702b..94ba2d0 100644
  	ipdevice = g_hash_table_lookup(ipdevice_hash, GINT_TO_POINTER(index));
  	if (ipdevice)
 -- 
-2.1.4
+2.34.1
 
