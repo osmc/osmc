@@ -38,6 +38,8 @@ PREESEED_LOCATION = '/boot/preseed.cfg'
 
 WAIT_FOR_NETWORK_SERVICE = 'connman-wait-for-network.service'
 
+CONNMAN_PREFS_FILE = '/etc/osmc/prefs.d/connman'
+
 
 def is_ethernet_enabled():
     return connman.is_technology_enabled('ethernet') or get_nfs_ip_cmdline_value() is not None
@@ -612,6 +614,39 @@ def tethering_disable():
 
     if is_tethering_ethernet():
         return connman.tethering_disable('ethernet')
+
+
+def get_dns_over_https():
+    return connman.get_dns_over_https()
+
+
+def set_dns_over_https_enabled(enabled):
+    # Disabled still upgrades public resolvers that support it ('auto')
+    return connman.set_dns_over_https('DNSOverHTTPS', 'on' if enabled else 'auto')
+
+
+def set_dns_over_https_servers(servers):
+    # An empty list selects the OSMC default servers
+    return connman.set_dns_over_https('DNSOverHTTPSServers',
+                                      dbus.Array(servers, signature=dbus.Signature('s')))
+
+
+def is_dns_proxy_disabled():
+    # start-network runs connmand with --nodnsproxy on NFS installs and with dnsproxy=no
+    with open(RUNNING_NETWORK_DETAILS_FILE, 'r', encoding='utf-8') as cmdline:
+        if 'nfsroot' in cmdline.read():
+            return True
+
+    try:
+        with open(CONNMAN_PREFS_FILE, 'r', encoding='utf-8') as prefs:
+            for line in prefs:
+                key, _, value = line.partition('=')
+                if key.strip() == 'dnsproxy' and value.strip().strip('\'"').lower() == 'no':
+                    return True
+    except IOError:
+        pass
+
+    return False
 
 
 def is_valid_ipv4_address(ip):

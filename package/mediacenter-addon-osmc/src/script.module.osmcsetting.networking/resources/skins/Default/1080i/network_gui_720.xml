@@ -29,7 +29,7 @@
 			<left>120</left>
 			<top>260</top>
 			<width>300</width>
-			<height>380</height>
+			<height>460</height>
 			<itemgap>34</itemgap>
 			<onleft>1000</onleft>
 			<onup>666</onup>
@@ -106,6 +106,24 @@
 				<aligny>center</aligny>
 				<onclick>noop</onclick>
 				<onright>1040</onright>
+			</control>
+			
+			<!-- DNS -->
+			<control id="106" type="button">
+				<visible>Control.IsEnabled(106)</visible>
+				<height>42</height>
+				<description>DNS</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32107]</label>
+				<font>osmc_addon_720_Large</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus>single_pixel.png</texturefocus>
+				<texturenofocus>single_pixel.png</texturenofocus>
+				<align>left</align>
+				<aligny>center</aligny>
+				<onclick>noop</onclick>
+				<onright>10601</onright>
 			</control>
 			
 			<!-- MySQL -->
@@ -1556,6 +1574,198 @@
 				<ondown>noop</ondown>
 				<onleft>10405</onleft>
 				<onright>noop</onright>
+			</control>
+			
+		</control>
+		
+		<!-- ## DNS Panel ## -->
+		<control id="1060" type="group">
+			<description>DNS Panel</description>
+			<left>480</left>
+			<top>105</top>
+			<width>1320</width>
+			<height>870</height>
+			<onleft>106</onleft>
+			<onright>noop</onright>
+			
+			<!-- Heading -->
+			<control type="label">
+				<align>left</align>
+				<aligny>center</aligny>
+				<label>$ADDON[script.module.osmcsetting.networking 32108]</label>
+				<width>1320</width>
+				<height>70</height>
+				<description>Header</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<scroll>true</scroll>
+			</control>
+			
+			<!-- Enable DNS over HTTPS -->
+			<control id="10601" type="radiobutton">
+				<description>Enable DNS over HTTPS</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32109]</label>
+				<top>100</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>noop</onup>
+				<ondown>10603</ondown>
+				<onleft>106</onleft>
+			</control>
+			
+			<!-- Description -->
+			<control id="10602" type="label">
+				<align>left</align>
+				<aligny>top</aligny>
+				<label/>
+				<top>185</top>
+				<width>1320</width>
+				<height>150</height>
+				<wrapmultiline>true</wrapmultiline>
+				<description>Description</description>
+				<font>osmc_addon_720_XSmall</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<!-- Use OSMC default server -->
+			<control id="10603" type="radiobutton">
+				<description>Use OSMC default server</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32111]</label>
+				<top>350</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10601</onup>
+				<ondown>10604</ondown>
+				<onleft>106</onleft>
+			</control>
+			
+			<!-- Use custom server -->
+			<control id="10604" type="radiobutton">
+				<description>Use custom server</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32112]</label>
+				<top>420</top>
+				<width>1320</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<textwidth>1254</textwidth>
+				<radiowidth>16</radiowidth>
+				<radioheight>16</radioheight>
+				<texturenofocus></texturenofocus>
+				<texturefocus></texturefocus>
+				<textureradioonfocus>RadioOn.png</textureradioonfocus>
+				<textureradioonnofocus>RadioOn.png</textureradioonnofocus>
+				<textureradioofffocus>RadioOff.png</textureradioofffocus>
+				<textureradiooffnofocus>RadioOff.png</textureradiooffnofocus>
+				<onup>10603</onup>
+				<ondown>10605</ondown>
+				<onleft>106</onleft>
+			</control>
+			
+			<!-- Custom server -->
+			<control id="10605" type="button">
+				<disabledcolor>ff000000</disabledcolor>
+				<description>Custom server</description>
+				<label>$ADDON[script.module.osmcsetting.networking 32113]</label>
+				<top>490</top>
+				<width>630</width>
+				<height>66</height>
+				<align>left</align>
+				<aligny>center</aligny>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<focusedcolor>ffe0b074</focusedcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<texturefocus></texturefocus>
+				<texturenofocus></texturenofocus>
+				<onup>10604</onup>
+				<ondown>noop</ondown>
+				<onleft>106</onleft>
+				<onright>noop</onright>
+			</control>
+			
+			<!-- Custom server VALUE -->
+			<control id="910605" type="label">
+				<disabledcolor>ff000000</disabledcolor>
+				<align>left</align>
+				<aligny>center</aligny>
+				<visible>!Control.HasFocus(10605)+Control.isVisible(10605)</visible>
+				<label/>
+				<left>690</left>
+				<top>490</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Custom server VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+			</control>
+			
+			<control type="label">
+				<align>left</align>
+				<aligny>center</aligny>
+				<visible>Control.HasFocus(10605)+Control.isVisible(10605)</visible>
+				<label>$INFO[Control.GetLabel(910605)]</label>
+				<left>690</left>
+				<top>490</top>
+				<width>630</width>
+				<height>70</height>
+				<description>Custom server VALUE</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<scroll>true</scroll>
+			</control>
+			
+			<!-- Status -->
+			<control id="10606" type="label">
+				<align>left</align>
+				<aligny>center</aligny>
+				<label/>
+				<top>600</top>
+				<width>1320</width>
+				<height>70</height>
+				<description>Status</description>
+				<font>osmc_addon_720_Med</font>
+				<textcolor>66ffffff</textcolor>
+				<shadowcolor>44000000</shadowcolor>
+				<scroll>true</scroll>
 			</control>
 			
 		</control>

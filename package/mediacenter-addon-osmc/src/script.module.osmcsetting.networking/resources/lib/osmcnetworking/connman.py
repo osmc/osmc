@@ -129,6 +129,43 @@ def tethering_enable(technology, ssid, passphrase):
     return True
 
 
+def get_dns_over_https():
+    """
+        Returns a dict with the DNS over HTTPS 'mode', 'servers' and 'state',
+        or None if this ConnMan does not support DNS over HTTPS.
+    """
+    manager = get_manager_interface()
+    try:
+        properties = manager.GetProperties()
+    except dbus.DBusException as e:
+        print('DBus Exception ' + str(e))
+        return None
+
+    if 'DNSOverHTTPS' not in properties:
+        return None
+
+    return {
+        'mode': str(properties['DNSOverHTTPS']),
+        'servers': [str(server) for server in properties.get('DNSOverHTTPSServers', [])],
+        'state': str(properties.get('DNSOverHTTPSState', 'off')),
+    }
+
+
+def set_dns_over_https(name, value):
+    """
+        Sets the DNSOverHTTPS or DNSOverHTTPSServers property. Returns None on
+        success, or the D-Bus error name.
+    """
+    manager = get_manager_interface()
+    try:
+        manager.SetProperty(name, value)
+    except dbus.DBusException as e:
+        print('DBus Exception ' + str(e))
+        return e.get_dbus_name() or 'error'
+
+    return None
+
+
 def tethering_disable(technology):
     bus = dbus.SystemBus()
     technology_interface = dbus.Interface(

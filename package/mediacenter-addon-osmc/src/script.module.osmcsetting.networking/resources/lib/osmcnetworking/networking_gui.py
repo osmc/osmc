@@ -109,6 +109,14 @@ GUI_IDS = {
     910524: 'MySQL Music Database user Value',
     10525: 'MySQL Music Database pass',
     910525: 'MySQL Music Database pass Value',
+    106: 'DNS',
+    10601: 'DNS - Enable DNS over HTTPS',
+    10602: 'DNS - Description',
+    10603: 'DNS - Use OSMC default server',
+    10604: 'DNS - Use custom server',
+    10605: 'DNS - Custom server',
+    910605: 'DNS - Custom server VALUE',
+    10606: 'DNS - Status',
 
 }
 
@@ -121,9 +129,10 @@ SELECTOR_WIRELESS_NETWORK = 102
 SELECTOR_BLUETOOTH = 103
 SELECTOR_TETHERING = 104
 SELECTOR_MYSQL = 105
+SELECTOR_DNS = 106
 
 MAIN_MENU = [SELECTOR_WIRED_NETWORK, SELECTOR_WIRELESS_NETWORK, SELECTOR_BLUETOOTH,
-             SELECTOR_TETHERING, SELECTOR_MYSQL]
+             SELECTOR_TETHERING, SELECTOR_MYSQL, SELECTOR_DNS]
 
 BLUETOOTH_CONTROLS = [10303, 6000, 7000]
 
@@ -183,6 +192,15 @@ MYSQL_IMPORT_WATCHED = 10580
 MYSQL_IMPORT_RESUME = 10590
 EXIT_CONTROL = 666
 
+ALL_DNS_CONTROLS = [10601, 10603, 10604, 10605]
+DNS_DOH_TOGGLE = 10601
+DNS_DESCRIPTION = 10602
+DNS_DEFAULT_SERVER = 10603
+DNS_CUSTOM_SERVER = 10604
+DNS_CUSTOM_URL = 10605
+DNS_CUSTOM_URL_VALUE = 910605
+DNS_STATUS = 10606
+
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
 
@@ -229,6 +247,9 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
         # connected SSID, the ssid we are currently connected to
         self.conn_ssid = None
+
+        # custom DNS over HTTPS server shown in the DNS panel
+        self.dns_custom_server = ''
 
         # list containing list items of all paired bluetooth devices
         self.paired_bluetooths = []
@@ -318,6 +339,10 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
         log("Checking bluetooth")
         if not self.osmc_bluetooth.is_bluetooth_available():
             self.toggle_controls(False, [SELECTOR_BLUETOOTH])
+
+        # ConnMan without DNS over HTTPS support
+        if osmc_network.get_dns_over_https() is None:
+            self.toggle_controls(False, [SELECTOR_DNS])
 
         panel_to_show = SELECTOR_WIRED_NETWORK
 
@@ -453,6 +478,9 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             elif controlID in ALL_MYSQL_CONTROLS:
                 self.user_entry_mysql(controlID)
 
+            elif controlID in ALL_DNS_CONTROLS:
+                self.handle_dns_selection(controlID)
+
             elif controlID == EXIT_CONTROL:
                 self.shutdown_process()
         except:
@@ -522,6 +550,8 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                     self.populate_bluetooth_panel()
                 elif focused_control == SELECTOR_TETHERING:
                     self.populate_tethering_panel()
+                elif focused_control == SELECTOR_DNS:
+                    self.populate_dns_panel()
 
             # change to the required settings panel
             for ctl in MAIN_MENU:
@@ -1765,6 +1795,123 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             ])
 
             self.toggle_controls(False, [TETHERING_DISABLE])
+
+    def populate_dns_panel(self):
+        doh = osmc_network.get_dns_over_https()
+        if doh is None:
+            return
+
+        proxy_disabled = osmc_network.is_dns_proxy_disabled()
+        enabled = doh['mode'] in ('on', 'strict')
+        custom = bool(doh['servers'])
+
+        # remember a custom server while the default one is selected
+        if custom:
+            self.dns_custom_server = doh['servers'][0]
+
+        self.getControl(DNS_DOH_TOGGLE).setSelected(enabled)
+        self.getControl(DNS_DEFAULT_SERVER).setSelected(not custom)
+        self.getControl(DNS_CUSTOM_SERVER).setSelected(custom)
+        self.getControl(DNS_CUSTOM_URL_VALUE).setLabel(self.dns_custom_server)
+
+        self.toggle_controls(not proxy_disabled, [DNS_DOH_TOGGLE])
+        self.toggle_controls(enabled and not proxy_disabled,
+                             [DNS_DEFAULT_SERVER, DNS_CUSTOM_SERVER])
+        self.toggle_controls(enabled and custom and not proxy_disabled,
+                             [DNS_CUSTOM_URL, DNS_CUSTOM_URL_VALUE])
+
+        if proxy_disabled:
+            # 'DNS over HTTPS needs the DNS proxy, which is disabled on this device'
+            description = self.lang(32124)
+        else:
+            # 'Encrypts the DNS lookups ...'
+            description = self.lang(32110)
+            if doh['mode'] == 'auto':
+                # '... still encrypted automatically ...'
+                description += ' ' + self.lang(32121)
+        self.getControl(DNS_DESCRIPTION).setLabel(description)
+
+        if doh['state'] == 'active':
+            # 'Active' or 'Active (using your network's DNS service)'
+            state = self.lang(32116) if enabled else self.lang(32117)
+        elif doh['state'] == 'unavailable':
+            # 'Unavailable' or 'Unavailable, using standard DNS'
+            state = self.lang(32119) if doh['mode'] == 'strict' else self.lang(32118)
+        elif doh['state'] == 'inactive':
+            # 'Not used yet' or 'Not in use'
+            state = self.lang(32125) if enabled else self.lang(32120)
+        else:
+            state = self.lang(32122)  # 'Off'
+
+        self.getControl(DNS_STATUS).setLabel('%s: %s' % (self.lang(32123), state))
+
+    def dns_error(self, error):
+        if error == 'net.connman.Error.NotSupported':
+            # 'DNS over HTTPS needs the DNS proxy, which is disabled on this device'
+            DIALOG.ok(self.lang(32108), self.lang(32124))
+        elif error == 'net.connman.Error.InvalidArguments':
+            # 'Invalid address. Enter the https:// address of a DNS over HTTPS server'
+            DIALOG.ok(self.lang(32108), self.lang(32115))
+        elif error:
+            DIALOG.ok(self.lang(32108), self.lang(32106))
+
+    def ask_dns_server(self):
+        # 'DNS over HTTPS server address, e.g. https://dns.example.com/dns-query'
+        url = DIALOG.input(self.lang(32114), self.dns_custom_server or 'https://')
+        url = url.strip() if url else ''
+        if not url or url == 'https://':
+            return None
+
+        return url
+
+    def wait_for_dns_state(self):
+        # ConnMan checks new settings in the background, show the outcome
+        self.show_busy_dialogue()
+        try:
+            for _ in range(16):
+                doh = osmc_network.get_dns_over_https()
+                if (not doh or doh['mode'] not in ('on', 'strict') or
+                        doh['state'] != 'inactive'):
+                    break
+                xbmc.sleep(250)
+        finally:
+            self.clear_busy_dialogue()
+
+    def handle_dns_selection(self, control_id):
+        doh = osmc_network.get_dns_over_https() or {'mode': 'off', 'servers': []}
+        servers = doh['servers']
+        error = None
+        changed = False
+
+        if control_id == DNS_DOH_TOGGLE:
+            enabled = self.getControl(DNS_DOH_TOGGLE).isSelected()
+            if enabled != (doh['mode'] in ('on', 'strict')):
+                log('Setting DNS over HTTPS enabled: %s' % enabled)
+                error = osmc_network.set_dns_over_https_enabled(enabled)
+                changed = True
+
+        elif control_id == DNS_DEFAULT_SERVER:
+            if servers:
+                error = osmc_network.set_dns_over_https_servers([])
+                changed = True
+
+        elif control_id in (DNS_CUSTOM_SERVER, DNS_CUSTOM_URL):
+            url = self.dns_custom_server
+            if control_id == DNS_CUSTOM_URL or not url:
+                url = self.ask_dns_server()
+
+            if url and (not servers or servers[0] != url):
+                # keep further servers that were set up with connmanctl
+                error = osmc_network.set_dns_over_https_servers(
+                    [url] + [server for server in servers[1:] if server != url])
+                changed = True
+
+        self.dns_error(error)
+
+        if changed and not error:
+            self.wait_for_dns_state()
+
+        self.populate_dns_panel()
 
     def _get_kodi_region_code(self):
         language = xbmc.getLanguage(xbmc.ISO_639_1, region=True)
