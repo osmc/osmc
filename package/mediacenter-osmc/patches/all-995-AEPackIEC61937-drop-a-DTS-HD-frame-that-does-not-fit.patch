@@ -1,0 +1,65 @@
+From 9176efbd80cc1729d2c58c3f6b32208c8513f177 Mon Sep 17 00:00:00 2001
+From: tanio99 <tanio99@wolke7.net>
+Date: Wed, 28 Oct 2026 18:11:12 +0100
+Subject: [PATCH] AEPackIEC61937: drop a DTS-HD frame that does not fit its
+ burst instead of crashing
+
+PackDTSHD() pads the burst with memset(..., burstsize - IEC61937_DATA_OFFSET - size). When the
+frame is larger than the burst, that length is negative and, as an unsigned int, about 4 GB:
+Kodi segfaults. It happens when a DTS-HD MA stream (8320-byte frames at peak bit rate) is
+mistaken for HRA and packed with a 2048 period, i.e. an 8192-byte burst.
+
+A period of 16384 overflowed as well, whatever the frame size: its 65536-byte burst does not fit
+the MAX_IEC61937_PACKET (61440) destination buffer.
+
+Check both before writing anything and drop the burst with an error log instead. The sink writes
+nothing for a zero-sized burst, which is what an unsupported period already did. This is the
+safety net; the misdetection itself is fixed in the stream parser.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ xbmc/cores/AudioEngine/Utils/AEPackIEC61937.cpp | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/xbmc/cores/AudioEngine/Utils/AEPackIEC61937.cpp b/xbmc/cores/AudioEngine/Utils/AEPackIEC61937.cpp
+index 43bfbf3c73..62f0f8bacb 100644
+--- a/xbmc/cores/AudioEngine/Utils/AEPackIEC61937.cpp
++++ b/xbmc/cores/AudioEngine/Utils/AEPackIEC61937.cpp
+@@ -8,6 +8,8 @@
+ 
+ #include "AEPackIEC61937.h"
+ 
++#include "utils/log.h"
++
+ #include <cassert>
+ #include <string.h>
+ 
+@@ -128,6 +130,17 @@ int CAEPackIEC61937::PackDTSHD(uint8_t *data, unsigned int size, uint8_t *dest,
+       return 0;
+   }
+ 
++  /* The payload must fit the burst, and the burst the destination buffer. Otherwise the padding
++   * memset below gets a negative length, i.e. about 4 GB. Drop the burst instead. */
++  unsigned int burstsize = period << 2;
++  if (burstsize > MAX_IEC61937_PACKET || size + (size & 0x1) > burstsize - IEC61937_DATA_OFFSET)
++  {
++    CLog::Log(LOGERROR,
++              "CAEPackIEC61937::PackDTSHD - {} byte frame does not fit a period {} burst, dropped",
++              size, period);
++    return 0;
++  }
++
+   struct IEC61937Packet *packet = (struct IEC61937Packet*)dest;
+   packet->m_preamble1 = IEC61937_PREAMBLE1;
+   packet->m_preamble2 = IEC61937_PREAMBLE2;
+@@ -147,7 +160,6 @@ int CAEPackIEC61937::PackDTSHD(uint8_t *data, unsigned int size, uint8_t *dest,
+   SwapEndian((uint16_t*)packet->m_data, (uint16_t*)data, size >> 1);
+ #endif
+ 
+-  unsigned int burstsize = period << 2;
+   memset(packet->m_data + size, 0, burstsize - IEC61937_DATA_OFFSET - size);
+   return burstsize;
+ }
+-- 
+2.34.1
+
