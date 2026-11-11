@@ -1,18 +1,39 @@
-From 49caa3d4c40026121c55141996a3099df1d82a9b Mon Sep 17 00:00:00 2001
+From 57db633c4fede72f7aa001b7dedcdc67bf7e614e Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Mon, 1 May 2017 19:18:35 +0100
-Subject: [PATCH] Don't save settings when exiting Kodi; this isn't necessary.
+Subject: [PATCH]     CSettings: Narrow the patch: restore the
+ CSettings::Save() in CApplication::Stop(),     keep the uptime store and the
+ skin-settings save removed.
+
+    Without it, nothing saves guisettings.xml on any exit path, and once Stop()
+    sets m_bStop, CApplication::OnSettingsSaving() vetoes every later save. State
+    that is only ever written as a side effect of some other Save() - volume and
+    mute, JSON-RPC Settings.SetSettingValue, the walkthrough's setters, settings
+    pages left without Back - is lost on reboot unless something else happened to
+    save first. That is the reported "change something else and everything gets
+    written out" behaviour.
+
+    The 2017 reasons for removing the save no longer hold: SIGTERM is now graceful
+    (upstream RequestQuit -> TMSG_QUIT -> Stop()), and Stop() runs before
+    Powerdown()/Reboot() since the Nexus rebase, so the save cannot be killed
+    mid-write by the OS shutdown.
+
+    Uptime stays out so that 'Save settings only if they were modified after the
+    last save' skips the write when nothing changed. The skin save stays out
+    because skin settings are saved on change and again in UnloadSkin().
+
+    See docs/osmc/settings-persistence.md.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/application/Application.cpp | 19 -------------------
- 1 file changed, 19 deletions(-)
+ xbmc/application/Application.cpp | 25 +++++++------------------
+ 1 file changed, 7 insertions(+), 18 deletions(-)
 
 diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
-index 2817398576..239bf65668 100644
+index 365210c69d..607168b6e6 100644
 --- a/xbmc/application/Application.cpp
 +++ b/xbmc/application/Application.cpp
-@@ -2116,25 +2116,6 @@ bool CApplication::Stop(int exitCode)
+@@ -2153,24 +2153,13 @@ bool CApplication::Stop(int exitCode)
  
      g_alarmClock.StopThread();
  
@@ -34,10 +55,16 @@ index 2817398576..239bf65668 100644
 -    CLog::Log(LOGINFO, "Saving skin settings");
 -    if (g_SkinInfo != nullptr)
 -      g_SkinInfo->SaveSettings();
--
++    // Flush in-memory state that nothing else saves (volume, JSON-RPC changes, ...).
++    // Must run before m_bStop is set: from then on OnSettingsSaving() vetoes every save.
++    // Uptime is deliberately not stored, so the unchanged-file check in CSettings::Save()
++    // can skip the write when nothing changed.
++    const auto settingsComponent = CServiceBroker::GetSettingsComponent();
++    if (CFile::Exists(settingsComponent->GetProfileManager()->GetSettingsFile()))
++      settingsComponent->GetSettings()->Save();
+ 
      m_bStop = true;
      // Add this here to keep the same ordering behaviour for now
-     // Needs cleaning up
 -- 
-2.25.1
+2.34.1
 
