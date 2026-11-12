@@ -1,0 +1,344 @@
+From 37870a254926b414b841ebe9cce5bf3be91bcc47 Mon Sep 17 00:00:00 2001
+From: Sam Nazarko <email@samnazarko.co.uk>
+Date: Sun, 26 Jul 2026 09:54:02 +0100
+Subject: [PATCH] [Application] Add optional OSMC startup splash video
+
+Play a short branding clip once when Kodi starts, gated by a new
+"lookandfeel.startupvideo" setting (Settings > Interface > Other),
+disabled by default.
+
+A fixed-framerate clip (25/30fps) is matched to the display's 50/60Hz
+refresh so the correct one plays without any resolution/refresh change.
+The mode switch that playback would normally trigger is suppressed for
+this single clip via a new CPlayerOptions::preventRefreshSwitch flag,
+passed through a "preventrefreshswitch" CFileItem property, so the global
+"Adjust display refresh rate" setting is never modified or restored.
+
+On all-platforms-final the switch fires from two independent sites, both
+now honouring the flag: CVideoPlayer::OpenVideoStream and
+CRenderManager::UpdateResolution (via CRenderManager::SetPreventRefreshSwitch).
+
+Playback is dispatched via TMSG_MEDIA_PLAY from CApplication::Initialize,
+so it runs on the main loop without blocking startup. An OEM clip
+(/usr/share/osmc/splash_oem_*) overrides the stock clip (splash_osmc_*)
+when present. The setting's user-facing strings (#40801/#40802) are
+provided downstream in OSMC's strings-osmc.po.
+
+Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
+---
+ system/settings/settings.xml                  |  5 +
+ xbmc/application/Application.cpp              | 12 +++
+ xbmc/application/ApplicationStartupVideo.cpp  | 98 +++++++++++++++++++
+ xbmc/application/ApplicationStartupVideo.h    | 41 ++++++++
+ xbmc/application/CMakeLists.txt               |  2 +
+ xbmc/cores/IPlayer.h                          |  2 +
+ xbmc/cores/VideoPlayer/VideoPlayer.cpp        |  7 +-
+ .../VideoRenderers/RenderManager.cpp          |  2 +-
+ .../VideoRenderers/RenderManager.h            |  4 +
+ 9 files changed, 171 insertions(+), 2 deletions(-)
+ create mode 100644 xbmc/application/ApplicationStartupVideo.cpp
+ create mode 100644 xbmc/application/ApplicationStartupVideo.h
+
+diff --git a/system/settings/settings.xml b/system/settings/settings.xml
+index 6e69bb9cab..92ba352e2f 100755
+--- a/system/settings/settings.xml
++++ b/system/settings/settings.xml
+@@ -4253,6 +4253,11 @@
+           </dependencies>
+           <control type="list" format="string" />
+         </setting>
++        <setting id="lookandfeel.startupvideo" type="boolean" label="40801" help="40802">
++          <level>1</level>
++          <default>false</default>
++          <control type="toggle" />
++        </setting>
+       </group>
+     </category>
+     <category id="window" label="0" help="36135">
+diff --git a/xbmc/application/Application.cpp b/xbmc/application/Application.cpp
+index 70ebc9a6d2..365210c69d 100644
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -43,6 +43,7 @@
+ #include "application/ApplicationPowerHandling.h"
+ #include "application/ApplicationSkinHandling.h"
+ #include "application/ApplicationStackHelper.h"
++#include "application/ApplicationStartupVideo.h"
+ #include "application/ApplicationVolumeHandling.h"
+ #include "cores/AudioEngine/Engines/ActiveAE/ActiveAE.h"
+ #include "cores/DataCacheCore.h"
+@@ -794,6 +795,13 @@ bool CApplication::Initialize()
+ 
+       // the startup window is considered part of the initialization as it most likely switches to the final window
+       uiInitializationFinished = firstWindow != WINDOW_STARTUP_ANIM;
++
++      // optionally play a one-time startup video over the start window. Dispatched
++      // onto the main loop so it does not block initialisation, and suppresses the
++      // refresh-rate mode switch so it cannot cause a signal-loss resolution change.
++      if (firstWindow != WINDOW_STARTUP_ANIM &&
++          m_eOSMCWalkthroughState == OSMC_WALKTHROUGH_NOTRUNNING)
++        CStartupVideo::PlayIfEnabled();
+     }
+   }
+   else //No GUI Created
+@@ -2440,6 +2448,10 @@ bool CApplication::PlayFile(CFileItem item, const std::string& player, bool bRes
+ 
+   CPlayerOptions options;
+ 
++  // OSMC startup video: skip the adjust-refresh-rate mode switch for this one
++  // playback so the splash never triggers a signal-loss resolution change.
++  options.preventRefreshSwitch = item.GetProperty("preventrefreshswitch").asBoolean(false);
++
+   if (item.HasProperty("StartPercent"))
+   {
+     options.startpercent = item.GetProperty("StartPercent").asDouble();
+diff --git a/xbmc/application/ApplicationStartupVideo.cpp b/xbmc/application/ApplicationStartupVideo.cpp
+new file mode 100644
+index 0000000000..8ad22761c9
+--- /dev/null
++++ b/xbmc/application/ApplicationStartupVideo.cpp
+@@ -0,0 +1,98 @@
++/*
++ *  Copyright (C) 2026 Team Kodi
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "ApplicationStartupVideo.h"
++
++#include "FileItem.h"
++#include "ServiceBroker.h"
++#include "filesystem/File.h"
++#include "messaging/ApplicationMessenger.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++#include "utils/Variant.h"
++#include "utils/log.h"
++#include "windowing/GraphicContext.h"
++#include "windowing/WinSystem.h"
++
++#include <memory>
++
++namespace
++{
++// User setting gating the startup video. Per-platform default is shipped in
++// the settings definition, not decided here.
++constexpr const char* SETTING_STARTUPVIDEO = "lookandfeel.startupvideo";
++
++// Stock clip and an optional OEM override (OEM takes precedence when present).
++// A "_25" / "_30" suffix selects the framerate matching the display.
++// The OEM override deliberately uses a distinct "_oem" name rather than
++// ply-lite's "<file>.oem" suffix, so Kodi still detects the container/player
++// by extension (a ".oem" suffix would not be recognised as video).
++constexpr const char* STOCK_CLIP = "/usr/share/osmc/splash_osmc";
++constexpr const char* OEM_CLIP = "/usr/share/osmc/splash_oem";
++constexpr const char* CLIP_EXT = ".mp4";
++
++// Below this refresh rate we treat the display as the 50Hz family (25fps clip);
++// at or above it, the 60Hz family (30fps clip). 50.00 and 59.94/60.00 land on
++// the correct sides.
++constexpr float REFRESH_SPLIT_HZ = 55.0f;
++} // namespace
++
++std::string CStartupVideo::ResolveClip()
++{
++  const auto* winSystem = CServiceBroker::GetWinSystem();
++  if (!winSystem)
++    return {};
++
++  const float refreshRate = winSystem->GetGfxContext().GetResInfo().fRefreshRate;
++  const std::string suffix = (refreshRate < REFRESH_SPLIT_HZ) ? "_25" : "_30";
++
++  const std::string oem = std::string(OEM_CLIP) + suffix + CLIP_EXT;
++  if (XFILE::CFile::Exists(oem))
++  {
++    CLog::Log(LOGINFO, "CStartupVideo: using OEM startup clip {}", oem);
++    return oem;
++  }
++
++  const std::string stock = std::string(STOCK_CLIP) + suffix + CLIP_EXT;
++  if (XFILE::CFile::Exists(stock))
++  {
++    CLog::Log(LOGINFO, "CStartupVideo: using startup clip {}", stock);
++    return stock;
++  }
++
++  return {};
++}
++
++bool CStartupVideo::PlayIfEnabled()
++{
++  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++  if (!settings || !settings->GetBool(SETTING_STARTUPVIDEO))
++    return false;
++
++  const std::string clip = ResolveClip();
++  if (clip.empty())
++  {
++    CLog::Log(LOGDEBUG, "CStartupVideo: enabled but no matching clip found, skipping");
++    return false;
++  }
++
++  // Play once, fullscreen. "preventrefreshswitch" tells CApplication::PlayFile to
++  // skip the adjust-refresh-rate mode switch for THIS playback only, so we never
++  // modify (or have to restore) the global setting and never cause a signal-loss
++  // mode change for the clip.
++  auto item = std::make_unique<CFileItem>(clip, false);
++  item->SetProperty("preventrefreshswitch", true);
++
++  CLog::Log(LOGINFO, "CStartupVideo: playing startup video {}", clip);
++
++  // Dispatch onto the main loop so playback does not block initialisation. The
++  // handler takes ownership of the CFileItem (param2 == 0 -> single item path).
++  CServiceBroker::GetAppMessenger()->PostMsg(TMSG_MEDIA_PLAY, 0, 0,
++                                             static_cast<void*>(item.release()));
++  return true;
++}
+diff --git a/xbmc/application/ApplicationStartupVideo.h b/xbmc/application/ApplicationStartupVideo.h
+new file mode 100644
+index 0000000000..fbb4af59ed
+--- /dev/null
++++ b/xbmc/application/ApplicationStartupVideo.h
+@@ -0,0 +1,41 @@
++/*
++ *  Copyright (C) 2026 Team Kodi
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <string>
++
++/*!
++ * \brief One-time startup video ("splash") helper.
++ *
++ * Plays a short clip once when Kodi starts, gated by a user setting.
++ *
++ * Two fixed-framerate clips (25fps / 30fps) are shipped so the correct one can
++ * be matched to a 50Hz or 60Hz display WITHOUT performing a resolution/refresh
++ * change. The mode switch that playback would normally trigger is suppressed for
++ * this one clip via CPlayerOptions::preventRefreshSwitch, so the global
++ * "Adjust display refresh rate" setting is never modified.
++ */
++class CStartupVideo
++{
++public:
++  /*!
++   * \brief Play the startup video if the user setting is enabled and a clip
++   *        matching the current display refresh rate exists.
++   * \return true if playback was dispatched, false otherwise.
++   */
++  static bool PlayIfEnabled();
++
++private:
++  /*!
++   * \brief Resolve the clip to play for the current display refresh rate.
++   *        An OEM clip overrides the stock clip when present.
++   * \return path to an existing clip, or an empty string if none was found.
++   */
++  static std::string ResolveClip();
++};
+diff --git a/xbmc/application/CMakeLists.txt b/xbmc/application/CMakeLists.txt
+index 2fd3dbedc2..6759737192 100644
+--- a/xbmc/application/CMakeLists.txt
++++ b/xbmc/application/CMakeLists.txt
+@@ -8,6 +8,7 @@ set(SOURCES AppEnvironment.cpp
+             ApplicationSettingsHandling.cpp
+             ApplicationSkinHandling.cpp
+             ApplicationStackHelper.cpp
++            ApplicationStartupVideo.cpp
+             ApplicationVolumeHandling.cpp
+             AppParamParser.cpp
+             AppParams.cpp)
+@@ -22,6 +23,7 @@ set(HEADERS AppEnvironment.h
+             ApplicationSettingsHandling.h
+             ApplicationSkinHandling.h
+             ApplicationStackHelper.h
++            ApplicationStartupVideo.h
+             ApplicationVolumeHandling.h
+             AppParamParser.h
+             AppParams.h)
+diff --git a/xbmc/cores/IPlayer.h b/xbmc/cores/IPlayer.h
+index 9b04674c41..044d72a491 100644
+--- a/xbmc/cores/IPlayer.h
++++ b/xbmc/cores/IPlayer.h
+@@ -38,6 +38,7 @@ public:
+     fullscreen = false;
+     videoOnly = false;
+     preferStereo = false;
++    preventRefreshSwitch = false;
+   }
+   double starttime; /* start time in seconds */
+   double startpercent; /* start time in percent */
+@@ -45,6 +46,7 @@ public:
+   bool fullscreen; /* player is allowed to switch to fullscreen */
+   bool videoOnly; /* player is not allowed to play audio streams, video streams only */
+   bool preferStereo; /* prefer stereo streams when selecting initial audio stream*/
++  bool preventRefreshSwitch; /* skip the adjust-refresh-rate mode switch for this playback only */
+ };
+ 
+ class CFileItem;
+diff --git a/xbmc/cores/VideoPlayer/VideoPlayer.cpp b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+index 5a42065fc9..cb07f41dcc 100644
+--- a/xbmc/cores/VideoPlayer/VideoPlayer.cpp
++++ b/xbmc/cores/VideoPlayer/VideoPlayer.cpp
+@@ -3756,10 +3756,15 @@ bool CVideoPlayer::OpenVideoStream(CDVDStreamInfo& hint, bool reset)
+   if (hint.flags & AV_DISPOSITION_ATTACHED_PIC)
+     return false;
+ 
++  // Suppress the adjust-refresh-rate mode switch for a single playback (e.g. the
++  // OSMC startup splash), without touching the global setting. Two paths switch
++  // the mode at playback start: this block and CRenderManager::UpdateResolution().
++  m_renderManager.SetPreventRefreshSwitch(m_playerOptions.preventRefreshSwitch);
++
+   // set desired refresh rate
+   if (m_CurrentVideo.id < 0 && m_playerOptions.fullscreen &&
+       CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenRoot() && hint.fpsrate != 0 &&
+-      hint.fpsscale != 0)
++      hint.fpsscale != 0 && !m_playerOptions.preventRefreshSwitch)
+   {
+     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF)
+     {
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+index 51bbbc514a..61efb3c057 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
+@@ -882,7 +882,7 @@ void CRenderManager::UpdateResolution()
+   {
+     if (CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenVideo() && CServiceBroker::GetWinSystem()->GetGfxContext().IsFullScreenRoot())
+     {
+-      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF && m_fps > 0.0f)
++      if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) != ADJUST_REFRESHRATE_OFF && m_fps > 0.0f && !m_bPreventRefreshSwitch)
+       {
+         RESOLUTION res = CResolutionUtils::ChooseBestResolution(
+             m_fps, m_picture.iWidth, m_picture.iHeight, !m_picture.stereoMode.empty());
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
+index 8b0872e2e0..a450122cef 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
+@@ -68,6 +68,9 @@ public:
+   RESOLUTION GetResolution();
+   void UpdateResolution();
+   void TriggerUpdateResolution(float fps, int width, int height, std::string &stereomode);
++  /*! \brief Suppress the adjust-refresh-rate mode switch for the current playback
++   *         only (e.g. the OSMC startup splash), without changing the global setting. */
++  void SetPreventRefreshSwitch(bool prevent) { m_bPreventRefreshSwitch = prevent; }
+   void SetViewMode(int iViewMode);
+   void PreInit();
+   void UnInit();
+@@ -150,6 +153,7 @@ protected:
+   CCriticalSection m_presentlock;
+   CCriticalSection m_datalock;
+   bool m_bTriggerUpdateResolution = false;
++  bool m_bPreventRefreshSwitch = false;
+   bool m_bRenderGUI = true;
+   bool m_renderedOverlay = false;
+   bool m_renderDebug = false;
+-- 
+2.34.1
+
