@@ -378,7 +378,7 @@ class RemoteGui(xbmcgui.WindowXMLDialog):
 
                 subprocess.call(['sudo', 'ln', '-sf', original_target, LIRCD_PATH])
 
-                subprocess.call(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
+                subprocess.call(['systemctl', 'restart', 'lircd_helper@*'])
 
                 # add busy dialog, loop until service restarts
 
@@ -535,7 +535,7 @@ class ServiceChecker(threading.Thread):
         counter = 0
 
         # restart the service for the changes to take effect
-        process = subprocess.Popen(['sudo', 'systemctl', 'restart', 'lircd_helper@*'])
+        process = subprocess.Popen(['systemctl', 'restart', 'lircd_helper@*'])
 
         # loop until the service has restarted
         # (or too much time has elapsed, in which case fail out)

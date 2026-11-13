@@ -53,20 +53,22 @@ class MaitreD(object):
 
     @clog(log)
     def enable_service(self, s_entry):
+        # polkit lets osmc start and stop units (allow-systemctl-as-osmc.pkla)
+        # but not enable or disable them, which still need sudo
         for service in s_entry:
             os.system("sudo /bin/systemctl enable " + service)
-            os.system("sudo /bin/systemctl start " + service)
+            os.system("/bin/systemctl start " + service)
 
     @clog(log)
     def disable_service(self, s_entry):
         for service in s_entry:
             os.system("sudo /bin/systemctl disable " + service)
-            os.system("sudo /bin/systemctl stop " + service)
+            os.system("/bin/systemctl stop " + service)
 
     @clog(log)
     def is_running(self, s_entry):
         for service in s_entry:
-            p = subprocess.call(["sudo", "/bin/systemctl", "is-active", service])
+            p = subprocess.call(["/bin/systemctl", "is-active", service])
 
             if p != 0:
                 return False
@@ -76,7 +78,7 @@ class MaitreD(object):
     @clog(log)
     def is_enabled(self, s_entry):
         for service in s_entry:
-            p = subprocess.call(["sudo", "/bin/systemctl", "is-enabled", service])
+            p = subprocess.call(["/bin/systemctl", "is-enabled", service])
 
             if p != 0:
                 # if a single service in the s_entry is not enabled, then return false

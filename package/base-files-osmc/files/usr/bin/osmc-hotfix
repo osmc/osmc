@@ -22,7 +22,7 @@
 """
 
 import argparse
-import os
+import subprocess
 import sys
 
 CORE_PATH = ('/usr/share/kodi/addons/script.module.osmcsetting.updates'
@@ -181,7 +181,12 @@ def main():
         core.clear_reboot_request()
         print()
         if confirm('This HotFix needs the device to restart. Restart now?'):
-            os.execvp('sudo', ['sudo', 'systemctl', 'reboot'])
+            # polkit lets osmc reboot through logind (allow-poweroff-kodi.pkla).
+            # Run as osmc, systemctl declines while another user is logged in
+            # or something blocks shutdown, and says why; keep the reminder if
+            # it does.
+            if subprocess.call(['systemctl', 'reboot']) == 0:
+                return 0
         core.defer_reboot()
         print('Not restarting now. You will be reminded to restart later.')
 

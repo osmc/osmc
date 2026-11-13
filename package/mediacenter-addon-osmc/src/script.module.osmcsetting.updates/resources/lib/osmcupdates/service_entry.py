@@ -347,7 +347,7 @@ class Main(object):
                     exit_osmc_settings_addon()
                     xbmc.sleep(1000)
 
-                    subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])
+                    subprocess.Popen(['systemctl', 'start', 'manual-update'])
 
                     return 'Running external update proceedure'
 
@@ -1027,7 +1027,7 @@ class Main(object):
                                                       nolabel=self.lang(32101))
 
                 if user_input_restart_now:
-                    subprocess.Popen(['sudo', 'systemctl', 'restart', 'mediacenter'])
+                    subprocess.Popen(['systemctl', 'restart', 'mediacenter'])
 
         except Exception as e:
             log('Backup Error Type and Args: %s : %s \n\n %s' %
@@ -1054,7 +1054,7 @@ class Main(object):
             exit_osmc_settings_addon()
             xbmc.sleep(1000)
 
-            subprocess.Popen(['sudo', 'systemctl', 'start', 'manual-update'])
+            subprocess.Popen(['systemctl', 'start', 'manual-update'])
 
             return "Calling external update"
 

@@ -437,7 +437,7 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
                 log('Disabling SSH service')
 
                 os.system("/usr/bin/sudo /bin/systemctl disable ssh")
-                os.system("/usr/bin/sudo /bin/systemctl stop ssh")
+                os.system("/bin/systemctl stop ssh")
 
             else:
 
