@@ -11,9 +11,9 @@ Do not worry about /etc/hosts as libnss-myhostname should handle this.
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/guilib/guiinfo/SystemGUIInfo.cpp | 11 +++++++++--
- xbmc/network/NetworkServices.cpp      | 18 ++++++++++++++++++
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ xbmc/guilib/guiinfo/SystemGUIInfo.cpp |   11 ++++-
+ xbmc/network/NetworkServices.cpp      |   74 +++++++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+), 2 deletions(-)
 
 diff --git a/xbmc/guilib/guiinfo/SystemGUIInfo.cpp b/xbmc/guilib/guiinfo/SystemGUIInfo.cpp
 index d6a428fab6..251087e30c 100644
@@ -52,10 +52,95 @@ index d6a428fab6..251087e30c 100644
      {
        int iStereoMode = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_VIDEOSCREEN_STEREOSCOPICMODE);
 diff --git a/xbmc/network/NetworkServices.cpp b/xbmc/network/NetworkServices.cpp
-index 1d137360ee..8138da53a1 100644
+index 0602807b1e..5e3ac6eff4 100644
 --- a/xbmc/network/NetworkServices.cpp
 +++ b/xbmc/network/NetworkServices.cpp
-@@ -144,6 +144,7 @@ CNetworkServices::CNetworkServices()
+@@ -26,10 +26,13 @@
+ #include "settings/lib/Setting.h"
+ #include "settings/lib/SettingsManager.h"
+ #include "utils/RssManager.h"
++#include "utils/StringUtils.h"
+ #include "utils/SystemInfo.h"
+ #include "utils/Variant.h"
+ #include "utils/log.h"
+ 
++#include <cstdio>
++#include <cstring>
+ #include <utility>
+ 
+ #ifdef TARGET_LINUX
+@@ -87,6 +90,70 @@ using namespace UPNP;
+ 
+ using KODI::MESSAGING::HELPERS::DialogResponse;
+ 
++#ifdef TARGET_LINUX
++namespace
++{
++// OSMC: the device name is a free-form friendly name (AirPlay, UPnP), but the hostname must be one
++// DNS label. Keep ASCII letters and digits, turn spaces and separators into a single '-', drop
++// everything else, and fall back to "osmc" if nothing is left: "Sam's Vero (Lounge)" becomes
++// "Sams-Vero-Lounge".
++std::string HostnameFromDeviceName(const std::string& deviceName)
++{
++  std::string hostname;
++  bool separator = false;
++  for (const char c : deviceName)
++  {
++    if (StringUtils::isasciialphanum(c))
++    {
++      if (separator && !hostname.empty())
++        hostname += '-';
++      hostname += c;
++      separator = false;
++    }
++    else if (c != '\0' && std::strchr(" \t-_.,/:;+&|", c) != nullptr)
++      separator = true;
++  }
++
++  // a label is at most 63 characters and must not end in '-'
++  if (hostname.size() > 63)
++    hostname.resize(63);
++  while (!hostname.empty() && hostname.back() == '-')
++    hostname.pop_back();
++
++  return hostname.empty() ? "osmc" : hostname;
++}
++
++// OSMC: the system hostname follows the device name. osmc-hostname@.service validates the name
++// again and hands it to systemd-hostnamed, which writes /etc/hostname and sets the running
++// hostname. Only start it when /etc/hostname differs.
++void SyncSystemHostname(const std::string& deviceName)
++{
++  const std::string hostname = HostnameFromDeviceName(deviceName);
++
++  std::string current;
++  std::FILE* file = std::fopen("/etc/hostname", "r");
++  if (file != nullptr)
++  {
++    char line[256];
++    if (std::fgets(line, sizeof(line), file) != nullptr)
++      current = line;
++    std::fclose(file);
++  }
++  StringUtils::Trim(current);
++  if (current == hostname)
++    return;
++
++  // only letters, digits and '-' remain, and '-' is the one that systemd-escape(1) changes
++  std::string instance = hostname;
++  StringUtils::Replace(instance, "-", "\\x2d");
++
++  const std::string unit = "osmc-hostname@" + instance + ".service";
++  if (!CUtil::Command({"/bin/systemctl", "start", unit}, true))
++    CLog::Log(LOGERROR, "CNetworkServices: starting {} failed, see 'journalctl -u {}'", unit, unit);
++}
++} // namespace
++#endif
++
+ CNetworkServices::CNetworkServices()
+ #ifdef HAS_WEB_SERVER
+   : m_webserver(*new CWebServer),
+@@ -144,6 +211,7 @@ CNetworkServices::CNetworkServices()
        CSettings::SETTING_SMB_MAXPROTOCOL,
        CSettings::SETTING_SMB_LEGACYSECURITY,
        CSettings::SETTING_SERVICES_WSDISCOVERY,
@@ -63,26 +148,15 @@ index 1d137360ee..8138da53a1 100644
    };
    m_settings = CServiceBroker::GetSettingsComponent()->GetSettings();
    m_settings->GetSettingsManager()->RegisterCallback(this, settingSet);
-@@ -515,6 +516,23 @@ void CNetworkServices::OnSettingChanged(const std::shared_ptr<const CSetting>& s
+@@ -515,6 +583,12 @@ void CNetworkServices::OnSettingChanged(const std::shared_ptr<const CSetting>& s
        CServiceBroker::GetAppMessenger()->PostMsg(TMSG_RESTARTAPP);
      }
    }
 +
-+  if (settingId == "services.devicename")
-+  {
-+     std::string newHostName = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString("services.devicename"); 
-+     FILE *fp;
-+     fp = fopen("/tmp/hostname", "w");
-+     if (fp)
-+     {
-+         fprintf(fp, "%s", newHostName.c_str());
-+         fclose(fp);
-+     }
-+     else
-+         return;
-+     system("/usr/bin/sudo /bin/mv /tmp/hostname /etc/hostname");
-+     system("/usr/bin/sudo /bin/hostname -F /etc/hostname");
-+  }
++#ifdef TARGET_LINUX
++  if (settingId == CSettings::SETTING_SERVICES_DEVICENAME)
++    SyncSystemHostname(m_settings->GetString(CSettings::SETTING_SERVICES_DEVICENAME));
++#endif
 +
  }
  
