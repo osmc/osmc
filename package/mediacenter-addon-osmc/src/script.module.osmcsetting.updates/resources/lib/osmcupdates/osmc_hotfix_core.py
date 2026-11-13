@@ -227,7 +227,13 @@ class HotFixCore(object):
             if line.lstrip().startswith('#'):
                 continue
 
-            if line:
+            # strip() first: a line of nothing but spaces or a tab is blank to
+            # the person who wrote it, but was truthy here, so it became an
+            # empty command. subprocess then raised IndexError on args[0], and
+            # the run stopped reporting a failed step whose text was the empty
+            # string. Editors leave trailing whitespace behind very easily, so
+            # a HotFix could be broken by something entirely invisible.
+            if line.strip():
                 instruction.append(line.replace('INSTRUCTION:', '', 1).strip())
 
         return {

@@ -21,7 +21,8 @@ DESCRIPTION: Repoints the Debian security repository at OSMC's copy so updates a
 #  # comment      any line whose first non-space character is '#'. Indented
 #                 comments work too, as below.
 #
-#  (blank line)   ignored, so steps can be spaced out for readability.
+#  (blank line)   ignored, so steps can be spaced out for readability. A line
+#                 of nothing but spaces or tabs counts as blank too.
 #
 #  INSTRUCTION:   an optional prefix on a command line. It is stripped and the
 #                 rest is run. Purely decorative -- step 4 uses it to show the
@@ -62,9 +63,10 @@ DESCRIPTION: Repoints the Debian security repository at OSMC's copy so updates a
 #  1. the DESCRIPTION line
 #  2. the full list of commands, before being asked to agree
 #  3. "HotFix complete -- all steps completed successfully", or
-#     "HotFix failed" naming the exact command that stopped it
-#  4. the paste.osmc.tv URL, if UPLOAD was asked for
-#  5. a restart prompt, only if the HotFix asked for one AND every step passed
+#     "HotFix failed" naming the exact command that stopped it. If UPLOAD was
+#     asked for, the paste.osmc.tv URL is part of this same dialog -- it is not
+#     a second screen to dismiss.
+#  4. a restart prompt, only if the HotFix asked for one AND every step passed
 # -----------------------------------------------------------------------------
 #
 # -----------------------------------------------------------------------------
@@ -85,6 +87,18 @@ DESCRIPTION: Repoints the Debian security repository at OSMC's copy so updates a
 # -----------------------------------------------------------------------------
 #
 # -----------------------------------------------------------------------------
+#  NAMING IT
+#
+#  The ID is what the user types, and what the file is called on the mirror. It
+#  must be letters, digits, dot, dash or underscore, and must start with a
+#  letter or digit. Anything else -- a slash above all -- is refused before any
+#  request is made, so a HotFix named outside that set cannot be fetched at all.
+#
+#  Keep it short and sayable: a user will be reading it off a forum post and
+#  typing it on a remote control.
+# -----------------------------------------------------------------------------
+#
+# -----------------------------------------------------------------------------
 #  BEFORE PUBLISHING
 #
 #  - Run it TWICE on a test device. A user who sees no immediate change will run
@@ -93,6 +107,11 @@ DESCRIPTION: Repoints the Debian security repository at OSMC's copy so updates a
 #    the backup with the already-modified file.
 #  - Include a verification step. Without one, a HotFix whose sed matched
 #    nothing reports success having done nothing at all.
+#  - Check the command list without running anything:
+#        osmc-hotfix <id> --dry-run
+#    It prints the description and the numbered commands exactly as the add-on
+#    will show them, and runs none of them. Use it to confirm the parse is what
+#    you intended before anyone else sees it.
 # -----------------------------------------------------------------------------
 
 
