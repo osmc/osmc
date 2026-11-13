@@ -69,12 +69,16 @@ def get_ethernet_settings():
     if ip_value:
         if ip_value == 'dhcp':
             nfs_settings = get_non_connman_connection_details()
+            if not nfs_settings:
+                return None
             protocol = 'IPV4'
             if 'IPV6' in nfs_settings:
                 protocol = 'IPV6'
             nfs_settings[protocol]['Method'] = 'nfs_dhcp'
         else:
             nfs_settings = split_nfs_static_cmdline(ip_value)
+            if not nfs_settings:
+                return None
             protocol = 'IPV4'
             if 'IPV6' in nfs_settings:
                 protocol = 'IPV6'
@@ -288,9 +292,17 @@ def get_non_connman_connection_details():
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (ifconfig_data, stderr) = proc.communicate()
     proc.wait()
-    # parse ifconfig using re
-    data = re.findall(r'^(\S+).*?inet addr:(\S+).*?Mask:(\S+)', ifconfig_data, re.S | re.M)
-    (name, address, netmask) = data[0]
+
+    if isinstance(ifconfig_data, bytes):
+        ifconfig_data = ifconfig_data.decode('utf-8', 'ignore')
+
+    # parse ifconfig using re: current net-tools prints 'inet 192.168.1.20  netmask
+    # 255.255.255.0', older versions printed 'inet addr:192.168.1.20 ... Mask:255.255.255.0'
+    data = re.findall(r'inet (?:addr:)?(\S+).*?(?:netmask |Mask:)(\S+)', ifconfig_data)
+    if not data:
+        return None
+
+    (address, netmask) = data[0]
 
     device_settings = {
         'IPV4': {
@@ -309,8 +321,9 @@ def get_non_connman_connection_details():
         if line.startswith('nameserver'):
             ip = line.replace('nameserver ', '').strip()
 
-            if is_valid_ip_address(ip):  # IPV4 address
+            if is_valid_ip_address(ip) and count <= 2:
                 device_settings['Nameservers']['DNS_' + str(count)] = str(ip)
+                count += 1
 
     for count in range(1, 3):
         if 'DNS_' + str(count) not in device_settings['Nameservers']:
@@ -326,8 +339,7 @@ def get_non_connman_connection_details():
 
     for line in route_data.split('\n'):
         if line.startswith('0.0.0.0'):  # IPv4
-            split = [value.strip() for value in line.split('    ')]
-            device_settings['IPV4']['Gateway'] = split[2]
+            device_settings['IPV4']['Gateway'] = line.split()[1]
 
     return device_settings
 
@@ -528,10 +540,9 @@ def has_network_connection(online):
 
 def check_ms_ncsi_response():
     try:
-        response = requests.get('http://www.msftncsi.com/ncsi.txt')
-        if response.status_code == 200 and response.text == 'Microsoft NCSI':
-            return True
-    finally:
+        response = requests.get('http://www.msftncsi.com/ncsi.txt', timeout=5)
+        return response.status_code == 200 and response.text == 'Microsoft NCSI'
+    except requests.RequestException:
         return False
 
 
@@ -665,7 +676,7 @@ def is_valid_ipv4_address(ip):
     try:
         socket.inet_aton(ip)
         return True
-    finally:
+    except (OSError, TypeError, ValueError):
         return False
 
 
@@ -673,7 +684,7 @@ def is_valid_ipv6_address(ip):
     try:
         socket.inet_pton(socket.AF_INET6, ip)
         return True
-    finally:
+    except (OSError, TypeError, ValueError):
         return False
 
 
