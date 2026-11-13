@@ -1739,6 +1739,13 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                     DIALOG.ok(self.lang(32063), self.lang(32070))
                     return
 
+                if len(ssid.encode('utf-8')) > 32:
+                    # 'Portable Hotspot'
+                    # 'SSID must be 32 bytes or less (accented letters and emoji count as more
+                    # than one)'
+                    DIALOG.ok(self.lang(32063), self.lang(32126))
+                    return
+
                 passphrase = self.hotspot_passphrase
                 if len(passphrase) > 63:
                     # 'Portable Hotspot'
