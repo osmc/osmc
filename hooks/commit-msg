@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# Require the bracketed area prefix the repository already uses:
+#
+#   [package] [base-files-osmc] Bump to 2026.05-2
+#   [filesystem] [toolchain] [scripts] Work around Debian bug ...
+#
+# pre-commit cannot do this: it runs before the message is written. commit-msg
+# receives the message file as $1.
+#
+# It only insists that *a* prefix is present and suggests the right one rather
+# than matching it exactly, since a commit touching five packages should not
+# have to name all five. The goal is to stop a subject going in with no prefix
+# at all, not to police wording.
+
+subject=$(head -1 "$1")
+
+# merges, reverts, fixups and amend-in-progress messages are exempt
+case "$subject" in
+	Merge*|Revert*|fixup!*|squash!*|"#"*) exit 0 ;;
+esac
+
+want=""
+for area in $(git diff --cached --name-only | cut -d/ -f1 | sort -u)
+do
+	case "$area" in
+		package)
+			# one [package], then each package name:
+			#   [package] [mediacenter-addon-osmc] [base-files-osmc] ...
+			want="$want [package]"
+			for p in $(git diff --cached --name-only -- package/ \
+					| cut -d/ -f2 | sort -u)
+			do
+				want="$want [$p]"
+			done ;;
+		filesystem)  want="$want [filesystem]" ;;
+		toolchains)  want="$want [toolchain]" ;;
+		scripts)     want="$want [scripts]" ;;
+		installer)   want="$want [installer]" ;;
+	esac
+done
+
+[ -z "$want" ] && exit 0
+
+case "$subject" in
+	\[*) exit 0 ;;
+esac
+
+echo "This commit touches areas that are conventionally prefixed."
+echo "Suggested subject prefix:$want"
+echo
+echo "Existing examples:"
+echo "  [package] [base-files-osmc] Bump to 2026.05-2"
+echo "  [filesystem] [toolchain] [scripts] Work around Debian bug ..."
+echo
+echo "Prefix the subject, or commit with --no-verify to override."
+exit 1

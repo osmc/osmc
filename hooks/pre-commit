@@ -1,23 +1,62 @@
 #!/bin/sh
+#
+# Strip build artefacts that dpkg-deb writes back into DEBIAN/control.
+#
+# Two rules, because the right one differs per field:
+#
+#   Installed-Size   dpkg-deb output, never hand-authored. Stripped from every
+#                    staged control file.
+#   Package          expanded at build time for packages that call
+#   Architecture     fix_arch_ctl (udisks-osmc -> armv7-udisks-osmc,
+#   Depends          Architecture: armhf). Stripped only for those, because
+#                    'Architecture: all' elsewhere is hand-written and correct.
+#
+# Only staged packages are touched. The loop used to run over every package in
+# the tree, which with the git add below would have swept a control file into a
+# commit that had nothing to do with it.
 
 fixpkg()
 {
-   sed '/Package/d' -i $1/$2/DEBIAN/control
-   sed '/Architecture/d' -i $1/$2/DEBIAN/control
-   sed '/Depends/d' -i $1/$2/DEBIAN/control
+	# anchored: an unanchored /Package/d also deletes a Description that
+	# happens to mention the word
+	sed -i '/^Package:/d;/^Architecture:/d;/^Depends:/d;/^Installed-Size:/d' \
+		"$1/$2/DEBIAN/control"
+	git add "$1/$2/DEBIAN/control"
 }
 
-for package in $(ls package)
+staged_packages=$(git diff --cached --name-only --diff-filter=ACM -- package/ \
+			| cut -d/ -f2 | sort -u)
+
+for package in $staged_packages
 do
-   grep -q fix_arch_ctl package/$package/build.sh > /dev/null 2>&1 
-   if [ $? -eq 0 ]
-   then
-       grep -q Package package/$package/files/DEBIAN/control
-       if [ $? -eq 0 ]
-       then
-           echo Removing package and architecture information from cross-platform package $package
-           fixpkg "package/$package" "files"
-	   if [ -d "package/$package/files-dev" ]; then fixpkg "package/$package" "files-dev"; fi
-       fi
-   fi
+	grep -q fix_arch_ctl "package/$package/build.sh" > /dev/null 2>&1 || continue
+
+	for variant in files files-dev
+	do
+		ctl="package/$package/$variant/DEBIAN/control"
+		[ -f "$ctl" ] || continue
+
+		if grep -q '^Package:' "$ctl"
+		then
+			echo "Removing build-injected fields from $ctl"
+			fixpkg "package/$package" "$variant"
+		fi
+	done
 done
+
+# Installed-Size applies to every package, however it is built. Done over
+# staged paths so files, files-dev and any future variant are covered without
+# a list.
+for ctl in $(git diff --cached --name-only --diff-filter=ACM | grep 'DEBIAN/control$')
+do
+	[ -f "$ctl" ] || continue
+
+	if grep -q '^Installed-Size:' "$ctl"
+	then
+		sed -i '/^Installed-Size:/d' "$ctl"
+		git add "$ctl"
+		echo "Removed Installed-Size from $ctl (dpkg-deb build artefact)"
+	fi
+done
+
+exit 0

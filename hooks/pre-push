@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# Warn when a package or toolchain changes without a version bump.
+#
+# A package whose files change but whose DEBIAN/control Version: does not will
+# build and publish as the same version with different contents. Anything that
+# already downloaded the old one never sees the change.
+#
+# Warns only, never blocks: holding a package back is a legitimate choice, and
+# the September 2026 series did exactly that for two packages deliberately.
+#
+# pre-commit would be the wrong place -- a bump is legitimately a separate,
+# later commit, so a per-commit check would fire constantly and be switched off
+# within a day. At push time the whole branch is visible and the question
+# becomes answerable: does this push touch package X without bumping X
+# anywhere in it?
+
+remote_head=$(git rev-parse --verify --quiet "refs/remotes/$1/master") || exit 0
+range="$remote_head..HEAD"
+
+git rev-list "$range" >/dev/null 2>&1 || exit 0
+
+warned=0
+
+check_tree()
+{
+	for item in $(git diff --name-only "$range" -- "$1/" | cut -d/ -f2 | sort -u)
+	do
+		ctl=$(find "$1/$item" -path '*DEBIAN/control' 2>/dev/null | head -1)
+		[ -n "$ctl" ] || continue
+
+		old=$(git show "$remote_head:$ctl" 2>/dev/null | sed -n 's/^Version: *//p')
+		new=$(sed -n 's/^Version: *//p' "$ctl")
+
+		if [ -n "$old" ] && [ "$old" = "$new" ]
+		then
+			if [ $warned -eq 0 ]
+			then
+				echo "Changed without a version bump:"
+				warned=1
+			fi
+			printf '  %-30s still %s\n' "$item" "$new"
+		fi
+	done
+}
+
+check_tree package
+check_tree toolchains
+
+if [ $warned -eq 1 ]
+then
+	echo
+	echo "Fine if deliberate -- they will not be rebuilt until bumped."
+	echo "Pushing anyway."
+fi
+
+exit 0
