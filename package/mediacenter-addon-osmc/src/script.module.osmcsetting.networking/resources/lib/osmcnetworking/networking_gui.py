@@ -247,6 +247,8 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
         # connected SSID, the ssid we are currently connected to
         self.conn_ssid = None
+        # service path of the network we are currently connected to
+        self.conn_path = None
 
         # custom DNS over HTTPS server shown in the DNS panel
         self.dns_custom_server = ''
@@ -1128,18 +1130,16 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 self.toggle_controls(True, [WIRED_RESET_BUTTON, WIRED_APPLY_BUTTON])
 
         if net_type == 'WIRELESS':
-            wireless_config = self.get_wireless_config(self.conn_ssid)
+            wireless_config = self.get_wireless_config(self.conn_path)
             if wireless_config == self.current_network_config:
                 self.toggle_controls(False, [WIRELESS_RESET_BUTTON, WIRELESS_APPLY_BUTTON])
 
             else:
                 self.toggle_controls(True, [WIRELESS_RESET_BUTTON, WIRELESS_APPLY_BUTTON])
 
-    def get_wireless_config(self, ssid):
-        if ssid is not None:
-            wifi = None
-            for adapterAddress, wifis in osmc_network.get_wifi_networks().items():
-                wifi = wifis.get(ssid, None)
+    def get_wireless_config(self, path):
+        if path is not None:
+            wifi = osmc_network.get_wifi_network(path=path)
 
             if wifi:
                 config = wifi
@@ -1170,9 +1170,11 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                 self.current_network_config = osmc_network.get_connected_wifi()
                 self.conn_ssid = None
+                self.conn_path = None
 
                 if 'SSID' in self.current_network_config:
                     self.conn_ssid = self.current_network_config['SSID']
+                    self.conn_path = self.current_network_config['path']
 
                 if self.conn_ssid:
                     if 'Address' in self.current_network_config[self.internet_protocol]:
@@ -1255,7 +1257,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 self.hide_controls(WIRELESS_IP_VALUES)
 
         elif control_id == WIRELESS_RESET_BUTTON:
-            self.current_network_config = self.get_wireless_config(self.conn_ssid)
+            self.current_network_config = self.get_wireless_config(self.conn_path)
 
             self.update_manual_dhcp_button(WIRELESS_DHCP_MANUAL_BUTTON,
                                            WIRELESS_IP_VALUES,
@@ -1309,7 +1311,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
         if connected == 'False':
             if not self.conn_ssid:  # if we are not connected to a network connect
-                self.connect_to_wifi(ssid, encrypted, opt_forget=True)
+                self.connect_to_wifi(ssid, encrypted, opt_forget=True, path=path)
             else:  # Display a toast asking the user to disconnect first
                 # 'Please disconnect from the current network before connecting'
                 # 'Wireless'
@@ -1317,7 +1319,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
         else:
 
-            if ssid == self.conn_ssid:
+            if path == self.conn_path:
                 #                             'Disconnect from'
                 selection = DIALOG.select(self.lang(32042) + ' ' + self.conn_ssid + '?',
                                           [self.lang(32051), self.lang(32058), self.lang(32059)])
@@ -1328,6 +1330,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                 self.show_busy_dialogue()
 
                 self.conn_ssid = None
+                self.conn_path = None
                 self.wireless_password = None
                 self.current_network_config = {}
 
@@ -1344,15 +1347,15 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                 self.clear_busy_dialogue()
 
-    def connect_to_wifi(self, ssid, encrypted, password=None, scan=False, opt_forget=False):
+    def connect_to_wifi(self, ssid, encrypted, password=None, scan=False, opt_forget=False,
+                        path=None):
         if scan:
             self.show_busy_dialogue()
             osmc_network.scan_wifi()
             self.clear_busy_dialogue()
 
-        wifi = None
-        for adapterAddress, wifis in osmc_network.get_wifi_networks().items():
-            wifi = wifis.get(ssid, None)
+        # the list knows the service path, preseeding only knows the name
+        wifi = osmc_network.get_wifi_network(path=path, ssid=ssid)
 
         if wifi:
             # 'Configuring'
@@ -1440,6 +1443,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                                                 WIRELESS_DHCP_MANUAL_BUTTON])
 
                     self.conn_ssid = self.current_network_config['SSID']
+                    self.conn_path = self.current_network_config['path']
                     interface = self.current_network_config['Interface']
 
                     if osmc_network.has_network_connection(True):
@@ -2190,31 +2194,31 @@ class WIFIPopulateBot(threading.Thread):
     def update_list_control(self, running_dict, multi_adapter):
         items_to_be_removed = []
         selected_adapter_address = ''
-        selected_ssid = ''
+        selected_path = ''
 
         # Remember selection, so it can be re-established after site list refresh
         previous_selected_item = self.WFP.getSelectedItem()
         if previous_selected_item is not None:
             selected_adapter_address = previous_selected_item.getProperty('AdapterAddress')
-            selected_ssid = previous_selected_item.getProperty('SSID')
+            selected_path = previous_selected_item.getProperty('Path')
 
         for index in range(0, self.WFP.size()):
             list_item = self.WFP.getListItem(index)
             list_item_adapter_address = list_item.getProperty('AdapterAddress')
-            list_item_ssid = list_item.getProperty('SSID')
+            list_item_path = list_item.getProperty('Path')
             list_item_connected = list_item.getProperty('Connected') == 'True'
 
             if list_item_adapter_address in running_dict.keys():
-                if list_item_ssid in running_dict[list_item_adapter_address].keys():
+                if list_item_path in running_dict[list_item_adapter_address].keys():
 
-                    wifi = running_dict[list_item_adapter_address][list_item_ssid]
+                    wifi = running_dict[list_item_adapter_address][list_item_path]
                     network_connected = wifi['State'] in ('ready', 'online')
                     expected_label = self.get_list_item_label(wifi, multi_adapter)
 
                     if (list_item.getLabel() == expected_label and
                             list_item_connected == network_connected):
 
-                        running_dict[list_item_adapter_address].pop(list_item_ssid)
+                        running_dict[list_item_adapter_address].pop(list_item_path)
 
                     else:
                         items_to_be_removed.append(index)
@@ -2229,7 +2233,7 @@ class WIFIPopulateBot(threading.Thread):
         if len(running_dict.keys()) > 0:
             for adapterAddress, wifis in running_dict.items():
 
-                for ssid, info in wifis.items():
+                for path, info in wifis.items():
                     self.WFP.addItem(self.convert_wifi_to_listitem(info, multi_adapter))
                     _ = info['State'] in ('ready', 'online')
 
@@ -2238,10 +2242,10 @@ class WIFIPopulateBot(threading.Thread):
             for index in range(0, self.WFP.size()):
                 list_item = self.WFP.getListItem(index)
                 list_item_adapter_address = list_item.getProperty('AdapterAddress')
-                list_item_ssid = list_item.getProperty('SSID')
+                list_item_path = list_item.getProperty('Path')
 
                 if (list_item_adapter_address == selected_adapter_address and
-                        list_item_ssid == selected_ssid):
+                        list_item_path == selected_path):
                     self.WFP.selectItem(index)
                     break
 

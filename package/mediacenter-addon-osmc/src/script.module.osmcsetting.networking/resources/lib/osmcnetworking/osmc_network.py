@@ -396,9 +396,21 @@ def get_wifi_networks():
             if address not in interfaces:
                 interfaces[address] = {}
 
-            interfaces[address][wifi_settings['SSID']] = wifi_settings
+            # key by service path: names are not unique
+            interfaces[address][path] = wifi_settings
 
     return interfaces
+
+
+def get_wifi_network(path=None, ssid=None):
+    # find a network by service path or, when only the name is known, the first network
+    # with that name in ConnMan's order (connected first, then favourite, then strongest)
+    for wifis in get_wifi_networks().values():
+        for wifi_path, wifi in wifis.items():
+            if (path and wifi_path == path) or (not path and wifi['SSID'] == ssid):
+                return wifi
+
+    return None
 
 
 def wifi_connect(path, password=None, ssid=None, script_base_path=None):
