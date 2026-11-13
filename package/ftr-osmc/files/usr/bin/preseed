@@ -85,11 +85,12 @@ if hasattr(sys, 'getwindowsversion'):
 
 class ConfigParser(configparser.ConfigParser):
     """
-    configparser.ConfigParser with optionxform set to str so the casing of options remains intact
+    configparser.ConfigParser with optionxform set to str so the casing of options remains intact,
+    and without interpolation, so values such as passphrases may contain '%'
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(interpolation=None)
         self.optionxform = str
 
     def sections_dict(self):
