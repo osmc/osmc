@@ -110,15 +110,16 @@ class Agent(dbus.service.Object):
                     response["Name"] = name
                     break
                 if arg.startswith("SSID="):
-                    ssid = arg.replace("SSID", "", 1)
-                    response["SSID"] = ssid
+                    ssid = arg.replace("SSID=", "", 1)
+                    response["SSID"] = dbus.ByteArray(ssid.encode('utf-8'))
                     break
 
         else:
             if self.name:
                 response["Name"] = self.name
             if self.ssid:
-                response["SSID"] = self.ssid
+                # ConnMan only accepts the SSID as a byte array
+                response["SSID"] = dbus.ByteArray(self.ssid.encode('utf-8'))
 
         return response
 
