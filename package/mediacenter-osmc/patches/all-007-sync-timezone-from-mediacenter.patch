@@ -6,38 +6,317 @@ Subject: [PATCH] When the timezone is changed in Kodi, synchronise the system
 
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/platform/posix/PosixTimezone.cpp | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ xbmc/platform/posix/PosixTimezone.cpp | 224 +++++++++++++++++++++++---
+ xbmc/platform/posix/PosixTimezone.h   |   3 +
+ 2 files changed, 208 insertions(+), 19 deletions(-)
 
 diff --git a/xbmc/platform/posix/PosixTimezone.cpp b/xbmc/platform/posix/PosixTimezone.cpp
-index e76fd722e9..26f24f79e9 100644
+index e76fd722e9..584d155444 100644
 --- a/xbmc/platform/posix/PosixTimezone.cpp
 +++ b/xbmc/platform/posix/PosixTimezone.cpp
-@@ -192,6 +192,24 @@ void CPosixTimezone::SetTimezone(const std::string& timezoneName)
+@@ -9,6 +9,7 @@
+ #include "PosixTimezone.h"
+ 
+ #include "ServiceBroker.h"
++#include "Util.h"
+ #include "XBDateTime.h"
+ #include "settings/Settings.h"
+ #include "settings/SettingsComponent.h"
+@@ -16,14 +17,69 @@
+ #include "settings/lib/SettingDefinitions.h"
+ #include "utils/StringUtils.h"
+ #include "utils/SystemInfo.h"
++#include "utils/log.h"
+ 
+ #include <algorithm>
+ #include <climits>
+ #include <cstdlib>
++#include <cstring>
+ #include <ctime>
+ 
++#include <sys/stat.h>
++#include <unistd.h>
++
+ #include "PlatformDefs.h"
+ 
++namespace
++{
++// The time zone database, with the trailing slash so a zone name can be appended.
++constexpr std::string_view ZONEINFO = "/usr/share/zoneinfo/";
++
++// Compiled zone files are a few KiB; anything far larger is not one.
++constexpr size_t MAX_ZONE_FILE_SIZE = 64 * 1024;
++
++std::string ReadZoneFile(const std::string& path)
++{
++  std::string content;
++  std::FILE* file = std::fopen(path.c_str(), "rb");
++  if (file == nullptr)
++    return content;
++
++  char buffer[4096];
++  size_t len;
++  while ((len = std::fread(buffer, 1, sizeof(buffer), file)) > 0)
++  {
++    content.append(buffer, len);
++    if (content.size() > MAX_ZONE_FILE_SIZE)
++    {
++      content.clear();
++      break;
++    }
++  }
++
++  std::fclose(file);
++  return content;
++}
++
++// systemd-escape(1) for a unit instance name: '/' becomes '-', and anything other than ASCII
++// letters, digits, ':', '_' and a non-leading '.' becomes \xNN.
++std::string EscapeUnitInstance(const std::string& value)
++{
++  std::string escaped;
++  for (size_t i = 0; i < value.size(); i++)
++  {
++    const char c = value[i];
++    if (c == '/')
++      escaped += '-';
++    else if (StringUtils::isasciialphanum(c) || c == ':' || c == '_' || (c == '.' && i > 0))
++      escaped += c;
++    else
++      escaped += StringUtils::Format("\\x{:02x}", static_cast<unsigned char>(c));
++  }
++  return escaped;
++}
++} // namespace
++
+ CPosixTimezone::CPosixTimezone()
+ {
+    char* line = NULL;
+@@ -155,7 +211,29 @@ void CPosixTimezone::OnSettingChanged(const std::shared_ptr<const CSetting>& set
+ 
+ void CPosixTimezone::OnSettingsLoaded()
+ {
+-  SetTimezone(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_LOCALE_TIMEZONE));
++  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
++  std::string timezone = settings->GetString(CSettings::SETTING_LOCALE_TIMEZONE);
++
++  // OSMC: a stored value that is not a zone falls back to the system's zone. Earlier builds could
++  // store "etc/localtime" (a plain /etc/localtime misread as a zone name) and the walkthrough
++  // "UTC/UTC". If the system's copy matches zones in several countries, the stored country
++  // decides. Change callbacks may not fire during load, so apply the result here either way.
++  if (!IsValidTimezone(timezone))
++  {
++    std::string system = GetOSConfiguredTimezone();
++    if (system.empty())
++    {
++      const auto country =
++          m_countryByName.find(settings->GetString(CSettings::SETTING_LOCALE_TIMEZONECOUNTRY));
++      if (country != m_countryByName.end())
++        system = FindTimezoneByContent("/etc/localtime", country->second);
++    }
++
++    if (!system.empty() && settings->SetString(CSettings::SETTING_LOCALE_TIMEZONE, system))
++      timezone = system;
++  }
++
++  SetTimezone(timezone);
+   CDateTime::ResetTimezoneBias();
+ }
+ 
+@@ -192,44 +270,150 @@ void CPosixTimezone::SetTimezone(const std::string& timezoneName)
      snprintf(env_var, sizeof(env_var), "TZ=:%s", timezoneName.c_str());
      putenv(env_var);
      tzset();
-+    if (timezoneName.empty())
-+       return;
-+    /* Keep /etc/timezone in sync */
-+    FILE *fp = fopen("/tmp/timezone", "w");
-+    if (fp)
-+    {
-+               fprintf(fp, "%s\n", timezoneName.c_str());
-+               fclose(fp);
-+               int res = system("/usr/bin/sudo /bin/mv /tmp/timezone /etc/timezone"); /* We need this to update a root owned file */
-+               if (res == 0)
-+               {
-+                 char *command;
-+                 asprintf(&command, "%s%s%s", "/usr/bin/sudo /bin/cp /usr/share/zoneinfo/", timezoneName.c_str(), " /etc/localtime.dpkg-new");
-+                 system(command);
-+                 system("/usr/bin/sudo /bin/mv /etc/localtime.dpkg-new /etc/localtime");
-+               }
-+    }
-+
++    SyncSystemTimezone(timezoneName);
    }
  }
  
+-std::string CPosixTimezone::GetOSConfiguredTimezone()
++void CPosixTimezone::SyncSystemTimezone(const std::string& timezone)
+ {
+-  std::string timezoneName;
++  // OSMC: Kodi's time zone setting drives the system's. osmc-timezone@.service validates the name
++  // again and, sandboxed, points /etc/localtime at the zone and updates /etc/timezone. Only start
++  // it when the system is not already on this zone, so a normal start does not touch /etc.
++  if (timezone.empty())
++    return;
+ 
+-  // try Slackware approach first
+-  timezoneName = ReadFromLocaltime("/etc/localtime-copied-from");
++  if (!IsValidTimezone(timezone))
++  {
++    CLog::Log(LOGWARNING, "CPosixTimezone: not applying invalid time zone \"{}\" to the system",
++              timezone);
++    return;
++  }
+ 
+-  // RHEL and maybe other distros make /etc/localtime a symlink
+-  if (timezoneName.empty())
+-    timezoneName = ReadFromLocaltime("/etc/localtime");
++  char target[PATH_MAX];
++  const ssize_t len = readlink("/etc/localtime", target, sizeof(target) - 1);
++  if (len != -1 && std::string_view(target, len) == std::string(ZONEINFO) + timezone)
++    return;
+ 
+-  // now try Debian approach
+-  if (timezoneName.empty())
+-    timezoneName = ReadFromTimezone("/etc/timezone");
++  const std::string unit = "osmc-timezone@" + EscapeUnitInstance(timezone) + ".service";
++  if (!CUtil::Command({"/bin/systemctl", "start", unit}, true))
++    CLog::Log(LOGERROR, "CPosixTimezone: starting {} failed, see 'journalctl -u {}'", unit, unit);
++}
+ 
+-  return timezoneName;
++bool CPosixTimezone::IsValidTimezone(const std::string& timezone)
++{
++  // Path components of ASCII letters, digits, '_', '+' and '-'. Without '.' the name cannot
++  // leave the zone database.
++  if (timezone.empty() || timezone.front() == '/' || timezone.back() == '/' ||
++      timezone.find("//") != std::string::npos)
++    return false;
++
++  for (const char c : timezone)
++  {
++    if (!StringUtils::isasciialphanum(c) && c != '_' && c != '+' && c != '-' && c != '/')
++      return false;
++  }
++
++  // zoneinfo/localtime links back to /etc/localtime
++  if (timezone == "localtime" || timezone == "posixrules")
++    return false;
++
++  // and it has to be a compiled zone file
++  std::FILE* file = std::fopen((std::string(ZONEINFO) + timezone).c_str(), "rb");
++  if (file == nullptr)
++    return false;
++
++  char magic[4];
++  const bool tzif =
++      std::fread(magic, 1, sizeof(magic), file) == sizeof(magic) && std::memcmp(magic, "TZif", 4) == 0;
++  std::fclose(file);
++  return tzif;
++}
++
++std::string CPosixTimezone::GetOSConfiguredTimezone()
++{
++  // Slackware records where its copy came from, Debian and RHEL make /etc/localtime a symlink,
++  // and Debian also keeps the name in /etc/timezone. Take the first that names a real zone.
++  for (const std::string& timezone :
++       {ReadFromLocaltime("/etc/localtime-copied-from"), ReadFromLocaltime("/etc/localtime"),
++        ReadFromTimezone("/etc/timezone")})
++  {
++    if (IsValidTimezone(timezone))
++      return timezone;
++  }
++
++  // OSMC: builds before osmc-timezone@.service left /etc/localtime as a plain copy, and could
++  // leave "etc/localtime" in /etc/timezone, so recognise the copy by its contents.
++  return FindTimezoneByContent("/etc/localtime");
+ }
+ 
+ std::string CPosixTimezone::ReadFromLocaltime(const std::string_view filename)
+ {
++  // Only a symlink names a zone. A plain file is a copy of one, and its own path is not a zone
++  // name: taking the last two components of "/etc/localtime" gives "etc/localtime".
++  struct stat st;
++  if (lstat(filename.data(), &st) != 0 || !S_ISLNK(st.st_mode))
++    return "";
++
+   char path[PATH_MAX];
+-  if(realpath(filename.data(), path) == nullptr)
++  const ssize_t len = readlink(filename.data(), path, sizeof(path) - 1);
++  if (len == -1)
+     return "";
+ 
+-  // Read the timezone starting from the second last occurrence of /
+-  std::string str = path;
+-  size_t pos = str.rfind('/');
++  path[len] = '\0';
++  std::string target = path;
++
++  // On webOS /etc/localtime links to another link, so resolve the whole chain there
++  if (target.find("zoneinfo/") == std::string::npos)
++  {
++    if (realpath(filename.data(), path) == nullptr)
++      return "";
++    target = path;
++  }
++
++  // Everything after "zoneinfo/", for absolute and relative links alike. Three-level names such
++  // as America/Argentina/Buenos_Aires stay whole.
++  const size_t pos = target.find("zoneinfo/");
+   if (pos == std::string::npos)
+     return "";
+ 
+-  pos = str.rfind('/', pos - 1);
+-  if (pos == std::string::npos)
++  return target.substr(pos + std::strlen("zoneinfo/"));
++}
++
++std::string CPosixTimezone::FindTimezoneByContent(const std::string_view filename,
++                                                  const std::string& countryCode)
++{
++  // Match a plain copy against the zones Kodi offers. Some share their contents across countries
++  // (Europe/Oslo and Arctic/Longyearbyen), so a match must be unique, or unique within
++  // countryCode; otherwise give up rather than guess.
++  struct stat st;
++  if (lstat(filename.data(), &st) != 0 || !S_ISREG(st.st_mode) ||
++      static_cast<size_t>(st.st_size) > MAX_ZONE_FILE_SIZE)
++    return "";
++
++  const std::string localtime = ReadZoneFile(std::string(filename));
++  if (localtime.empty())
+     return "";
+ 
+-  return str.substr(pos + 1);
++  std::vector<std::string> matches;
++  std::vector<std::string> countryMatches;
++  for (const auto& [timezone, country] : m_countriesByTimezoneName)
++  {
++    const std::string path = std::string(ZONEINFO) + timezone;
++    struct stat zone;
++    if (stat(path.c_str(), &zone) != 0 || zone.st_size != st.st_size ||
++        ReadZoneFile(path) != localtime)
++      continue;
++
++    matches.push_back(timezone);
++    if (!countryCode.empty() && country == countryCode)
++      countryMatches.push_back(timezone);
++  }
++
++  if (matches.size() == 1)
++    return matches.front();
++  if (countryMatches.size() == 1)
++    return countryMatches.front();
++  return "";
+ }
+ 
+ std::string CPosixTimezone::ReadFromTimezone(const std::string_view filename)
+@@ -248,6 +432,8 @@ std::string CPosixTimezone::ReadFromTimezone(const std::string_view filename)
+     std::fclose(file);
+   }
+ 
++  // fgets() keeps the newline
++  StringUtils::Trim(timezoneName);
+   return timezoneName;
+ }
+ 
+diff --git a/xbmc/platform/posix/PosixTimezone.h b/xbmc/platform/posix/PosixTimezone.h
+index 26a7f09340..fd9dbd1514 100644
+--- a/xbmc/platform/posix/PosixTimezone.h
++++ b/xbmc/platform/posix/PosixTimezone.h
+@@ -46,8 +46,11 @@ public:
+                                             void* data);
+ 
+ private:
++  static bool IsValidTimezone(const std::string& timezone);
+   std::string ReadFromLocaltime(std::string_view filename);
+   std::string ReadFromTimezone(std::string_view filename);
++  std::string FindTimezoneByContent(std::string_view filename, const std::string& countryCode = "");
++  void SyncSystemTimezone(const std::string& timezone);
+   std::vector<std::string> m_counties;
+   std::map<std::string, std::string> m_countryByCode;
+   std::map<std::string, std::string> m_countryByName;
 -- 
 2.34.1
 
