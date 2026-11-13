@@ -14,6 +14,7 @@ import socket
 import subprocess
 import threading
 import traceback
+import unicodedata
 from io import open
 
 import xbmc
@@ -202,6 +203,71 @@ DNS_CUSTOM_URL_VALUE = 910605
 DNS_STATUS = 10606
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
+
+
+def kodi_major_version():
+    try:
+        return int(xbmc.getInfoLabel('System.BuildVersionShort').split('.')[0])
+    except ValueError:
+        return 0
+
+
+# Before v23, Kodi keeps only the low 16 bits of each character, so it cannot draw anything
+# above U+FFFF, such as emoji. Kodi v23 can (xbmc/xbmc#30034), and there this does nothing.
+SPELL_OUT_ASTRAL_CHARACTERS = kodi_major_version() < 23
+
+
+def is_emoji_modifier(char):
+    # zero width joiner, keycap, variation selectors, skin tones and tags: these only change
+    # the emoji before them
+    code = ord(char)
+    return (char in '‍⃣︎️' or 0x1F3FB <= code <= 0x1F3FF or
+            0xE0000 <= code <= 0xE0FFF)
+
+
+def is_regional_indicator(char):
+    return 0x1F1E6 <= ord(char) <= 0x1F1FF
+
+
+def display_ssid(ssid):
+    """
+    Return a network name as it should be shown. On Kodi before v23, emoji and anything else
+    above U+FFFF are spelled out, e.g. ':rainbow:' or ':flag_gb:', and what only modifies them
+    is dropped. Use the real name for everything except display.
+    """
+    if not SPELL_OUT_ASTRAL_CHARACTERS:
+        return ssid
+
+    shown = []
+    index = 0
+    while index < len(ssid):
+        char = ssid[index]
+        following = ssid[index + 1:index + 2]
+        index += 1
+
+        if is_regional_indicator(char) and following and is_regional_indicator(following):
+            # two regional indicators make a flag
+            shown.append(':flag_%s%s:' % (chr(ord(char) - 0x1F1E6 + ord('a')),
+                                          chr(ord(following) - 0x1F1E6 + ord('a'))))
+            index += 1
+
+        elif (ord(char) > 0xFFFF or following == '️') and not is_emoji_modifier(char):
+            # U+FE0F asks for the emoji form of the character before it
+            name = unicodedata.name(char, 'U+%X' % ord(char))
+            shown.append(':%s:' % name.lower().replace(' ', '_').replace('-', '_'))
+
+        elif ord(char) > 0xFFFF:
+            # a stray modifier: masked to 16 bits, a tag would show as a letter
+            continue
+
+        else:
+            shown.append(char)
+            continue
+
+        while index < len(ssid) and is_emoji_modifier(ssid[index]):
+            index += 1
+
+    return ''.join(shown)
 
 
 class NetworkingGui(xbmcgui.WindowXMLDialog):
@@ -1321,7 +1387,8 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
             if path == self.conn_path:
                 #                             'Disconnect from'
-                selection = DIALOG.select(self.lang(32042) + ' ' + self.conn_ssid + '?',
+                selection = DIALOG.select(self.lang(32042) + ' ' +
+                                          display_ssid(self.conn_ssid) + '?',
                                           [self.lang(32051), self.lang(32058), self.lang(32059)])
 
                 if selection == -1 or selection == 0:
@@ -1364,6 +1431,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             path = wifi['path']
             hiddenssid = None
             connect = False
+            shown_ssid = display_ssid(ssid)
 
             if '_hidden_' in path:
                 # 'Enter SSID to connect to this hidden network'
@@ -1372,12 +1440,12 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             else:
                 if not opt_forget or not os.path.isdir(path.replace('/net/connman/service/', '/var/lib/connman/')):
                     # 'Wireless'   'Connect to'
-                    if DIALOG.yesno(self.lang(32041), self.lang(32052) + ' ' + ssid + '?'):
+                    if DIALOG.yesno(self.lang(32041), self.lang(32052) + ' ' + shown_ssid + '?'):
                         connect = True
                 else:
-                    selection = DIALOG.select('%s: %s' % (self.lang(32041), ssid),
-                                              [self.lang(32052) + ' ' + ssid + '?',
-                                               self.lang(32094) % ssid])
+                    selection = DIALOG.select('%s: %s' % (self.lang(32041), shown_ssid),
+                                              [self.lang(32052) + ' ' + shown_ssid + '?',
+                                               self.lang(32094) % shown_ssid])
                     if selection == 0:
                         connect = True
 
@@ -1412,7 +1480,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
                 if not connection_status:
                     # 'Connection to '                  'failed'
-                    message = self.lang(32024) + ' ' + ssid + ' ' + self.lang(32025)
+                    message = self.lang(32024) + ' ' + shown_ssid + ' ' + self.lang(32025)
                     #                                                   'Wireless'
                     DIALOG.notification(self.lang(32041), message, time=2500, sound=False)
 
@@ -1665,7 +1733,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
         if not self.hotspot_ssid:
             self.hotspot_ssid = 'osmc_wifi'
 
-        wifi_ssid_label.setLabel(self.hotspot_ssid)
+        wifi_ssid_label.setLabel(display_ssid(self.hotspot_ssid))
         self.hotspot_passphrase = osmc_network.get_tethering_passphrase()
 
         if not self.hotspot_passphrase:
@@ -1712,7 +1780,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
 
             if entered_ssid:
                 self.hotspot_ssid = entered_ssid
-                wifi_ssid_label.setLabel(entered_ssid)
+                wifi_ssid_label.setLabel(display_ssid(entered_ssid))
 
         if control_id == TETHERING_WIFI_PASSPHRASE_LABEL:
             wifi_passphrase_label = self.getControl(TETHERING_WIFI_PASSPHRASE_VALUE)
@@ -2251,7 +2319,7 @@ class WIFIPopulateBot(threading.Thread):
 
     @staticmethod
     def get_list_item_label(wifi, multi_adapter):
-        ssid = wifi['SSID']
+        ssid = display_ssid(wifi['SSID'])
         interface = wifi['Interface']
 
         if multi_adapter:
