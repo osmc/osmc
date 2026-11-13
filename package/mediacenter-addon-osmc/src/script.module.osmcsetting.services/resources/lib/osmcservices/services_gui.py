@@ -19,6 +19,7 @@ import xbmcgui
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
 from osmccommon.osmc_logging import clog
+from osmccommon.osmc_units import set_unit_enabled
 
 ACTION_PREVIOUS_MENU = 10
 ACTION_NAV_BACK = 92
@@ -53,16 +54,16 @@ class MaitreD(object):
 
     @clog(log)
     def enable_service(self, s_entry):
-        # polkit lets osmc start and stop units (allow-systemctl-as-osmc.pkla)
-        # but not enable or disable them, which still need sudo
+        # polkit lets osmc start and stop units (allow-systemctl-as-osmc.pkla);
+        # enabling goes through osmc-enable@, which accepts what apps.d names
         for service in s_entry:
-            os.system("sudo /bin/systemctl enable " + service)
+            set_unit_enabled(service, True)
             os.system("/bin/systemctl start " + service)
 
     @clog(log)
     def disable_service(self, s_entry):
         for service in s_entry:
-            os.system("sudo /bin/systemctl disable " + service)
+            set_unit_enabled(service, False)
             os.system("/bin/systemctl stop " + service)
 
     @clog(log)

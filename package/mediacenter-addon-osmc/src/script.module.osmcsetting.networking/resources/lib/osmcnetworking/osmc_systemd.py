@@ -12,6 +12,8 @@ import os
 import subprocess
 import time
 
+from osmccommon.osmc_units import set_unit_enabled
+
 
 def is_service_running(service_name):
     enabled = is_service_enabled(service_name)
@@ -51,9 +53,15 @@ def is_service_active(service_name):
 
 
 def update_service(service_name, service_status):
-    with open(os.devnull, 'w') as fnull:
-        subprocess.call(['sudo', '/bin/systemctl', service_status, service_name],
-                        stderr=fnull, stdout=fnull)
+    if service_status in ('enable', 'disable'):
+        # osmc-enable@ / osmc-disable@ accept connman-wait-for-network.service,
+        # this module's one enable/disable user, as an exception
+        set_unit_enabled(service_name, service_status == 'enable')
+    else:
+        # polkit lets osmc start and stop units (allow-systemctl-as-osmc.pkla)
+        with open(os.devnull, 'w') as fnull:
+            subprocess.call(['/bin/systemctl', service_status, service_name],
+                            stderr=fnull, stdout=fnull)
 
     time.sleep(1)
 

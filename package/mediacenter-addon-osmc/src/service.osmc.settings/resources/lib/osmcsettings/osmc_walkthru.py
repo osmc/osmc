@@ -25,6 +25,7 @@ import xbmcgui
 import xbmcvfs
 from osmccommon.osmc_language import LangRetriever
 from osmccommon.osmc_logging import StandardLogger
+from osmccommon.osmc_units import set_unit_enabled
 
 from . import __LICENSE__
 from . import __WARRANTY__
@@ -436,7 +437,7 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
 
                 log('Disabling SSH service')
 
-                os.system("/usr/bin/sudo /bin/systemctl disable ssh")
+                set_unit_enabled('ssh.service', False)
                 os.system("/bin/systemctl stop ssh")
 
             else:
