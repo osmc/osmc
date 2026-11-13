@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+# Set the hostname. Run as root by osmc-hostname@.service, which passes the
+# unit's escaped instance name (%i) as the only argument.
+#
+# systemd-hostnamed does the work: it writes /etc/hostname and, because the
+# static hostname takes precedence, sets the running hostname as well. This
+# script only asks it, so the unit needs no write access of its own.
+
+set -eu
+export LC_ALL=C
+
+fail() {
+	echo "osmc-hostname: $*" >&2
+	exit 1
+}
+
+[ "$#" -eq 1 ] || fail "usage: osmc-hostname <hostname escaped with systemd-escape>"
+
+# Escaping only makes the name safe to carry in a unit name. Validate it before
+# using it.
+name=$(systemd-escape --unescape -- "$1") || fail "cannot unescape '$1'"
+
+# One DNS label (RFC 1123): ASCII letters, digits and '-', at most 63
+# characters, not starting or ending with '-'. Kodi derives such a label from
+# its free-form device name.
+case "$name" in
+	""|-*|*-|*[!A-Za-z0-9-]*) fail "invalid hostname '$name'" ;;
+esac
+[ "${#name}" -le 63 ] || fail "hostname longer than 63 characters: '$name'"
+
+# set-hostname is still accepted by trixie's hostnamectl, where 'hostname'
+# replaces it
+hostnamectl set-hostname --static -- "$name"
+
+echo "osmc-hostname: hostname is $name"

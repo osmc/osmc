@@ -1,0 +1,45 @@
+# Set the hostname:
+#
+#   systemctl start osmc-hostname@$(systemd-escape living-room).service
+#
+# The instance is the hostname escaped with systemd-escape(1). The helper
+# unescapes and validates it: escaping is transport safety, not validation. As
+# a oneshot, 'systemctl start' returns when the helper exits, and fails if it
+# does; 'journalctl -u osmc-hostname@<instance>' has the reason.
+#
+# systemd-hostnamed writes /etc/hostname, so this unit needs no write access.
+# It runs as root with no capabilities; hostnamed accepts that because polkit
+# always authorises uid 0.
+
+[Unit]
+Description=Set the hostname to %I
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/osmc/osmc-hostname %i
+
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+ProcSubset=pid
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+# hostnamectl reaches hostnamed over D-Bus; 'none' would need systemd 249
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
