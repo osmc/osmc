@@ -1,0 +1,47 @@
+# Set the system time zone:
+#
+#   systemctl start osmc-timezone@$(systemd-escape America/Los_Angeles).service
+#
+# The instance is the zone escaped with systemd-escape(1). The helper unescapes
+# and validates it: escaping is transport safety, not validation. As a oneshot,
+# 'systemctl start' returns when the helper exits, and fails if it does;
+# 'journalctl -u osmc-timezone@<instance>' has the reason.
+
+[Unit]
+Description=Set the system time zone to %I
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/osmc/osmc-timezone %i
+UMask=0022
+
+# Replacing /etc/localtime and /etc/timezone needs write access to /etc itself,
+# so keep what matters most read-only within it.
+ProtectSystem=strict
+ReadWritePaths=/etc
+ReadOnlyPaths=-/etc/passwd -/etc/group -/etc/shadow -/etc/gshadow -/etc/sudoers -/etc/sudoers.d -/etc/polkit-1 -/etc/systemd -/etc/ssh -/etc/pam.d -/etc/apt
+
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+ProcSubset=pid
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+# 'none' needs systemd 249; bullseye has 247
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM

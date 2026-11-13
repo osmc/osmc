@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# Set the system time zone. Run as root by osmc-timezone@.service, which passes
+# the unit's escaped instance name (%i) as the only argument.
+#
+# /etc/localtime becomes an absolute symlink and /etc/timezone is refreshed if
+# it exists, as Debian's tzdata does, so tzdata, timedatectl and Kodi all read
+# the same zone on bullseye and trixie. Bullseye's tzdata only recognises an
+# absolute link, which is why this does not hand off to timedatectl: systemd's
+# timedated writes a relative one.
+
+set -eu
+export LC_ALL=C
+
+ZONEINFO=/usr/share/zoneinfo
+
+fail() {
+	echo "osmc-timezone: $*" >&2
+	exit 1
+}
+
+[ "$#" -eq 1 ] || fail "usage: osmc-timezone <zone escaped with systemd-escape>"
+
+# Escaping only makes the name safe to carry in a unit name. Validate it before
+# anything is written.
+zone=$(systemd-escape --unescape -- "$1") || fail "cannot unescape '$1'"
+
+# Path components of ASCII letters, digits, '_', '+' and '-'. Without '.' the
+# name cannot leave $ZONEINFO. zoneinfo/localtime links back to /etc/localtime.
+case "$zone" in
+	""|/*|*/|*//*|*[!A-Za-z0-9_+/-]*|localtime|posixrules)
+		fail "invalid time zone '$zone'" ;;
+esac
+
+# and it has to be a compiled zone file
+if [ ! -f "$ZONEINFO/$zone" ] || [ "$(head -c 4 "$ZONEINFO/$zone")" != TZif ]; then
+	fail "no such time zone '$zone'"
+fi
+
+target="$ZONEINFO/$zone"
+
+# Replace atomically. -T stops mv moving into a directory if /etc/localtime
+# has been made a link to one.
+if [ "$(readlink /etc/localtime || true)" != "$target" ]; then
+	ln -sfn "$target" "/etc/localtime.osmc-$$"
+	mv -fT "/etc/localtime.osmc-$$" /etc/localtime
+fi
+
+# trixie's tzdata maintains /etc/timezone only if it already exists; so do we
+if [ -f /etc/timezone ] && [ "$(cat /etc/timezone)" != "$zone" ]; then
+	printf '%s\n' "$zone" > "/etc/timezone.osmc-$$"
+	mv -fT "/etc/timezone.osmc-$$" /etc/timezone
+fi
+
+echo "osmc-timezone: system time zone is $zone"
