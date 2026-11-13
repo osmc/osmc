@@ -32,6 +32,8 @@ if [ "$1" = "configure" ]; then
 	systemctl enable osmc-prune-devel.timer
 	systemctl enable osmc-id-generator.service osmc-report-stats.timer
 	systemctl start osmc-id-generator.service osmc-report-stats.timer
+	systemctl enable osmc-password-check.service osmc-password-check.path
+	systemctl start osmc-password-check.service osmc-password-check.path
 
 	# migrate sources.list only if the previous base-files-osmc version is older than this version
 	#if [ -n "$2" ] && dpkg --compare-versions "$2" lt "3.1.8"; then
