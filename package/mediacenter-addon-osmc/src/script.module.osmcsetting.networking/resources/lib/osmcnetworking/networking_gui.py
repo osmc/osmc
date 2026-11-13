@@ -1371,7 +1371,7 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
                     if DIALOG.yesno(self.lang(32041), self.lang(32052) + ' ' + ssid + '?'):
                         connect = True
                 else:
-                    selection = DIALOG.select('%s: %s' % (self.lang(32041), self.conn_ssid),
+                    selection = DIALOG.select('%s: %s' % (self.lang(32041), ssid),
                                               [self.lang(32052) + ' ' + ssid + '?',
                                                self.lang(32094) % ssid])
                     if selection == 0:
