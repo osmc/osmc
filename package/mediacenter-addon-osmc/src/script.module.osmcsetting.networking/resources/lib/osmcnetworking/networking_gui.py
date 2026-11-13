@@ -632,7 +632,8 @@ class NetworkingGui(xbmcgui.WindowXMLDialog):
             control.setVisible(True)
 
     def hide_controls(self, control_ids):
-        map(lambda x: self.getControl(x).setVisible(False), control_ids)
+        for control_id in control_ids:
+            self.getControl(control_id).setVisible(False)
 
     @staticmethod
     def get_wired_config():
