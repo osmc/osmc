@@ -1,0 +1,50 @@
+# Enable a unit that My OSMC manages:
+#
+#   systemctl start osmc-enable@$(systemd-escape ssh.service).service
+#
+# The instance is the unit name escaped with systemd-escape(1). The helper
+# unescapes it and accepts only a unit named in /etc/osmc/apps.d, or
+# connman-wait-for-network.service: escaping is transport safety, not
+# validation. Enabling does not start the unit; osmc may start it directly. As
+# a oneshot, 'systemctl start' returns when the helper exits, and fails if it
+# does; 'journalctl -u osmc-enable@<instance>' has the reason.
+#
+# osmc-disable@.service is the same unit with 'disable'.
+
+[Unit]
+Description=Enable %I
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/osmc/osmc-toggle-unit enable %i
+UMask=0022
+
+# PID1 writes the unit symlinks itself. The only writes here are the SysV links
+# that update-rc.d keeps in step for units that also ship an init script.
+ProtectSystem=strict
+ReadWritePaths=-/etc/rc0.d -/etc/rc1.d -/etc/rc2.d -/etc/rc3.d -/etc/rc4.d -/etc/rc5.d -/etc/rc6.d -/etc/rcS.d
+
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+ProcSubset=pid
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+# systemctl reaches PID1 over a unix socket; 'none' would need systemd 249
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM

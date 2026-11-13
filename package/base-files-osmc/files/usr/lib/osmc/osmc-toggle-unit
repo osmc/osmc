@@ -1,0 +1,69 @@
+#!/bin/sh
+#
+# Enable or disable one unit that My OSMC manages. Run as root by
+# osmc-enable@.service and osmc-disable@.service, which pass the verb and the
+# unit's escaped instance name (%i).
+#
+# The allowlist is /etc/osmc/apps.d. Every app that My OSMC's Services list
+# switches on and off installs a file there: its friendly name on the first
+# line, its units on the lines after. A new app is accepted as soon as its
+# package is installed, with no change here. The one exception is
+# connman-wait-for-network.service, which the network settings toggle but which
+# must not appear in the Services list.
+#
+# Why a list at all: enabling an arbitrary unit amounts to root.
+# debug-shell.service, for one, is a passwordless root shell on tty9 from the
+# next boot.
+
+set -eu
+export LC_ALL=C
+
+APPS=/etc/osmc/apps.d
+EXCEPTION=connman-wait-for-network.service
+
+fail() {
+	echo "osmc-toggle-unit: $*" >&2
+	exit 1
+}
+
+[ "$#" -eq 2 ] || fail "usage: osmc-toggle-unit enable|disable <unit escaped with systemd-escape>"
+
+case "$1" in
+	enable|disable) verb=$1 ;;
+	*) fail "unknown verb '$1'" ;;
+esac
+
+# Escaping only makes the name safe to carry in a unit name. Validate it before
+# it is used.
+unit=$(systemd-escape --unescape -- "$2") || fail "cannot unescape '$2'"
+
+# The lookup below is the real test; this keeps junk out of it and out of the
+# journal.
+case "$unit" in
+	""|[!A-Za-z0-9]*|*[!A-Za-z0-9:_.@-]*)
+		fail "invalid unit '$unit'" ;;
+esac
+[ "${#unit}" -le 255 ] || fail "invalid unit '$unit'"
+
+allowed=
+[ "$unit" = "$EXCEPTION" ] && allowed=1
+
+# Read apps.d as the Services list does: regular files only, every line after
+# the first, compared whole.
+for f in "$APPS"/*; do
+	[ -z "$allowed" ] || break
+	[ -f "$f" ] || continue
+	if UNIT="$unit" awk 'FNR > 1 && $0 == ENVIRON["UNIT"] { found = 1 } END { exit !found }' "$f"; then
+		allowed=1
+	fi
+done
+
+[ -n "$allowed" ] || fail "$unit is not named in $APPS"
+
+# systemctl reaches PID1 over its private socket, which authorises uid 0 even
+# without capabilities. PID1 writes the unit symlinks. For a unit that also
+# ships a SysV script (ssh), systemctl first keeps /etc/rc?.d in step through
+# update-rc.d, because invoke-rc.d still reads those links.
+systemctl "$verb" -- "$unit"
+
+echo "osmc-toggle-unit: ${verb}d $unit"
