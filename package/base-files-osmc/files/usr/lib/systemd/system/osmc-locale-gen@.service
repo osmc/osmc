@@ -1,0 +1,50 @@
+# Enable and generate one locale from /etc/locale.gen:
+#
+#   systemctl start osmc-locale-gen@$(systemd-escape en_GB.UTF-8).service
+#
+# /etc/profile.d/103-generate-locale.sh starts it when an SSH client's LANG
+# names a locale that /etc/locale.gen offers but has not enabled. The instance
+# is the locale escaped with systemd-escape(1). The helper unescapes it and
+# accepts only a locale that /etc/locale.gen lists: escaping is transport
+# safety, not validation. As a oneshot, 'systemctl start' returns when the
+# locale has been generated, and fails if it was not;
+# 'journalctl -u osmc-locale-gen@<instance>' has the reason.
+
+[Unit]
+Description=Generate the %I locale
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/osmc/osmc-locale-gen %i
+UMask=0022
+
+# The helper rewrites /etc/locale.gen in place and localedef writes the locale
+# archive. Nothing else is writable. '-': without the locales package there is
+# no /etc/locale.gen, and the helper says so.
+ProtectSystem=strict
+ReadWritePaths=-/etc/locale.gen /usr/lib/locale
+
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+ProcSubset=pid
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+# 'none' needs systemd 249; bullseye has 247
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM

@@ -1,0 +1,77 @@
+#!/bin/sh
+#
+# Enable one locale in /etc/locale.gen and generate it. Run as root by
+# osmc-locale-gen@.service, which passes the unit's escaped instance name (%i)
+# as the only argument.
+#
+# /etc/locale.gen is the allowlist: the locales package lists every supported
+# locale there, commented out, as "# <locale> <charset>". Only a name matching
+# one of those lines exactly is enabled. The name is compared as a string and
+# never reaches a regular expression or another command's arguments.
+
+set -eu
+export LC_ALL=C
+
+LOCALEGEN=/etc/locale.gen
+
+fail() {
+	echo "osmc-locale-gen: $*" >&2
+	exit 1
+}
+
+[ "$#" -eq 1 ] || fail "usage: osmc-locale-gen <locale escaped with systemd-escape>"
+
+# Escaping only makes the name safe to carry in a unit name. Validate it before
+# anything is read or written.
+locale=$(systemd-escape --unescape -- "$1") || fail "cannot unescape '$1'"
+
+# Locale names are short ASCII: en_GB, en_GB.UTF-8, sr_RS@latin. The lookup
+# below is the real test; this keeps junk out of it and out of the journal.
+case "$locale" in
+	""|[!A-Za-z]*|*[!A-Za-z0-9_.@-]*)
+		fail "invalid locale '$locale'" ;;
+esac
+[ "${#locale}" -le 64 ] || fail "invalid locale '$locale'"
+
+[ -s "$LOCALEGEN" ] || fail "$LOCALEGEN is missing"
+
+# Two logins with different LANGs can start two instances at once, so take
+# turns with the file. The lock is on the inode, which the in-place rewrite
+# below keeps.
+exec 9<"$LOCALEGEN"
+flock 9
+
+state=$(LOCALE="$locale" awk '
+	BEGIN { loc = ENVIRON["LOCALE"] }
+	NF == 2 && $1 == loc { enabled = 1 }
+	NF == 3 && $1 == "#" && $2 == loc { offered = 1 }
+	END { print enabled ? "enabled" : offered ? "offered" : "absent" }
+' "$LOCALEGEN")
+
+case "$state" in
+	enabled) ;;
+	offered)
+		# The unit may write this file but not /etc, so rewrite it in place
+		# rather than replacing it.
+		tmp=$(mktemp)
+		LOCALE="$locale" awk '
+			BEGIN { loc = ENVIRON["LOCALE"] }
+			NF == 3 && $1 == "#" && $2 == loc { $0 = $2 " " $3 }
+			{ print }
+		' "$LOCALEGEN" > "$tmp"
+		cat "$tmp" > "$LOCALEGEN"
+		rm -f "$tmp"
+		;;
+	*)
+		fail "$LOCALEGEN does not offer locale '$locale'" ;;
+esac
+
+# Generate only what is missing. Without --keep-existing, locale-gen deletes
+# the locale archive and rebuilds every enabled locale, one localedef run each.
+/usr/sbin/locale-gen --keep-existing
+
+# locale-gen ignores localedef failures, so check the way it checks.
+PERL_BADLANG=0 perl -MPOSIX -e 'exit 1 unless setlocale(LC_ALL, $ARGV[0])' "$locale" ||
+	fail "locale-gen did not generate '$locale'"
+
+echo "osmc-locale-gen: generated $locale"
