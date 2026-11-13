@@ -6,6 +6,10 @@ OSMC (Open Source Media Center) is a free and open source media player based on 
 
 Upstream source code for OSMC is available at https://github.com/osmc/osmc. You can clone this repository with the command 'git clone'. You can learn about how to set up a development environment <a href="https://osmc.tv/wiki/development/getting-involved-with-osmc-development/">here</a>.
 
+#### Contributing ####
+
+After cloning, run `sh hooks/install.sh` once. It points git at this repository's `hooks/` directory, so the hooks arrive with a clone and update with a pull. They check that a commit subject carries the area prefix this repository uses (for example `[package] [base-files-osmc]`), warn before pushing a package whose version was not bumped, and strip build output such as `Installed-Size` out of `DEBIAN/control` files. The hooks are advisory and run only on your own machine, so this needs doing once per clone.
+
 #### Download ####
 
 A compiled version of OSMC can be downloaded from <a href="https://osmc.tv/download">https://osmc.tv/download</a>. 
