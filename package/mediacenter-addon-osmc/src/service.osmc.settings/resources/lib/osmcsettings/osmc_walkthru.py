@@ -479,12 +479,16 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
 
         if self.selected_country is not None and self.selected_region is not None:
 
-            users_timezone = "%s/%s" % (self.selected_region, self.selected_country)
+            if self.selected_region == 'UTC':
+                # the list's own UTC entry, not a zone.tab region
+                users_timezone = 'Etc/UTC'
+            else:
+                users_timezone = "%s/%s" % (self.selected_region, self.selected_country)
 
             log('users timezone: %s' % users_timezone)
 
             try:
-                xbmc.settimezone(users_timezone)
+                osmc_timezones.apply_timezone(users_timezone)
             except:
                 log('Failed to set users timezone: %s' % users_timezone)
                 log(traceback.format_exc())

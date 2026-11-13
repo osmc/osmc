@@ -8,7 +8,10 @@
     See LICENSES/GPL-2.0-or-later for more information.
 """
 
+import subprocess
 from io import open
+
+import xbmc
 
 
 def get_timezones():
@@ -47,3 +50,17 @@ def get_timezones():
         timezones[tz_region] = tz_item
 
     return timezones
+
+
+def apply_timezone(timezone):
+    """ Sets the time zone. Kodi v21 keeps its own setting and applies it to the system through
+        osmc-timezone@.service; Kodi v22 has no such setting and follows the system, so start
+        the unit directly. Raises on failure; 'journalctl -u osmc-timezone@*' has the reason. """
+
+    if hasattr(xbmc, 'settimezone'):
+        xbmc.settimezone(timezone)
+        return
+
+    instance = subprocess.check_output(['systemd-escape', '--', timezone],
+                                       universal_newlines=True).strip()
+    subprocess.check_call(['systemctl', 'start', 'osmc-timezone@%s.service' % instance])
