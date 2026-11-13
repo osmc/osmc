@@ -22,7 +22,7 @@ except ImportError:
 
 
 class Canceled(dbus.DBusException):
-    _dbus_error_name = "net.connman.Error.Canceled"
+    _dbus_error_name = "net.connman.Agent.Error.Canceled"
 
 
 class LaunchBrowser(dbus.DBusException):
