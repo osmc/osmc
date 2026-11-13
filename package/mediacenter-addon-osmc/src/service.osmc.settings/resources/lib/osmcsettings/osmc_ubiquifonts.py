@@ -9,7 +9,7 @@
 """
 
 import os
-import subprocess
+import shutil
 import traceback
 from io import open
 from xml.etree import ElementTree
@@ -174,15 +174,6 @@ class UbiquiFonts:
             self.log('Ubiqui fonts already exist.')
             return 'ubiquited'
 
-        # copy fonts to skins font folder
-        fonts = set(os.listdir(self.skin_font_folder))
-        unique_files = set(os.listdir(self.font_folder)) - fonts
-
-        for filename in unique_files:
-            subprocess.call([
-                'sudo', 'cp', os.path.join(self.font_folder, filename), self.skin_font_folder
-            ])
-
         with open(self.font_partials, 'r', encoding='utf-8') as open_file:
             font_partials_lines = open_file.readlines()
 
@@ -205,17 +196,36 @@ class UbiquiFonts:
 
             payload.append(line)
 
+        # No sudo: osmc owns every skin this writes to. mediacenter-osmc's
+        # postinst chowns Estuary, mediacenter-skin-osmc's chowns skin.osmc, and
+        # repository skins live in ~/.kodi. A skin osmc cannot write is logged
+        # and left alone; this runs unguarded when the service starts.
         backup_file = os.path.join(self.skin_font_folder, 'backup_Font.xml')
-        self.log('Creating Font.xml backup: %s' % backup_file)
-        subprocess.call(['sudo', 'cp', self.skin_font_xml, backup_file])
+        tmp_font_xml = self.skin_font_xml + '.osmc-tmp'
 
-        tmp_font_xml = '/tmp/Font.xml'
-        self.log('Writing temporary Font.xml: %s' % tmp_font_xml)
-        with open(tmp_font_xml, 'w', encoding='utf-8') as open_file:
-            open_file.writelines(payload)
+        try:
+            # copy fonts to skins font folder
+            fonts = set(os.listdir(self.skin_font_folder))
+            unique_files = set(os.listdir(self.font_folder)) - fonts
 
-        self.log('Moving new Font.xml to skin: %s' % self.skin_font_xml)
-        subprocess.call(['sudo', 'mv', tmp_font_xml, self.skin_font_xml])
+            for filename in unique_files:
+                source = os.path.join(self.font_folder, filename)
+                if os.path.isfile(source):
+                    shutil.copy(source, self.skin_font_folder)
+
+            self.log('Creating Font.xml backup: %s' % backup_file)
+            shutil.copyfile(self.skin_font_xml, backup_file)
+
+            # write beside Font.xml and rename over it, so Kodi never reads
+            # half a file
+            self.log('Writing new Font.xml: %s' % self.skin_font_xml)
+            with open(tmp_font_xml, 'w', encoding='utf-8') as open_file:
+                open_file.writelines(payload)
+            os.replace(tmp_font_xml, self.skin_font_xml)
+
+        except OSError as e:
+            self.log('Could not import Ubiqui fonts into the skin: %s' % e)
+            return 'failed'
 
         self.log('Ubiqui fonts import completed.')
         return 'reload_please'

@@ -21,6 +21,11 @@ if [ "$1" = "configure" ]; then
 
         if ischroot; then OWNER="1000:1000"; else OWNER="osmc:osmc"; fi
         chown -R $OWNER /usr/share/kodi/addons/resource.language.*
+        # My OSMC adds its fonts to the active skin's Font.xml as Kodi's user
+        # (osmc_ubiquifonts.py), again after each upgrade replaces it. skin.osmc
+        # is chowned by mediacenter-skin-osmc and repository skins live in
+        # ~/.kodi; Estuary is the skin Kodi itself ships.
+        chown -R $OWNER /usr/share/kodi/addons/skin.estuary
 
 	# Generate Python bytecode for the add-on tree. Debian's python3 postinst
 	# does this for the standard library and dist-packages, but nothing does it
