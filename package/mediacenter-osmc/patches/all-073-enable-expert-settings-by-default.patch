@@ -1,15 +1,27 @@
-From 5e321b0b6d91ac70e94b54b5f42ad22fc7cf9ede Mon Sep 17 00:00:00 2001
+From 88dd09838efbcbb4013af1639dc740bdaf6747b2 Mon Sep 17 00:00:00 2001
 From: Sam Nazarko <email@samnazarko.co.uk>
 Date: Tue, 6 Sep 2016 16:22:43 +0100
 Subject: [PATCH] Enable Expert Settings by default
 
+CViewStateSettings gets its default setting level from Clear(), which
+the constructor calls. On first boot there is no guisettings.xml, so
+CSettings::Load() calls Reset(), which saves the in-memory level into a
+new guisettings.xml and then loads that file back. Because Save() always
+writes <settinglevel>, the fallback in Load() is never reached.
+
+Default to Expert in Clear() and in the member initializer so that a
+freshly created guisettings.xml gets Expert, and keep the fallback in
+Load() consistent. Levels already stored in guisettings.xml are left
+alone.
+
 Signed-off-by: Sam Nazarko <email@samnazarko.co.uk>
 ---
- xbmc/view/ViewStateSettings.cpp | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ xbmc/view/ViewStateSettings.cpp | 4 ++--
+ xbmc/view/ViewStateSettings.h   | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/xbmc/view/ViewStateSettings.cpp b/xbmc/view/ViewStateSettings.cpp
-index d8833934ae..0c557cece1 100644
+index d8833934ae..ad3683e912 100644
 --- a/xbmc/view/ViewStateSettings.cpp
 +++ b/xbmc/view/ViewStateSettings.cpp
 @@ -114,7 +114,7 @@ bool CViewStateSettings::Load(const TiXmlNode *settings)
@@ -21,6 +33,27 @@ index d8833934ae..0c557cece1 100644
  
      const TiXmlNode* pEventLogNode = pElement->FirstChild(XML_EVENTLOG);
      if (pEventLogNode != NULL)
+@@ -189,7 +189,7 @@ bool CViewStateSettings::Save(TiXmlNode *settings) const
+ 
+ void CViewStateSettings::Clear()
+ {
+-  m_settingLevel = SettingLevel::Standard;
++  m_settingLevel = SettingLevel::Expert;
+ }
+ 
+ const CViewState* CViewStateSettings::Get(const std::string &viewState) const
+diff --git a/xbmc/view/ViewStateSettings.h b/xbmc/view/ViewStateSettings.h
+index 2a18fc948b..1d70888164 100644
+--- a/xbmc/view/ViewStateSettings.h
++++ b/xbmc/view/ViewStateSettings.h
+@@ -53,7 +53,7 @@ protected:
+ 
+ private:
+   std::map<std::string, CViewState*> m_viewStates;
+-  SettingLevel m_settingLevel = SettingLevel::Standard;
++  SettingLevel m_settingLevel = SettingLevel::Expert;
+   EventLevel m_eventLevel = EventLevel::Basic;
+   bool m_eventShowHigherLevels = true;
+   mutable CCriticalSection m_critical;
 -- 
-2.25.1
-
+2.43.0
