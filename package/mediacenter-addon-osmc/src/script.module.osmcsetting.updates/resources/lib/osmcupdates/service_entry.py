@@ -228,8 +228,6 @@ class Main(object):
             except:
                 pass
 
-        # change this to 'apt' to give the user the option to clean the apt files
-        self.freespace_remedy = 'reboot'
         self.freespace_supressor = 172200
 
         self.keep_alive = True
@@ -901,8 +899,7 @@ class Main(object):
         except:
             pass
 
-        # run an apt-cache clean
-        self.clean_apt_cache()
+        # the downloaded packages were cleaned up by apt_cache_action.py, as root
 
         if self.check_if_reboot_required():
             # the files flagging that an installed package needs a reboot are present
@@ -1310,13 +1307,6 @@ class Main(object):
         flag_files = ['/tmp/reboot-needed', '/var/run/reboot-required']
         return bool(any([os.path.isfile(x) for x in flag_files]))
 
-    @staticmethod
-    def clean_apt_cache():
-        try:
-            os.system('sudo apt-cache clean')
-        except:
-            pass
-
     def check_for_unsupported_version(self):
         """
             Checks if this version is an Alpha, prevent updates
@@ -1369,22 +1359,6 @@ class Main(object):
             freespace, value = self.check_target_location_for_size(location='/', requirement=250)
             if not freespace:
                 if 'Home.xml' in xbmc.getInfoLabel('Window.Property(xmlfile)'):
-                    if self.freespace_remedy == 'apt':
-                        # THIS SECTION IS CURRENTLY DISABLED
-                        # TO ENABLE IT CHANGE THE INIT FREESPACE_REMEDY TO 'apt'
-                        resp = DIALOG.yesno(self.lang(32136),
-                                            '[CR]'.join([self.lang(32142) % int(value),
-                                                         self.lang(32143)]))
-
-                        if resp:
-                            subprocess.Popen(['sudo', 'apt-get', 'autoremove', '&&',
-                                              'apt-get', 'clean'])
-
-                            self.freespace_remedy = 'reboot'
-                            # wait 10 minutes before next space check
-                            self.freespace_supressor = 171600
-
-                    else:
-                        _ = DIALOG.ok(self.lang(32136),
-                                      '[CR]'.join([self.lang(32142) % int(value),
-                                                   self.lang(32144)]))
+                    _ = DIALOG.ok(self.lang(32136),
+                                  '[CR]'.join([self.lang(32142) % int(value),
+                                               self.lang(32144)]))

@@ -15,6 +15,7 @@
 import json
 import os
 import socket
+import subprocess
 import sys
 import traceback
 from contextlib import closing
@@ -365,6 +366,17 @@ class Main(object):
 
         print('%s %s committing cache' % (datetime.now(), 'apt_cache_action.py'))
         self.commit_action()
+
+        # python-apt keeps the packages it downloaded: only apt and apt-get honour
+        # APT::Keep-Downloaded-Packages. So clean them up here, as root, as
+        # manual-update does. The settings addon used to try with 'sudo apt-cache
+        # clean', which is not a command. Only after a successful update, as before.
+        self.clean_archives()
+
+    @staticmethod
+    def clean_archives():
+        if subprocess.call(['apt-get', 'clean']) != 0:
+            print('%s %s apt-get clean failed' % (datetime.now(), 'apt_cache_action.py'))
 
     def commit_action(self):
         download_progress = DownloadProgress()
