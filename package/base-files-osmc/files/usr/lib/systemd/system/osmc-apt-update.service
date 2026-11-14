@@ -1,0 +1,42 @@
+# Update the package lists:
+#
+#   systemctl start osmc-apt-update.service
+#
+# /etc/profile.d/101-apt-update.sh starts it at an SSH login while the lists
+# are empty, as on a fresh install, so that apt is ready to use. It takes no
+# input: whoever starts it can only have the lists updated. As a oneshot,
+# 'systemctl start' returns when apt-get update has finished, and fails if it
+# did; 'journalctl -u osmc-apt-update' has the output. Starting it while it
+# runs waits for that run instead of starting another.
+
+[Unit]
+Description=Update the package lists
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/apt-get -q update
+
+# apt-get update writes /var/lib/apt/lists and /var/cache/apt, and downloads as
+# the _apt user, so it keeps the capabilities it needs to switch to _apt and
+# hand it the download directory, and /var stays writable. It needs the
+# network, including netlink, which name resolution uses.
+ProtectSystem=full
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
