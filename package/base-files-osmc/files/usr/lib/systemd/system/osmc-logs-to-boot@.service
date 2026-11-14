@@ -1,0 +1,57 @@
+# Copy a log to /boot/uploadlog.txt, where it can be read from another
+# computer:
+#
+#   systemctl start osmc-logs-to-boot@$(systemd-escape --path /var/tmp/uploadlog.txt).service
+#
+# grab-logs (My OSMC's log uploader, also /usr/bin/grab-logs) starts it when
+# asked to copy its logs to /boot, or when an upload fails. The instance is the
+# log's path, escaped with systemd-escape --path.
+#
+# The copy runs as osmc, so it reads only what osmc could read anyway. systemd
+# opens /boot/uploadlog.txt as root before it switches user, and hands it over
+# as stdout: the name is fixed here, and the caller chooses only what goes in
+# it. As a oneshot, 'systemctl start' returns when the copy is on disk, and
+# fails if it is not; 'journalctl -u osmc-logs-to-boot@<instance>' has the
+# reason.
+
+[Unit]
+Description=Copy %f to /boot/uploadlog.txt
+
+[Service]
+Type=oneshot
+User=osmc
+Group=osmc
+ExecStart=/usr/lib/osmc/osmc-logs-to-boot %f
+StandardOutput=file:/boot/uploadlog.txt
+# stderr would otherwise go into the copy too
+StandardError=journal
+UMask=0022
+
+# Nothing is writable; the only output is stdout, opened before the sandbox.
+# Home stays readable, since grab-logs can be given a log anywhere. Not
+# PrivateTmp: the log is usually in /var/tmp.
+ProtectSystem=strict
+ProtectHome=read-only
+
+PrivateDevices=yes
+PrivateNetwork=yes
+ProtectHostname=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+ProcSubset=pid
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+# 'none' needs systemd 249; bullseye has 247
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM

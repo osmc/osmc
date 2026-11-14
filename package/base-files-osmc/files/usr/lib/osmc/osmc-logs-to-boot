@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Copy a log to /boot/uploadlog.txt. Run as osmc by
+# osmc-logs-to-boot@.service, with that file already open as stdout: systemd
+# opened it as root, so writing it needs no privilege here, and the log is
+# read with osmc's. A root cp could be pointed at /etc/shadow by a link in
+# /var/tmp; this cannot.
+
+set -eu
+
+log=$1
+
+if [ ! -f "$log" ]; then
+	echo "osmc-logs-to-boot: $log is not a file" >&2
+	exit 1
+fi
+
+cat -- "$log"
+
+# StandardOutput=file: neither truncates nor syncs ('truncate:' needs systemd
+# 248; bullseye has 247). Cut off whatever an older, longer copy left past the
+# end of this one, and get the copy onto the card before 'systemctl start'
+# returns: people copy logs to /boot so they can take the card out.
+perl -MIO::Handle -e '
+	defined(my $end = sysseek(STDOUT, 0, 1)) or die "osmc-logs-to-boot: seek: $!\n";
+	truncate(STDOUT, $end) or die "osmc-logs-to-boot: truncate: $!\n";
+	STDOUT->sync or die "osmc-logs-to-boot: sync: $!\n";
+'
+
+echo "osmc-logs-to-boot: copied $log to /boot/uploadlog.txt" >&2
