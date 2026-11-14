@@ -167,13 +167,6 @@ class OSMCBackup(object):
             log(traceback.format_exc())
             pass
 
-        if not os.path.exists(LOCAL_BACKUP_TEMP):
-            try:
-                subprocess.Popen(['sudo', 'mkdir', LOCAL_BACKUP_TEMP])
-            except:
-                log(traceback.format_exc())
-                pass
-
     @staticmethod
     def prepare_restore_temp():
         try:
@@ -186,13 +179,6 @@ class OSMCBackup(object):
         except:
             log(traceback.format_exc())
             pass
-
-        if not os.path.exists(LOCAL_RESTORE_TEMP):
-            try:
-                subprocess.Popen(['sudo', 'mkdir', LOCAL_RESTORE_TEMP])
-            except:
-                log(traceback.format_exc())
-                pass
 
     def start_backup(self):
         """

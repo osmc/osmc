@@ -10,7 +10,6 @@
 
 import os
 import random
-import subprocess
 import threading
 import traceback
 from collections import OrderedDict
@@ -494,8 +493,13 @@ class WalkthruGui(xbmcgui.WindowXMLDialog):
                 log('Failed to set users timezone: %s' % users_timezone)
                 log(traceback.format_exc())
 
-        # delete skin update block file
-        subprocess.call(['sudo', 'rm', '/tmp/NO_UPDATE'])
+        # delete skin update block file; ftr-osmc chowns it to osmc
+        try:
+            os.remove('/tmp/NO_UPDATE')
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            log('Could not remove /tmp/NO_UPDATE: %s' % e)
 
         self.close()
 

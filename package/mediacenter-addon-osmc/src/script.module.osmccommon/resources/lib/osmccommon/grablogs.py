@@ -330,7 +330,8 @@ SETS = {
                 'name': 'System Journal',
                 'key': 'MyqVXi2x',
                 'ltyp': 'cl_log',
-                'actn': '/bin/bash -c "sudo journalctl --flush && sudo journalctl -n 30000 -o short-precise --since -24h"',
+                # No sudo: osmc is in adm, which systemd lets read the whole journal
+                'actn': 'journalctl -n 30000 -o short-precise --since -24h',
             },
         ],
     },

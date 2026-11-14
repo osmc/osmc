@@ -10,7 +10,6 @@
 
 import os
 import socket
-import subprocess
 import threading
 import traceback
 
@@ -54,17 +53,13 @@ class Communicator(threading.Thread):
         self.stopped = False
 
     def delete_sockfile(self):
-        if os.path.exists(self.address):
-            subprocess.call(['sudo', 'rm', self.address])
-            if os.path.exists(self.address):
-                try:
-                    # I need this for testing on my laptop
-                    os.remove(self.address)
-                except:
-                    pass
-
-        if os.path.exists(self.address):
-            log('Failed to delete socket file @ %s.' % self.address)
+        # No sudo: only My OSMC's services create these sockets, as osmc
+        try:
+            os.remove(self.address)
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            log('Failed to delete socket file @ %s: %s' % (self.address, e))
 
     def close_socket(self):
         self.sock.close()

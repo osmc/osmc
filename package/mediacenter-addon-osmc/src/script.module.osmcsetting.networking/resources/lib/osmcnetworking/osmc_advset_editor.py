@@ -10,7 +10,6 @@
 
 import os
 import re
-import subprocess
 from io import open
 
 import xbmcvfs
@@ -138,10 +137,15 @@ class AdvancedSettingsEditor(object):
             self.log('Empty dictionary passed to advancedsettings file writer. '
                      'Preventing write, backing up and removing file.')
 
-            subprocess.call(['sudo', 'cp', loc, loc.replace('advancedsettings.xml',
-                                                            'advancedsettings_backup.xml')])
-
-            subprocess.call(['sudo', 'rm', '-f', loc])
+            # Moving it is the copy and the removal in one. No sudo: Kodi's
+            # userdata belongs to osmc, whoever owns the file.
+            try:
+                os.replace(loc, loc.replace('advancedsettings.xml',
+                                            'advancedsettings_backup.xml'))
+            except FileNotFoundError:
+                pass
+            except OSError as e:
+                self.log('Could not back up and remove %s: %s' % (loc, e))
             return
 
         with open(loc, 'w', encoding='utf-8') as open_file:

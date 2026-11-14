@@ -9,7 +9,6 @@
 """
 
 import os
-import subprocess
 
 import xbmcgui
 
@@ -95,12 +94,20 @@ class OSMCSettingClass(osmc_setting.OSMCSettingClass):
 
         self.me.openSettings()
 
-        # check the kodi reset setting, if it is true then create the kodi_reset file, otherwise remove that file
-        if self.me.getSetting('kodi_reset') == 'true':
-            log('creating kodi reset file')
-            subprocess.call(['sudo', 'touch', self.reset_file])
-        else:
-            subprocess.call(['sudo', 'rm', self.reset_file])
+        # check the kodi reset setting, if it is true then create the kodi_reset file, otherwise remove that file.
+        # No sudo: it is in osmc's home, so osmc can create it, and remove it whoever owns it.
+        # Only its presence matters; the watchdog acts on it and removes it as root.
+        try:
+            if self.me.getSetting('kodi_reset') == 'true':
+                log('creating kodi reset file')
+                if not os.path.isfile(self.reset_file):
+                    open(self.reset_file, 'a').close()
+            else:
+                os.remove(self.reset_file)
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            log('Could not update the kodi reset file: %s' % e)
 
         log('END')
         for x, k in self.setting_data_method.items():
