@@ -10,7 +10,6 @@
 
 import os
 import sys
-import subprocess
 import threading
 import traceback
 from io import open
@@ -24,6 +23,11 @@ from osmccommon.osmc_logging import StandardLogger
 from osmccommon.osmc_logging import clog
 
 ADDON_ID = 'service.osmc.settings'
+
+# Created as root when the device's support ends; the second records, in
+# osmc's home, that the message has been shown.
+END_OF_LIFE_FLAG = '/end_of_life_message'
+END_OF_LIFE_SHOWN = '/home/osmc/.end_of_life_message_shown'
 
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 
@@ -69,17 +73,19 @@ class OSMCGui(xbmcgui.WindowXMLDialog):
 
     def onInit(self):
 
-        if os.path.isfile('/end_of_life_message'):
-            with open('/end_of_life_message', 'r', encoding='utf-8') as file_handle:
+        # The flag is put in place as root when a device's support ends. The
+        # message is shown once, which osmc records in its home, so it needs no
+        # sudo. Older versions wrote '1' into the flag itself; that still counts.
+        if os.path.isfile(END_OF_LIFE_FLAG) and not os.path.isfile(END_OF_LIFE_SHOWN):
+            with open(END_OF_LIFE_FLAG, 'r', encoding='utf-8') as file_handle:
                 eol_read = file_handle.readline(1)
-                if eol_read != '1':
-                    _ = xbmcgui.Dialog().ok(self.lang(32083), self.lang(32084))
             if eol_read != '1':
-                with open('/tmp/end_of_life_message', 'w', encoding='utf-8') as file_handle:
-                    file_handle.write('1')
-                    log('/tmp/end_of_life_message written')
-
-                subprocess.call(['sudo', 'mv', '/tmp/end_of_life_message', '/end_of_life_message'])
+                _ = xbmcgui.Dialog().ok(self.lang(32083), self.lang(32084))
+                try:
+                    with open(END_OF_LIFE_SHOWN, 'w', encoding='utf-8') as _:
+                        log('%s written' % END_OF_LIFE_SHOWN)
+                except OSError as e:
+                    log('Could not record that the end of life message was shown: %s' % e)
 
         if self.first_run:
             self.first_run = False

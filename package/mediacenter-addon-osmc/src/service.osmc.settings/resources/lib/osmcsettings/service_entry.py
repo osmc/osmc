@@ -43,6 +43,16 @@ DIALOG = xbmcgui.Dialog()
 log = StandardLogger(ADDON_ID, os.path.basename(__file__)).log
 lang = LangRetriever(ADDON).lang
 
+# The walkthrough marks itself done in osmc's home, beside .factoryreset and
+# .nosshwarn, so it needs no sudo. Older versions wrote /walkthrough_completed
+# as root; that still counts. Survives a Kodi reset, which removes ~/.kodi.
+WALKTHROUGH_COMPLETED = '/home/osmc/.walkthrough_completed'
+WALKTHROUGH_COMPLETED_OLD = '/walkthrough_completed'
+
+
+def walkthrough_completed():
+    return os.path.isfile(WALKTHROUGH_COMPLETED) or os.path.isfile(WALKTHROUGH_COMPLETED_OLD)
+
 
 class Main(object):
 
@@ -77,7 +87,7 @@ class Main(object):
         # run the ubiquifonts script to import the needed fonts into the Font.xml
         _ = self.fonts.import_osmc_fonts()
 
-        if not os.path.isfile('/walkthrough_completed'):
+        if not walkthrough_completed():
             # Tell Kodi that OSMC is running the walkthrough
             try:
                 xbmc.setosmcwalkthroughstatus(1)
@@ -103,7 +113,7 @@ class Main(object):
     def _daemon(self):
         log('daemon started')
 
-        if not os.path.isfile('/walkthrough_completed'):
+        if not walkthrough_completed():
             self._walk_through()  # start walk through
 
         while not self.monitor.abortRequested():
@@ -312,10 +322,11 @@ class Main(object):
 
             osmc_walkthru.open_gui(ADDON, networking_instance=network_module['class_instance'])
 
-            with open('/tmp/walkthrough_completed', 'w+', encoding='utf-8') as _:
-                log('/tmp/walkthrough_completed written')
-
-            subprocess.call(['sudo', 'mv', '/tmp/walkthrough_completed', '/walkthrough_completed'])
+            try:
+                with open(WALKTHROUGH_COMPLETED, 'w', encoding='utf-8') as _:
+                    log('%s written' % WALKTHROUGH_COMPLETED)
+            except OSError as e:
+                log('Could not mark the walkthrough completed: %s' % e)
 
             self.set_walkthrough_status(2)
             self.window.clearProperty('walkthrough_is_running')
