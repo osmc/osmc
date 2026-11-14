@@ -2,6 +2,12 @@
 if [ "$1" = "configure" ]; then
 	systemctl daemon-reload
 	systemctl enable performance.service >/dev/null 2>&1
+	# util-linux only enables fstrim.timer on a fresh bullseye install, so devices
+	# imaged before April 2022 and upgraded in place never got it. Enable it once.
+	if [ -z "$2" ] || dpkg --compare-versions "$2" lt "1.4.1"; then
+		systemctl enable fstrim.timer >/dev/null 2>&1
+		if ! ischroot; then systemctl start fstrim.timer >/dev/null 2>&1; fi
+	fi
 	if ischroot; then exit 0; fi
 	systemctl start performance.service
 fi
