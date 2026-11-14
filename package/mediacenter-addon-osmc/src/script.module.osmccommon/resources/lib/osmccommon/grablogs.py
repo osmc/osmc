@@ -654,6 +654,20 @@ class CommandLineInterface(object):
         pass
 
 
+def copy_log_to_boot():
+    """ Copies TEMP_LOG_FILE to /boot/uploadlog.txt through osmc-logs-to-boot@.service,
+        which reads it as osmc and writes that file and nothing else.
+        Returns True if the copy is on disk. """
+    try:
+        instance = subprocess.check_output(['systemd-escape', '--path', os.path.abspath(TEMP_LOG_FILE)],
+                                           universal_newlines=True).strip()
+        return subprocess.call(['systemctl', 'start', 'osmc-logs-to-boot@%s.service' % instance]) == 0
+
+    except (OSError, subprocess.CalledProcessError):
+        log(traceback.format_exc())
+        return False
+
+
 def right_now(raw=False):
     """ Returns the current time.
         raw=True will return the raw datetime, but default is to convert it into a string.
@@ -1032,16 +1046,21 @@ class Main(object):
                 lang(32001), '' if not xbmc else lang(32009) % ('/boot/' + TEMP_LOG_FILENAME)
             )
 
-            os.popen('sudo cp -rf %s /boot/' % TEMP_LOG_FILE)
+            copied = copy_log_to_boot()
+            result = 32008 if copied else 32013  # Copy Complete / Copy Failed
 
-            self.progress_dialog.update(percent=100, message=lang(32008))
+            self.progress_dialog.update(percent=100, message=lang(result))
 
             if xbmc:
-                _ = DIALOG.ok(lang(32001), lang(32008))
+                _ = DIALOG.ok(lang(32001), lang(result))
+
+            elif copied:
+
+                log('Logs copied to /boot/%s ' % TEMP_LOG_FILENAME)
 
             else:
 
-                log('Logs copied to /boot/%s ' % TEMP_LOG_FILENAME)
+                log('Could not copy logs to /boot/%s ' % TEMP_LOG_FILENAME)
             self.progress_dialog.close()
             del self.progress_dialog
         else:
@@ -1125,8 +1144,12 @@ class Main(object):
 
                     log("Failed to upload log files, copying to /boot instead. (Unable to verify)")
 
-                if self.copy_to_boot:
-                    os.popen('sudo cp -rf %s /boot/' % TEMP_LOG_FILE)
+                if self.copy_to_boot and not copy_log_to_boot():
+                    if xbmc:
+                        _ = DIALOG.ok(lang(32001), lang(32013))
+
+                    else:
+                        log('Could not copy logs to /boot/%s ' % TEMP_LOG_FILENAME)
 
             else:
 
