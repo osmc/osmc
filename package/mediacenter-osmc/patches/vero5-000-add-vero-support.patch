@@ -2290,10 +2290,10 @@ index 3eb85be4ee..d46be3d2cf 100644
  
      overlay->iPTSStartTime = m_StartTime;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
-index 452ed873be..539499eb3e 100644
+index 452ed873be..a17544b89c 100644
 --- a/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/CMakeLists.txt
-@@ -11,6 +11,42 @@ if(NOT ENABLE_EXTERNAL_LIBAV)
+@@ -11,6 +11,46 @@ if(NOT ENABLE_EXTERNAL_LIBAV)
    list(APPEND HEADERS DVDVideoPPFFmpeg.h)
  endif()
  
@@ -2305,10 +2305,12 @@ index 452ed873be..539499eb3e 100644
 +                      amlogic/DVCodec.cpp
 +                      amlogic/AV1Codec.cpp
 +                      amlogic/H264Codec.cpp
++                      amlogic/H264MVCCodec.cpp
 +                      amlogic/HEVCCodec.cpp
 +                      amlogic/LibAmcodec.cpp
 +                      amlogic/MPEG12Codec.cpp
 +                      amlogic/MPEG4Codec.cpp
++                      amlogic/MvcFrameNumRewriter.cpp
 +                      amlogic/VC1Codec.cpp
 +                      amlogic/VP9Codec.cpp
 +                      DVDVideoCodecAmlogic.cpp)
@@ -2322,10 +2324,12 @@ index 452ed873be..539499eb3e 100644
 +                      amlogic/DVCodec.h
 +                      amlogic/AV1Codec.h
 +                      amlogic/H264Codec.h
++                      amlogic/H264MVCCodec.h
 +                      amlogic/HEVCCodec.h
 +                      amlogic/LibAmcodec.h
 +                      amlogic/MPEG12Codec.h
 +                      amlogic/MPEG4Codec.h
++                      amlogic/MvcFrameNumRewriter.h
 +                      amlogic/namespace.h
 +                      amlogic/PosixFile.h
 +                      amlogic/VC1Codec.h
@@ -2371,7 +2375,7 @@ index adb8b51242..2e61bf4b3e 100644
    AVMasteringDisplayMetadata displayMetadata;
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 new file mode 100644
-index 0000000000..61d777e494
+index 0000000000..a4956065ec
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.cpp
 @@ -0,0 +1,311 @@
@@ -2444,7 +2448,7 @@ index 0000000000..61d777e494
 +
 +CDVDVideoCodecAmlogic::CDVDVideoCodecAmlogic(CProcessInfo &processInfo)
 +  : CDVDVideoCodec(processInfo)
-+  , m_pFormatName("amcodec")
++  , m_formatName("amcodec")
 +  , m_opened(false)
 +  , m_codecControlFlags(0)
 +{
@@ -2536,7 +2540,7 @@ index 0000000000..61d777e494
 +    goto FAIL;
 +  }
 +
-+  m_pFormatName = m_codec->getFormatName().c_str();
++  m_formatName = m_codec->getFormatName();
 +
 +  m_aspect_ratio = m_hints.aspect;
 +
@@ -2558,7 +2562,7 @@ index 0000000000..61d777e494
 +    }
 +  }
 +
-+  m_processInfo.SetVideoDecoderName(m_pFormatName, true);
++  m_processInfo.SetVideoDecoderName(m_formatName, true);
 +  m_processInfo.SetVideoDimensions(m_hints.width, m_hints.height);
 +  m_processInfo.SetVideoDeintMethod("hardware");
 +  m_processInfo.SetVideoDAR(m_hints.aspect);
@@ -2688,10 +2692,10 @@ index 0000000000..61d777e494
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
 new file mode 100644
-index 0000000000..4d0b1730c0
+index 0000000000..9996b69823
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/DVDVideoCodecAmlogic.h
-@@ -0,0 +1,88 @@
+@@ -0,0 +1,89 @@
 +/*
 + *  Copyright (C) 2005-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -2708,6 +2712,7 @@ index 0000000000..4d0b1730c0
 +#include "cores/VideoPlayer/Buffers/VideoBuffer.h"
 +
 +#include <set>
++#include <string>
 +#include <atomic>
 +#include "amlogic/AMLVideoCodec.h"
 +
@@ -2762,14 +2767,14 @@ index 0000000000..4d0b1730c0
 +  virtual VCReturn GetPicture(VideoPicture* pVideoPicture) override;
 +  virtual void SetSpeed(int iSpeed) override;
 +  virtual void SetCodecControl(int flags) override;
-+  virtual const char* GetName(void) override { return (const char*)m_pFormatName; }
++  virtual const char* GetName(void) override { return m_formatName.c_str(); }
 +
 +protected:
 +  void            Dispose(void);
 +
 +  std::shared_ptr<amlogic::AMLVideoCodec> m_codec;
 +
-+  const char     *m_pFormatName;
++  std::string     m_formatName;
 +  VideoPicture m_videobuffer;
 +  bool            m_opened;
 +  int             m_codecControlFlags;
@@ -5477,10 +5482,10 @@ index 0000000000..07efe40027
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
 new file mode 100644
-index 0000000000..5b645c6f21
+index 0000000000..8f7f68dbb1
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.cpp
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,159 @@
 +/*
 + *  Copyright (C) 2024 OSMC
 + *
@@ -5497,6 +5502,8 @@ index 0000000000..5b645c6f21
 +#include "settings/SettingsComponent.h"
 +
 +#include "OSMCSecureOS.h"
++#include "ServiceBroker.h"
++#include "windowing/amlogic/WinSystemAmlogic.h"
 +
 +using namespace amlogic;
 +
@@ -5535,6 +5542,7 @@ index 0000000000..5b645c6f21
 +
 +void DVCodec::setupDolbyVision(const CDVDStreamInfo &hints)
 +{
++	setIptOutput(false);
 +	bool isProfile4 = hints.dovi.dv_profile == 4;
 +	bool isSDR = hints.colorPrimaries == 1;
 +	bool isDVoutputDisabled =
@@ -5574,6 +5582,24 @@ index 0000000000..5b645c6f21
 +
 +	CLog::Log(LOGINFO, "DVCodec: DV support enabled");
 +	m_dv_enabled = true;
++
++	// To a Dolby Vision display everything except profile 7 (a PQ base layer) goes out as IPT, as the
++	// kernel routes the OSD for it. The subtitles of profile 5 and of profile 8 with an HDR10 base
++	// layer (compatibility id 1) are PQ, so those need IPT on the OSD2 plane. The other profile 8
++	// variants (SDR or HLG base layer) have SDR subtitles that would not need IPT either, so the flag
++	// stays false for them; whether they should take the PQ route at all is an open point in
++	// docs/osmc/pgs-subtitles-pq.md.
++	const bool toDvDisplay = isDisplaySupportsDolbyVision() && !isDVoutputDisabled;
++	const bool ipt = toDvDisplay && (hints.dovi.dv_profile == 5 ||
++					 (hints.dovi.dv_profile == 8 && hints.dovi.dv_bl_signal_compatibility_id == 1));
++	setIptOutput(ipt);
++}
++
++void DVCodec::setIptOutput(bool ipt) const
++{
++	auto* winSystem = dynamic_cast<CWinSystemAmlogic*>(CServiceBroker::GetWinSystem());
++	if (winSystem)
++		winSystem->SetDvIptOutput(ipt);
 +}
 +
 +void DVCodec::setupVideoCodecParams(aml_generic_param &params) const
@@ -5597,6 +5623,7 @@ index 0000000000..5b645c6f21
 +void DVCodec::closeAmlVideo()
 +{
 +	setDualLayerSupport(false);
++	setIptOutput(false);
 +
 +	AMLInsecureVideoCodec::closeAmlVideo();
 +}
@@ -5620,10 +5647,10 @@ index 0000000000..5b645c6f21
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h
 new file mode 100644
-index 0000000000..dfadd027f9
+index 0000000000..8773a57b28
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/DVCodec.h
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,39 @@
 +/*
 + *  Copyright (C) 2024 OSMC
 + *
@@ -5653,6 +5680,8 @@ index 0000000000..dfadd027f9
 +	virtual void closeAmlVideo();
 +
 +	virtual void setDualLayerSupport(bool on=true) const;
++	//! Tell the window system whether the OSD2 plane has to carry IPT for this video
++	void setIptOutput(bool ipt) const;
 +	virtual bool setVideoRect(const CRect &SrcRect, const CRect &DestRect);
 +private:
 +	void setupDolbyVision(const CDVDStreamInfo &hints);
@@ -5663,10 +5692,10 @@ index 0000000000..dfadd027f9
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
 new file mode 100644
-index 0000000000..09e9342ca9
+index 0000000000..a12b8c2e65
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.cpp
-@@ -0,0 +1,245 @@
+@@ -0,0 +1,233 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5676,12 +5705,11 @@ index 0000000000..09e9342ca9
 + */
 +
 +#include "H264Codec.h"
++#include "H264MVCCodec.h"
 +
 +#include "AMLCodecList.h"
 +#include "AMLVideoCodecInfo.h"
 +#include "AMLVideoCodecConstants.h"
-+
-+#include "OSMCSecureOS.h"
 +
 +#include "utils/AMLUtils.h"
 +#include "utils/BitstreamConverter.h"
@@ -5745,14 +5773,18 @@ index 0000000000..09e9342ca9
 +		bool requestMvc = hints.codec_tag == CODEC_TAG_AMVC || hints.codec_tag == CODEC_TAG_MVC1;
 +		bool request4k = !requestMvc && aml_support_h264_4k2k() == AML_HAS_H264_4K2K && (hints.width > 1920 || hints.height > 1088);
 +
-+		return new H264Codec(processInfo, request4k, requestMvc);
++		if (requestMvc) {
++			return new H264MVCCodec(processInfo);
++		}
++
++		return new H264Codec(processInfo, request4k);
 +	}
 +
 +} h264CodecInfo;
 +
 +
-+H264Codec::H264Codec(CProcessInfo &processInfo, bool request4k, bool requestMvc)
-+	: AMLInsecureVideoCodec(processInfo), m_is4k(request4k), m_isMvc(requestMvc), m_hasKeyframe(false),
++H264Codec::H264Codec(CProcessInfo &processInfo, bool request4k)
++	: AMLInsecureVideoCodec(processInfo), m_is4k(request4k), m_hasKeyframe(false),
 +	  m_bitstream(nullptr), m_bitparser(nullptr)
 +{
 +}
@@ -5769,12 +5801,12 @@ index 0000000000..09e9342ca9
 +
 +std::string H264Codec::getFormatName() const
 +{
-+	return m_isMvc ? "am-h264mvc" : "am-h264";
++	return "am-h264";
 +}
 +
 +vformat_t H264Codec::getVideoFormat(const CDVDStreamInfo &hints) const
 +{
-+	return m_isMvc ? VFORMAT_H264MVC : (m_is4k ? VFORMAT_H264_4K2K : VFORMAT_H264);
++	return m_is4k ? VFORMAT_H264_4K2K : VFORMAT_H264;
 +}
 +
 +vdec_type_t H264Codec::getVideoCodecType(const CDVDStreamInfo &hints) const
@@ -5785,10 +5817,6 @@ index 0000000000..09e9342ca9
 +void H264Codec::setupVideoCodecParams(aml_generic_param &params) const
 +{
 +	AMLInsecureVideoCodec::setupVideoCodecParams(params);
-+
-+	if (m_isMvc) {
-+		params.decoder_type = DECODER_TYPE_SINGLE_MODE;
-+	}
 +
 +	params.param = (void*) EXTERNAL_PTS;
 +	// h264 in an avi file
@@ -5838,17 +5866,6 @@ index 0000000000..09e9342ca9
 +	}
 +
 +	return rate;
-+}
-+
-+CDVDVideoCodec::VCReturn H264Codec::getPicture(VideoPicture *pVideoPicture)
-+{
-+	CDVDVideoCodec::VCReturn ret = AMLInsecureVideoCodec::getPicture(pVideoPicture);
-+
-+	if (m_isMvc && ret == CDVDVideoCodec::VC_PICTURE) {
-+		pVideoPicture->m_3dSubtitleDepth = m_secureOSMC->getMvcSubtitleDepth(pVideoPicture->pts/DVD_TIME_BASE);
-+	}
-+
-+	return ret;
 +}
 +
 +bool H264Codec::openDecoder(CDVDStreamInfo &hints)
@@ -5914,10 +5931,10 @@ index 0000000000..09e9342ca9
 +}
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.h
 new file mode 100644
-index 0000000000..7261cebbcb
+index 0000000000..76e9b00cd0
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264Codec.h
-@@ -0,0 +1,50 @@
+@@ -0,0 +1,47 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -5937,7 +5954,6 @@ index 0000000000..7261cebbcb
 +{
 +private:
 +	bool	m_is4k;
-+	bool	m_isMvc;
 +	bool	m_hasKeyframe;
 +
 +	CBitstreamConverter	*m_bitstream;
@@ -5955,12 +5971,162 @@ index 0000000000..7261cebbcb
 +	virtual void playbackResume(int speed);
 +
 +public:
-+	H264Codec(CProcessInfo &processInfo, bool request4k, bool requestMvc);
++	H264Codec(CProcessInfo &processInfo, bool request4k);
 +	virtual ~H264Codec();
 +
 +	virtual std::string getFormatName() const;
 +
 +	virtual bool openDecoder(CDVDStreamInfo &hints);
++
++	virtual bool prepareFrame(CDVDStreamInfo &hints, uint8_t *&data, size_t &size, double dts, double pts);
++
++	virtual void reset();
++};
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264MVCCodec.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264MVCCodec.cpp
+new file mode 100644
+index 0000000000..7d3bdc1106
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264MVCCodec.cpp
+@@ -0,0 +1,99 @@
++/*
++ *  Copyright (C) 2026 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "H264MVCCodec.h"
++
++#include "OSMCSecureOS.h"
++
++#include "utils/log.h"
++
++using namespace amlogic;
++
++H264MVCCodec::H264MVCCodec(CProcessInfo &processInfo)
++	: H264Codec(processInfo, false), m_extradataRewritten(false), m_loggedEvents(0)
++{
++}
++
++H264MVCCodec::~H264MVCCodec()
++{
++}
++
++std::string H264MVCCodec::getFormatName() const
++{
++	return "am-h264mvc";
++}
++
++vformat_t H264MVCCodec::getVideoFormat(const CDVDStreamInfo &hints) const
++{
++	return VFORMAT_H264MVC;
++}
++
++void H264MVCCodec::setupVideoCodecParams(aml_generic_param &params) const
++{
++	H264Codec::setupVideoCodecParams(params);
++
++	params.decoder_type = DECODER_TYPE_SINGLE_MODE;
++}
++
++CDVDVideoCodec::VCReturn H264MVCCodec::getPicture(VideoPicture *pVideoPicture)
++{
++	CDVDVideoCodec::VCReturn ret = H264Codec::getPicture(pVideoPicture);
++
++	if (ret == CDVDVideoCodec::VC_PICTURE) {
++		pVideoPicture->m_3dSubtitleDepth = m_secureOSMC->getMvcSubtitleDepth(pVideoPicture->pts/DVD_TIME_BASE);
++	}
++
++	return ret;
++}
++
++bool H264MVCCodec::prepareFrame(CDVDStreamInfo &hints, uint8_t *&data, size_t &size, double dts, double pts)
++{
++	if (!H264Codec::prepareFrame(hints, data, size, dts, pts)) {
++		return false;
++	}
++
++	// Give both views a 16-bit frame_num that never wraps, see MvcFrameNumRewriter.
++	// The extradata reaches the decoder in openDecoder(), which only runs after the first
++	// prepareFrame() that returns true; by then the base class has made it Annex-B.
++	if (!m_extradataRewritten) {
++		m_extradataRewritten = true;
++		if (hints.extradata.GetSize() &&
++			m_rewriter.Process(hints.extradata.GetData(), hints.extradata.GetSize(), m_rewriteBuffer)) {
++			hints.extradata = FFmpegExtraData(m_rewriteBuffer.data(), m_rewriteBuffer.size());
++		}
++	}
++
++	// m_rewriteBuffer stays valid until the next call, so after the caller's addData()
++	if (m_rewriter.Process(data, size, m_rewriteBuffer)) {
++		data = m_rewriteBuffer.data();
++		size = m_rewriteBuffer.size();
++	}
++
++	logRewriterEvents();
++
++	return true;
++}
++
++void H264MVCCodec::reset()
++{
++	H264Codec::reset();
++
++	// the decoder starts afresh at the next anchor picture, so the count does too
++	m_rewriter.Reset();
++}
++
++void H264MVCCodec::logRewriterEvents()
++{
++	unsigned int events = m_rewriter.TakeEvents() & ~m_loggedEvents;
++	m_loggedEvents |= events;
++
++	for (unsigned int i = 0; i < MvcFrameNumRewriter::EVENT_COUNT; i++) {
++		if (events & (1u << i)) {
++			CLog::Log(LOGDEBUG, "H264MVCCodec: {}", MvcFrameNumRewriter::GetEventName(1u << i));
++		}
++	}
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264MVCCodec.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264MVCCodec.h
+new file mode 100644
+index 0000000000..d0bf3fc55e
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/H264MVCCodec.h
+@@ -0,0 +1,41 @@
++/*
++ *  Copyright (C) 2026 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include "H264Codec.h"
++#include "MvcFrameNumRewriter.h"
++
++#include <vector>
++
++class amlogic::H264MVCCodec : public amlogic::H264Codec
++{
++private:
++	MvcFrameNumRewriter	m_rewriter;
++	std::vector<uint8_t>	m_rewriteBuffer;
++	bool	m_extradataRewritten;
++	unsigned int	m_loggedEvents;
++
++	void logRewriterEvents();
++
++protected:
++	virtual vformat_t getVideoFormat(const CDVDStreamInfo &hints) const;
++
++	virtual void setupVideoCodecParams(aml_generic_param &params) const;
++
++public:
++	H264MVCCodec(CProcessInfo &processInfo);
++	virtual ~H264MVCCodec();
++
++	virtual std::string getFormatName() const;
 +
 +	virtual CDVDVideoCodec::VCReturn getPicture(VideoPicture *pVideoPicture);
 +
@@ -7048,6 +7214,965 @@ index 0000000000..26ddcd801f
 +
 +	virtual std::string getFormatName() const;
 +};
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MvcFrameNumRewriter.cpp b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MvcFrameNumRewriter.cpp
+new file mode 100644
+index 0000000000..e7f08ddd5b
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MvcFrameNumRewriter.cpp
+@@ -0,0 +1,809 @@
++/*
++ *  Copyright (C) 2026 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "MvcFrameNumRewriter.h"
++
++#include "utils/BitstreamReader.h"
++#include "utils/BitstreamWriter.h"
++
++using namespace amlogic;
++
++namespace
++{
++
++constexpr unsigned int NEW_LOG2_MAX_FRAME_NUM = 16;
++
++constexpr unsigned int NAL_SLICE = 1;
++constexpr unsigned int NAL_SLICE_IDR = 5;
++constexpr unsigned int NAL_SPS = 7;
++constexpr unsigned int NAL_PPS = 8;
++constexpr unsigned int NAL_SUBSET_SPS = 15;
++constexpr unsigned int NAL_SLICE_EXTENSION = 20;
++
++// slice_type % 5
++constexpr unsigned int SLICE_P = 0;
++constexpr unsigned int SLICE_B = 1;
++constexpr unsigned int SLICE_I = 2;
++constexpr unsigned int SLICE_SP = 3;
++constexpr unsigned int SLICE_SI = 4;
++
++// CBitstreamReader with bounds checks and Exp-Golomb codes. Once a read runs past the end, every
++// further read returns 0 and Failed() is true.
++class BitReader
++{
++public:
++  BitReader(const uint8_t* data, size_t size)
++    : m_reader(data, static_cast<int>(size)), m_sizeBits(size * 8)
++  {
++  }
++
++  uint32_t U(unsigned int n)
++  {
++    // CBitstreamReader::ReadBits() is only exact up to 25 bits
++    if (n > 16)
++    {
++      uint32_t high = U(n - 16);
++      return (high << 16) | U(16);
++    }
++    if (m_failed || Position() + n > m_sizeBits)
++    {
++      m_failed = true;
++      return 0;
++    }
++    return n ? m_reader.ReadBits(n) : 0;
++  }
++
++  bool Flag() { return U(1) != 0; }
++
++  uint32_t Ue()
++  {
++    unsigned int zeros = 0;
++    while (!U(1))
++    {
++      if (m_failed || ++zeros > 31)
++      {
++        m_failed = true;
++        return 0;
++      }
++    }
++    return ((1u << zeros) - 1) + U(zeros);
++  }
++
++  int32_t Se()
++  {
++    uint32_t k = Ue();
++    return (k & 1) ? static_cast<int32_t>((k + 1) / 2) : -static_cast<int32_t>(k / 2);
++  }
++
++  size_t Position() { return m_reader.Position(); }
++  bool Failed() const { return m_failed; }
++  void Fail() { m_failed = true; }
++
++private:
++  CBitstreamReader m_reader;
++  size_t m_sizeBits;
++  bool m_failed = false;
++};
++
++// CBitstreamWriter into a buffer sized up front, counting the bits written.
++class BitWriter
++{
++public:
++  // CBitstreamWriter doesn't check bounds, so the buffer is sized for maxBytes up front
++  BitWriter(std::vector<uint8_t>& buffer, size_t maxBytes)
++    : m_buffer(buffer), m_writer(Prepare(buffer, maxBytes), static_cast<unsigned int>(maxBytes), 0)
++  {
++  }
++
++  void U(unsigned int n, uint32_t value)
++  {
++    if (n > 16)
++    {
++      U(n - 16, value >> 16);
++      n = 16;
++    }
++    if (n)
++      m_writer.WriteBits(n, value & ((1u << n) - 1));
++    m_bits += n;
++  }
++
++  void Ue(uint32_t value)
++  {
++    uint64_t v = static_cast<uint64_t>(value) + 1;
++    unsigned int len = 0;
++    while (v >> (len + 1))
++      len++;
++    U(len, 0);
++    U(len + 1, static_cast<uint32_t>(v));
++  }
++
++  // copies bits [from, to) of data
++  void Copy(const uint8_t* data, size_t size, size_t from, size_t to)
++  {
++    CBitstreamReader reader(data, static_cast<int>(size));
++    reader.SkipBits(static_cast<int>(from));
++    for (size_t pos = from; pos < to;)
++    {
++      unsigned int n = (to - pos) > 16 ? 16 : static_cast<unsigned int>(to - pos);
++      U(n, reader.ReadBits(n));
++      pos += n;
++    }
++  }
++
++  void AlignWith(unsigned int bit)
++  {
++    while (m_bits % 8)
++      U(1, bit);
++  }
++
++  // flushes and trims the buffer to the bytes written; the bit count must be byte-aligned
++  void Finish()
++  {
++    m_writer.FlushBits();
++    m_buffer.resize(m_bits / 8);
++  }
++
++private:
++  static uint8_t* Prepare(std::vector<uint8_t>& buffer, size_t maxBytes)
++  {
++    buffer.resize(maxBytes + 8);
++    return buffer.data();
++  }
++
++  std::vector<uint8_t>& m_buffer;
++  CBitstreamWriter m_writer;
++  size_t m_bits = 0;
++};
++
++// index of the next 00 00 01 at or after from, or size
++size_t FindStartCode(const uint8_t* data, size_t size, size_t from)
++{
++  size_t i = from;
++  while (i + 2 < size)
++  {
++    if (data[i + 2] > 1)
++      i += 3;
++    else if (data[i + 1])
++      i += 2;
++    else if (data[i] || data[i + 2] != 1)
++      i++;
++    else
++      return i;
++  }
++  return size;
++}
++
++// removes emulation prevention bytes
++void Unescape(const uint8_t* src, size_t size, std::vector<uint8_t>& dst)
++{
++  dst.resize(size);
++  size_t out = 0;
++  unsigned int zeros = 0;
++  for (size_t i = 0; i < size; i++)
++  {
++    const uint8_t b = src[i];
++    if (zeros >= 2 && b == 3)
++    {
++      zeros = 0;
++      continue;
++    }
++    dst[out++] = b;
++    zeros = b ? 0 : zeros + 1;
++  }
++  dst.resize(out);
++}
++
++// appends src to dst with emulation prevention bytes, as the reference rewriter does
++void Escape(const uint8_t* src, size_t size, std::vector<uint8_t>& dst)
++{
++  size_t out = dst.size();
++  dst.resize(out + size + size / 2 + 1);
++  unsigned int zeros = 0;
++  for (size_t i = 0; i < size; i++)
++  {
++    const uint8_t b = src[i];
++    if (zeros >= 2 && b <= 3)
++    {
++      dst[out++] = 3;
++      zeros = 0;
++    }
++    dst[out++] = b;
++    zeros = b ? 0 : zeros + 1;
++  }
++  if (size && dst[out - 1] == 0)
++    dst[out++] = 3;
++  dst.resize(out);
++}
++
++// number of RBSP bits before rbsp_stop_one_bit, or 0 if there is none
++size_t RbspPayloadBits(const std::vector<uint8_t>& rbsp)
++{
++  size_t i = rbsp.size();
++  while (i > 0 && rbsp[i - 1] == 0)
++    i--;
++  if (i == 0)
++    return 0;
++  const uint8_t last = rbsp[i - 1];
++  unsigned int trailingZeros = 0;
++  while (!(last & (1u << trailingZeros)))
++    trailingZeros++;
++  return (i - 1) * 8 + (7 - trailingZeros);
++}
++
++void SkipScalingList(BitReader& br, unsigned int size)
++{
++  int last = 8;
++  int next = 8;
++  for (unsigned int j = 0; j < size && !br.Failed(); j++)
++  {
++    if (next)
++      next = (last + br.Se() + 256) % 256;
++    if (next)
++      last = next;
++  }
++}
++
++// ref_pic_list_modification() or ref_pic_list_mvc_modification() for one list
++void SkipRefPicListModification(BitReader& br)
++{
++  if (!br.Flag())
++    return;
++  // modification_of_pic_nums_idc 0, 1, 2 (and 4, 5 in the MVC form) are each followed by one
++  // ue(v); 3 ends the list
++  for (unsigned int n = 0; n < 100 && !br.Failed(); n++)
++  {
++    if (br.Ue() == 3)
++      return;
++    br.Ue();
++  }
++  br.Fail(); // too many to be real
++}
++
++bool IsMvcProfile(unsigned int profile)
++{
++  return profile == 118 || profile == 128 || profile == 134;
++}
++
++bool HasChromaFormatInfo(unsigned int profile)
++{
++  switch (profile)
++  {
++    case 100:
++    case 110:
++    case 122:
++    case 244:
++    case 44:
++    case 83:
++    case 86:
++    case 118:
++    case 128:
++    case 138:
++    case 139:
++    case 134:
++    case 135:
++      return true;
++    default:
++      return false;
++  }
++}
++
++} // namespace
++
++const char* MvcFrameNumRewriter::GetEventName(unsigned int event)
++{
++  switch (event)
++  {
++    case EVENT_SPS_REWRITTEN:
++      return "SPS rewritten to a 16-bit frame_num";
++    case EVENT_SUBSET_SPS_REWRITTEN:
++      return "subset SPS rewritten to a 16-bit frame_num";
++    case EVENT_SPS_KEPT:
++      return "SPS or subset SPS left unchanged, its slices keep their frame_num width";
++    case EVENT_SLICE_KEPT:
++      return "slice could not be rewritten, the picture will decode wrongly";
++    case EVENT_COUNT_WRAPPED:
++      return "frame_num count passed 65535 without an IDR and wrapped";
++    case EVENT_MMCO5_RESET:
++      return "frame_num count restarted at an MMCO 5";
++    default:
++      return "unknown";
++  }
++}
++
++void MvcFrameNumRewriter::Reset()
++{
++  for (Count& count : m_count)
++  {
++    count.havePrevious = false;
++    count.resetNext = false;
++  }
++}
++
++unsigned int MvcFrameNumRewriter::TakeEvents()
++{
++  unsigned int events = m_events;
++  m_events = 0;
++  return events;
++}
++
++bool MvcFrameNumRewriter::Process(const uint8_t* data, size_t size, std::vector<uint8_t>& out)
++{
++  bool changed = false;
++  size_t copied = 0;
++
++  size_t startCode = FindStartCode(data, size, 0);
++  while (startCode < size)
++  {
++    const size_t nalStart = startCode + 3;
++    const size_t next = FindStartCode(data, size, nalStart);
++
++    // zero bytes before the next start code are trailing_zero_8bits or the first byte of a
++    // 4-byte start code; a NAL unit never ends in 0x00
++    size_t nalEnd = next;
++    while (nalEnd > nalStart && data[nalEnd - 1] == 0)
++      nalEnd--;
++
++    if (nalEnd > nalStart && RewriteNal(data + nalStart, nalEnd - nalStart))
++    {
++      if (!changed)
++      {
++        out.clear();
++        out.reserve(size + 1024);
++        changed = true;
++      }
++      out.insert(out.end(), data + copied, data + nalStart);
++      out.insert(out.end(), m_nal.begin(), m_nal.end());
++      copied = nalEnd;
++    }
++
++    startCode = next;
++  }
++
++  if (changed)
++    out.insert(out.end(), data + copied, data + size);
++
++  return changed;
++}
++
++bool MvcFrameNumRewriter::RewriteNal(const uint8_t* nal, size_t size)
++{
++  switch (nal[0] & 0x1f)
++  {
++    case NAL_PPS:
++      ParsePps(nal, size);
++      return false;
++    case NAL_SPS:
++      return RewriteSps(nal, size, VIEW_BASE);
++    case NAL_SUBSET_SPS:
++      return RewriteSps(nal, size, VIEW_DEPENDENT);
++    case NAL_SLICE:
++    case NAL_SLICE_IDR:
++      return RewriteSlice(nal, size, VIEW_BASE);
++    case NAL_SLICE_EXTENSION:
++      return RewriteSlice(nal, size, VIEW_DEPENDENT);
++    default:
++      return false;
++  }
++}
++
++void MvcFrameNumRewriter::ParsePps(const uint8_t* nal, size_t size)
++{
++  Unescape(nal + 1, size - 1, m_rbsp);
++  BitReader br(m_rbsp.data(), m_rbsp.size());
++
++  const uint32_t ppsId = br.Ue();
++  if (br.Failed() || ppsId >= m_pps.size())
++    return;
++
++  Pps pps;
++  pps.known = true;
++  pps.spsId = br.Ue();
++  pps.cabac = br.Flag();
++  pps.bottomFieldPicOrder = br.Flag();
++  const uint32_t numSliceGroups = br.Ue() + 1;
++  if (numSliceGroups == 1)
++  {
++    pps.numRefIdxL0 = br.Ue() + 1;
++    pps.numRefIdxL1 = br.Ue() + 1;
++    pps.weightedPred = br.Flag();
++    pps.weightedBipredIdc = br.U(2);
++    br.Se(); // pic_init_qp_minus26
++    br.Se(); // pic_init_qs_minus26
++    br.Se(); // chroma_qp_index_offset
++    pps.deblockingFilterControl = br.Flag();
++    br.Flag(); // constrained_intra_pred_flag
++    pps.redundantPicCnt = br.Flag();
++
++    // slice groups are not allowed in the MVC profiles, so a PPS with them is left unsupported
++    pps.supported = !br.Failed() && pps.spsId < m_sps[VIEW_BASE].size() &&
++                    pps.numRefIdxL0 <= 32 && pps.numRefIdxL1 <= 32;
++  }
++
++  m_pps[ppsId] = pps;
++}
++
++// seq_parameter_set_data() starts both an SPS and a subset SPS; everything up to
++// frame_mbs_only_flag is parsed the same way for both
++bool MvcFrameNumRewriter::RewriteSps(const uint8_t* nal, size_t size, View view)
++{
++  Unescape(nal + 1, size - 1, m_rbsp);
++  BitReader br(m_rbsp.data(), m_rbsp.size());
++
++  Sps sps;
++  sps.known = true;
++
++  const uint32_t profile = br.U(8);
++  br.U(8); // constraint flags
++  br.U(8); // level_idc
++  const uint32_t spsId = br.Ue();
++  if (br.Failed() || spsId >= m_sps[view].size())
++  {
++    m_events |= EVENT_SPS_KEPT;
++    return false;
++  }
++
++  uint32_t chromaFormatIdc = 1;
++  if (HasChromaFormatInfo(profile))
++  {
++    chromaFormatIdc = br.Ue();
++    if (chromaFormatIdc == 3)
++      sps.separateColourPlane = br.Flag();
++    br.Ue(); // bit_depth_luma_minus8
++    br.Ue(); // bit_depth_chroma_minus8
++    br.Flag(); // qpprime_y_zero_transform_bypass_flag
++    if (br.Flag()) // seq_scaling_matrix_present_flag
++    {
++      for (unsigned int i = 0; i < (chromaFormatIdc != 3 ? 8u : 12u); i++)
++      {
++        if (br.Flag())
++          SkipScalingList(br, i < 6 ? 16 : 64);
++      }
++    }
++  }
++  sps.chroma = chromaFormatIdc != 0 && !sps.separateColourPlane;
++
++  const size_t log2Start = br.Position();
++  sps.log2MaxFrameNum = br.Ue() + 4;
++  const size_t log2End = br.Position();
++
++  sps.pocType = br.Ue();
++  if (sps.pocType == 0)
++  {
++    sps.log2MaxPocLsb = br.Ue() + 4;
++  }
++  else if (sps.pocType == 1)
++  {
++    sps.deltaPicOrderAlwaysZero = br.Flag();
++    br.Se(); // offset_for_non_ref_pic
++    br.Se(); // offset_for_top_to_bottom_field
++    const uint32_t cycle = br.Ue();
++    for (uint32_t i = 0; i < cycle && i < 256 && !br.Failed(); i++)
++      br.Se();
++  }
++  br.Ue(); // max_num_ref_frames
++  br.Flag(); // gaps_in_frame_num_value_allowed_flag
++  br.Ue(); // pic_width_in_mbs_minus1
++  br.Ue(); // pic_height_in_map_units_minus1
++  sps.frameMbsOnly = br.Flag();
++
++  Sps& entry = m_sps[view][spsId];
++
++  if (sps.log2MaxFrameNum == NEW_LOG2_MAX_FRAME_NUM)
++  {
++    // Either the stream already has 16 bits, which never wrap, or this is a copy we have
++    // rewritten ourselves being passed in again. Keep what we know in the second case, so that
++    // the slices go on being rewritten.
++    if (!entry.rewritten)
++      entry = sps;
++    return false;
++  }
++
++  const size_t payloadEnd = RbspPayloadBits(m_rbsp);
++  if (br.Failed() || (view == VIEW_DEPENDENT && !IsMvcProfile(profile)) ||
++      sps.log2MaxFrameNum > NEW_LOG2_MAX_FRAME_NUM || sps.pocType > 2 || sps.log2MaxPocLsb > 16 ||
++      payloadEnd < br.Position())
++  {
++    entry = sps;
++    m_events |= EVENT_SPS_KEPT;
++    return false;
++  }
++
++  BitWriter bw(m_rbspOut, m_rbsp.size() + 4);
++  bw.Copy(m_rbsp.data(), m_rbsp.size(), 0, log2Start);
++  bw.Ue(NEW_LOG2_MAX_FRAME_NUM - 4);
++  bw.Copy(m_rbsp.data(), m_rbsp.size(), log2End, payloadEnd);
++  bw.U(1, 1); // rbsp_stop_one_bit
++  bw.AlignWith(0);
++  bw.Finish();
++
++  m_nal.assign(nal, nal + 1);
++  Escape(m_rbspOut.data(), m_rbspOut.size(), m_nal);
++
++  sps.rewritten = true;
++  entry = sps;
++  m_events |= view == VIEW_BASE ? EVENT_SPS_REWRITTEN : EVENT_SUBSET_SPS_REWRITTEN;
++  return true;
++}
++
++bool MvcFrameNumRewriter::RewriteSlice(const uint8_t* nal, size_t size, View view)
++{
++  // a dependent-view slice has the 3-byte nal_unit_header_mvc_extension() after the NAL header
++  const size_t headerSize = view == VIEW_DEPENDENT ? 4 : 1;
++  if (size <= headerSize)
++    return false;
++
++  bool idr = (nal[0] & 0x1f) == NAL_SLICE_IDR;
++  if (view == VIEW_DEPENDENT)
++  {
++    if (nal[1] & 0x80) // svc_extension_flag: SVC, not MVC
++      return false;
++    idr = !(nal[1] & 0x40); // non_idr_flag
++  }
++  const unsigned int refIdc = (nal[0] >> 5) & 3;
++
++  Unescape(nal + headerSize, size - headerSize, m_rbsp);
++  BitReader br(m_rbsp.data(), m_rbsp.size());
++
++  const uint32_t firstMb = br.Ue();
++  const uint32_t sliceTypeRaw = br.Ue();
++  const uint32_t ppsId = br.Ue();
++  if (br.Failed() || sliceTypeRaw > 9 || ppsId >= m_pps.size() || !m_pps[ppsId].known)
++  {
++    if (AnySpsRewritten(view))
++      m_events |= EVENT_SLICE_KEPT;
++    return false;
++  }
++
++  const Pps& pps = m_pps[ppsId];
++  const Sps& sps = m_sps[view][pps.spsId < m_sps[view].size() ? pps.spsId : 0];
++  if (pps.spsId >= m_sps[view].size() || !sps.rewritten)
++    return false; // an SPS that keeps its width
++  if (!pps.supported)
++  {
++    m_events |= EVENT_SLICE_KEPT;
++    return false;
++  }
++
++  const unsigned int sliceType = sliceTypeRaw % 5;
++
++  if (sps.separateColourPlane)
++    br.U(2); // colour_plane_id
++
++  const size_t frameNumStart = br.Position();
++  const uint32_t frameNum = br.U(sps.log2MaxFrameNum);
++  if (br.Failed())
++  {
++    m_events |= EVENT_SLICE_KEPT;
++    return false;
++  }
++
++  // a new picture starts with first_mb_in_slice 0; its other slices share its count
++  uint32_t count = m_count[view].previousCount & 0xffff;
++  if (firstMb == 0 || !m_count[view].havePrevious)
++  {
++    // a previous picture's MMCO 5 reset this view's frame_num, like an IDR does; restart here
++    if (firstMb == 0 && m_count[view].resetNext)
++    {
++      m_count[view].havePrevious = false;
++      m_count[view].resetNext = false;
++    }
++    count = MapFrameNum(view, frameNum, sps.log2MaxFrameNum, idr);
++  }
++
++  // the rest of the slice header, only to find where it ends
++  bool field = false;
++  if (!sps.frameMbsOnly)
++  {
++    field = br.Flag(); // field_pic_flag
++    if (field)
++      br.Flag(); // bottom_field_flag
++  }
++  if (idr)
++    br.Ue(); // idr_pic_id
++  if (sps.pocType == 0)
++  {
++    br.U(sps.log2MaxPocLsb); // pic_order_cnt_lsb
++    if (pps.bottomFieldPicOrder && !field)
++      br.Se(); // delta_pic_order_cnt_bottom
++  }
++  else if (sps.pocType == 1 && !sps.deltaPicOrderAlwaysZero)
++  {
++    br.Se(); // delta_pic_order_cnt[0]
++    if (pps.bottomFieldPicOrder && !field)
++      br.Se(); // delta_pic_order_cnt[1]
++  }
++  if (pps.redundantPicCnt)
++    br.Ue(); // redundant_pic_cnt
++  if (sliceType == SLICE_B)
++    br.Flag(); // direct_spatial_mv_pred_flag
++
++  uint32_t numRefIdxL0 = pps.numRefIdxL0;
++  uint32_t numRefIdxL1 = pps.numRefIdxL1;
++  if (sliceType == SLICE_P || sliceType == SLICE_SP || sliceType == SLICE_B)
++  {
++    if (br.Flag()) // num_ref_idx_active_override_flag
++    {
++      numRefIdxL0 = br.Ue() + 1;
++      if (sliceType == SLICE_B)
++        numRefIdxL1 = br.Ue() + 1;
++    }
++  }
++  if (numRefIdxL0 > 32 || numRefIdxL1 > 32)
++  {
++    m_events |= EVENT_SLICE_KEPT;
++    return false;
++  }
++
++  if (sliceType != SLICE_I && sliceType != SLICE_SI)
++  {
++    SkipRefPicListModification(br);
++    if (sliceType == SLICE_B)
++      SkipRefPicListModification(br);
++  }
++
++  if ((pps.weightedPred && (sliceType == SLICE_P || sliceType == SLICE_SP)) ||
++      (pps.weightedBipredIdc == 1 && sliceType == SLICE_B))
++  {
++    br.Ue(); // luma_log2_weight_denom
++    if (sps.chroma)
++      br.Ue(); // chroma_log2_weight_denom
++    for (unsigned int list = 0; list < (sliceType == SLICE_B ? 2u : 1u); list++)
++    {
++      const uint32_t entries = list ? numRefIdxL1 : numRefIdxL0;
++      for (uint32_t i = 0; i < entries && !br.Failed(); i++)
++      {
++        if (br.Flag()) // luma_weight_flag
++        {
++          br.Se();
++          br.Se();
++        }
++        if (sps.chroma && br.Flag()) // chroma_weight_flag
++        {
++          for (int j = 0; j < 4; j++)
++            br.Se();
++        }
++      }
++    }
++  }
++
++  bool mmco5 = false;
++  if (refIdc)
++  {
++    if (idr)
++    {
++      br.Flag(); // no_output_of_prior_pics_flag
++      br.Flag(); // long_term_reference_flag
++    }
++    else if (br.Flag()) // adaptive_ref_pic_marking_mode_flag
++    {
++      for (unsigned int n = 0;; n++)
++      {
++        const uint32_t op = br.Ue(); // memory_management_control_operation
++        if (op == 0 || br.Failed())
++          break;
++        if (n >= 100)
++        {
++          br.Fail(); // too many to be real
++          break;
++        }
++        if (op == 5)
++          mmco5 = true; // resets frame_num for this view, like an IDR
++        if (op == 1 || op == 2 || op == 3 || op == 4 || op == 6)
++          br.Ue();
++        if (op == 3)
++          br.Ue();
++      }
++    }
++  }
++
++  if (pps.cabac && sliceType != SLICE_I && sliceType != SLICE_SI)
++    br.Ue(); // cabac_init_idc
++  br.Se(); // slice_qp_delta
++  if (sliceType == SLICE_SP || sliceType == SLICE_SI)
++  {
++    if (sliceType == SLICE_SP)
++      br.Flag(); // sp_for_switch_flag
++    br.Se(); // slice_qs_delta
++  }
++  if (pps.deblockingFilterControl)
++  {
++    if (br.Ue() != 1) // disable_deblocking_filter_idc
++    {
++      br.Se(); // slice_alpha_c0_offset_div2
++      br.Se(); // slice_beta_offset_div2
++    }
++  }
++
++  const size_t headerEnd = br.Position();
++  const size_t payloadEnd = RbspPayloadBits(m_rbsp);
++  if (br.Failed() || headerEnd > payloadEnd)
++  {
++    m_events |= EVENT_SLICE_KEPT;
++    return false;
++  }
++
++  // The header parsed cleanly: if it carried MMCO 5, restart this view's count at the next
++  // picture, mirroring the frame_num reset the decoder performs (checked after the guard so a
++  // slice we end up keeping cannot arm the reset).
++  if (mmco5)
++  {
++    m_count[view].resetNext = true;
++    m_events |= EVENT_MMCO5_RESET;
++  }
++
++  // CABAC slice data starts byte-aligned after cabac_alignment_one_bits
++  const size_t dataStart = (headerEnd + 7) / 8;
++  if (pps.cabac)
++  {
++    for (size_t i = headerEnd; i < dataStart * 8; i++)
++    {
++      if (!((m_rbsp[i / 8] >> (7 - i % 8)) & 1))
++      {
++        m_events |= EVENT_SLICE_KEPT;
++        return false;
++      }
++    }
++  }
++
++  BitWriter bw(m_rbspOut, m_rbsp.size() + 4);
++  bw.Copy(m_rbsp.data(), m_rbsp.size(), 0, frameNumStart);
++  bw.U(NEW_LOG2_MAX_FRAME_NUM, count);
++  bw.Copy(m_rbsp.data(), m_rbsp.size(), frameNumStart + sps.log2MaxFrameNum, headerEnd);
++  if (pps.cabac)
++  {
++    bw.AlignWith(1); // cabac_alignment_one_bit
++    bw.Finish();
++    m_rbspOut.insert(m_rbspOut.end(), m_rbsp.begin() + dataStart, m_rbsp.end());
++  }
++  else
++  {
++    // CAVLC slice data isn't byte-aligned: shift it along with the header
++    bw.Copy(m_rbsp.data(), m_rbsp.size(), headerEnd, payloadEnd);
++    bw.U(1, 1); // rbsp_stop_one_bit
++    bw.AlignWith(0);
++    bw.Finish();
++  }
++
++  m_nal.assign(nal, nal + headerSize);
++  Escape(m_rbspOut.data(), m_rbspOut.size(), m_nal);
++  return true;
++}
++
++uint32_t MvcFrameNumRewriter::MapFrameNum(View view,
++                                          uint32_t frameNum,
++                                          unsigned int log2MaxFrameNum,
++                                          bool idr)
++{
++  Count& c = m_count[view];
++  if (idr || !c.havePrevious)
++  {
++    c.havePrevious = true;
++    c.previousFrameNum = frameNum;
++    c.previousCount = frameNum;
++    return frameNum;
++  }
++
++  const uint32_t maxFrameNum = 1u << log2MaxFrameNum;
++  const uint32_t count =
++      c.previousCount + ((frameNum + maxFrameNum - c.previousFrameNum) & (maxFrameNum - 1));
++  if ((count >> NEW_LOG2_MAX_FRAME_NUM) != (c.previousCount >> NEW_LOG2_MAX_FRAME_NUM))
++    m_events |= EVENT_COUNT_WRAPPED;
++
++  c.previousFrameNum = frameNum;
++  c.previousCount = count;
++  return count & ((1u << NEW_LOG2_MAX_FRAME_NUM) - 1);
++}
++
++bool MvcFrameNumRewriter::AnySpsRewritten(View view) const
++{
++  for (const Sps& sps : m_sps[view])
++  {
++    if (sps.rewritten)
++      return true;
++  }
++  return false;
++}
+diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MvcFrameNumRewriter.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MvcFrameNumRewriter.h
+new file mode 100644
+index 0000000000..54b0002ca0
+--- /dev/null
++++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/MvcFrameNumRewriter.h
+@@ -0,0 +1,138 @@
++/*
++ *  Copyright (C) 2026 OSMC
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <array>
++#include <stddef.h>
++#include <stdint.h>
++#include <vector>
++
++namespace amlogic
++{
++
++/*!
++ * \brief Gives both views of H.264 MVC a 16-bit frame_num that never wraps.
++ *
++ * The Amlogic amvdec_h264mvc firmware predicts from the wrong reference picture after a frame_num
++ * wrap. It also uses one MaxFrameNum for both views, so the two views must have the same width.
++ * This rewrites every SPS (NAL 7) and MVC subset SPS (NAL 15) to log2_max_frame_num = 16, and
++ * every slice of either view (NAL 1, 5 and 20) to a 16-bit frame_num that counts on across the
++ * wrap and restarts at that view's IDR. The slice data and everything else in the stream are left
++ * as they are. See docs/osmc/mvc-framenum-rewrite.md.
++ *
++ * Works on Annex-B data. The parameter sets it has seen are kept across calls and across Reset(),
++ * so the caller must pass every parameter set the decoder gets, including those in the
++ * extradata, through Process().
++ *
++ * Depends only on utils/BitstreamReader and utils/BitstreamWriter, so that it can be built and
++ * checked on its own; it does no logging itself, see TakeEvents().
++ */
++class MvcFrameNumRewriter
++{
++public:
++  //! Things the caller may want to log, as bits of a mask.
++  enum Event : unsigned int
++  {
++    //! An SPS (base view) was rewritten to a 16-bit frame_num.
++    EVENT_SPS_REWRITTEN = 1 << 0,
++    //! A subset SPS (dependent view) was rewritten to a 16-bit frame_num.
++    EVENT_SUBSET_SPS_REWRITTEN = 1 << 1,
++    //! An SPS or subset SPS was left unchanged, so its slices keep their original frame_num width.
++    EVENT_SPS_KEPT = 1 << 2,
++    //! A slice of a rewritten view could not be rewritten. It reaches the decoder with the old
++    //! frame_num width against a 16-bit SPS, so that picture decodes wrongly.
++    EVENT_SLICE_KEPT = 1 << 3,
++    //! A view's count passed 65535 without an IDR and wrapped after all.
++    EVENT_COUNT_WRAPPED = 1 << 4,
++    //! A view's count was restarted at a memory_management_control_operation 5 (frame_num reset).
++    EVENT_MMCO5_RESET = 1 << 5,
++  };
++  static constexpr unsigned int EVENT_COUNT = 6;
++
++  static const char* GetEventName(unsigned int event);
++
++  //! Restarts the count, as after a decoder reset. The parameter sets seen so far are kept.
++  void Reset();
++
++  /*!
++   * \brief Rewrites the Annex-B data in \p data.
++   * \return true if anything changed; the result is then in \p out. On false, \p out is
++   * unspecified and \p data is to be used unchanged.
++   */
++  bool Process(const uint8_t* data, size_t size, std::vector<uint8_t>& out);
++
++  //! Returns the events since the last call, and clears them.
++  unsigned int TakeEvents();
++
++private:
++  //! The base view's slices (NAL 1, 5) refer to an SPS, the dependent view's (NAL 20) to a subset
++  //! SPS; both use the same PPS table.
++  enum View
++  {
++    VIEW_BASE = 0,
++    VIEW_DEPENDENT = 1,
++    VIEW_COUNT = 2,
++  };
++
++  struct Sps
++  {
++    bool known = false;
++    bool rewritten = false;
++    bool separateColourPlane = false;
++    bool chroma = false; // ChromaArrayType != 0
++    bool frameMbsOnly = false;
++    bool deltaPicOrderAlwaysZero = false;
++    unsigned int log2MaxFrameNum = 0; // as in the original stream
++    unsigned int pocType = 0;
++    unsigned int log2MaxPocLsb = 0;
++  };
++
++  struct Pps
++  {
++    bool known = false;
++    bool supported = false;
++    bool cabac = false;
++    bool bottomFieldPicOrder = false;
++    bool weightedPred = false;
++    bool deblockingFilterControl = false;
++    bool redundantPicCnt = false;
++    unsigned int spsId = 0;
++    unsigned int weightedBipredIdc = 0;
++    unsigned int numRefIdxL0 = 0;
++    unsigned int numRefIdxL1 = 0;
++  };
++
++  //! The count of one view: its previous picture's original frame_num and that picture's count.
++  struct Count
++  {
++    bool havePrevious = false;
++    bool resetNext = false; //!< a prior picture's MMCO 5 reset frame_num; restart at the next one
++    uint32_t previousFrameNum = 0;
++    uint32_t previousCount = 0;
++  };
++
++  bool RewriteNal(const uint8_t* nal, size_t size);
++  void ParsePps(const uint8_t* nal, size_t size);
++  bool RewriteSps(const uint8_t* nal, size_t size, View view);
++  bool RewriteSlice(const uint8_t* nal, size_t size, View view);
++  uint32_t MapFrameNum(View view, uint32_t frameNum, unsigned int log2MaxFrameNum, bool idr);
++  bool AnySpsRewritten(View view) const;
++
++  std::array<std::array<Sps, 32>, VIEW_COUNT> m_sps;
++  std::array<Pps, 256> m_pps;
++  std::array<Count, VIEW_COUNT> m_count;
++
++  unsigned int m_events = 0;
++
++  // scratch buffers, kept to avoid allocations per access unit
++  std::vector<uint8_t> m_rbsp;
++  std::vector<uint8_t> m_rbspOut;
++  std::vector<uint8_t> m_nal;
++};
++
++} // namespace amlogic
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/PosixFile.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/PosixFile.h
 new file mode 100644
 index 0000000000..b590b4d18e
@@ -7792,10 +8917,10 @@ index 0000000000..a6bf4c91a7
 +};
 diff --git a/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h
 new file mode 100644
-index 0000000000..98f20775cc
+index 0000000000..9c30b79b59
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/DVDCodecs/Video/amlogic/namespace.h
-@@ -0,0 +1,32 @@
+@@ -0,0 +1,33 @@
 +/*
 + *  Copyright (C) 2005-2022 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -7822,6 +8947,7 @@ index 0000000000..98f20775cc
 +	// insecure decoders
 +	class AV1Codec;
 +	class H264Codec;
++	class H264MVCCodec;
 +	class HEVCCodec;
 +	class MPEG12Codec;
 +	class MPEG4Codec;
@@ -9986,10 +11112,10 @@ index 8598052b41..98b41313c0 100644
                        RendererMediaCodecSurface.cpp)
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
 new file mode 100644
-index 0000000000..73ed403b84
+index 0000000000..d208a24cf1
 --- /dev/null
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/HwDecRender/RendererAML.cpp
-@@ -0,0 +1,225 @@
+@@ -0,0 +1,218 @@
 +/*
 + *  Copyright (C) 2007-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -10071,22 +11197,14 @@ index 0000000000..73ed403b84
 +  CalculateFrameAspectRatio(picture.iDisplayWidth, picture.iDisplayHeight);
 +  SetViewMode(m_videoSettings.m_ViewMode);
 +
++  const bool sourceIsHDR = picture.color_transfer == AVCOL_TRC_SMPTE2084 ||
++                           picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION;
++  CServiceBroker::GetWinSystem()->GetGfxContext().SetSourceIsHDR(sourceIsHDR);
++
 +  // Configure GUI/OSD for HDR PQ when display is in HDR PQ mode
-+  if (!forceSDRoutput) {
-+    if (picture.color_transfer == AVCOL_TRC_SMPTE2084)
-+    {
-+      if (CServiceBroker::GetWinSystem()->IsHDRDisplay())
-+      {
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
-+      }
-+    }
-+    else if (picture.hdrType == StreamHdrType::HDR_TYPE_DOLBYVISION)
-+    {
-+      if (CServiceBroker::GetWinSystem()->GetDisplayHDRCapabilities().SupportsDolbyVision())
-+      {
-+        CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
-+      }
-+    }
++  if (!forceSDRoutput && CServiceBroker::GetWinSystem()->IsHDRDisplay() && sourceIsHDR)
++  {
++    CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(true);
 +  }
 +
 +  ManageRenderArea();
@@ -10190,6 +11308,7 @@ index 0000000000..73ed403b84
 +    }
 +  }
 +  CServiceBroker::GetWinSystem()->GetGfxContext().SetTransferPQ(false);
++  CServiceBroker::GetWinSystem()->GetGfxContext().SetSourceIsHDR(false);
 +}
 +
 +bool CRendererAML::Flush(bool saveBuffers)
@@ -10281,10 +11400,53 @@ index 0000000000..be598196f8
 +  bool m_bConfigured;
 +};
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
-index dfd4b31227..1774eba28f 100644
+index dfd4b31227..1bfee2da90 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRenderer.cpp
-@@ -241,7 +241,7 @@ void CRenderer::Render(COverlay* o)
+@@ -21,6 +21,7 @@
+ #include "settings/Settings.h"
+ #include "settings/SettingsComponent.h"
+ #include "windowing/GraphicContext.h"
++#include "windowing/WinSystem.h"
+ 
+ #include <algorithm>
+ #include <mutex>
+@@ -86,6 +87,11 @@ void CRenderer::Flush()
+ {
+   std::unique_lock<CCriticalSection> lock(m_section);
+ 
++  // the window system may already be gone when the renderer is destroyed at shutdown
++  CWinSystemBase* winSystem = CServiceBroker::GetWinSystem();
++  if (winSystem && winSystem->SupportsRawOverlay())
++    winSystem->HideRawOverlay();
++
+   for(std::vector<SElement>& buffer : m_buffers)
+     Release(buffer);
+ 
+@@ -142,6 +148,11 @@ void CRenderer::Render(int idx)
+ {
+   std::unique_lock<CCriticalSection> lock(m_section);
+ 
++  CWinSystemBase* winSystem = CServiceBroker::GetWinSystem();
++  const bool rawOverlays = winSystem->SupportsRawOverlay();
++  if (rawOverlays)
++    winSystem->BeginRawOverlays();
++
+   std::vector<SElement>& list = m_buffers[idx];
+   for(std::vector<SElement>::iterator it = list.begin(); it != list.end(); ++it)
+   {
+@@ -154,6 +165,10 @@ void CRenderer::Render(int idx)
+     }
+   }
+ 
++  // shows the overlays that asked for the raw plane, or hides it if there were none
++  if (rawOverlays)
++    winSystem->EndRawOverlays();
++
+   ReleaseUnused();
+ }
+ 
+@@ -241,7 +256,7 @@ void CRenderer::Render(COverlay* o)
      }
    }
  
@@ -10293,7 +11455,7 @@ index dfd4b31227..1774eba28f 100644
  
    o->Render(state);
  }
-@@ -418,20 +418,6 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
+@@ -418,20 +433,6 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
    rOpts.frameWidth = m_rv.Width();
    rOpts.frameHeight = m_rv.Height();
  
@@ -10314,7 +11476,7 @@ index dfd4b31227..1774eba28f 100644
    // Set position of subtitles based on video calibration settings
    RESOLUTION_INFO resInfo = CServiceBroker::GetWinSystem()->GetGfxContext().GetResInfo();
    // Keep track of subtitle position value change,
-@@ -473,12 +459,22 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
+@@ -473,12 +474,22 @@ std::shared_ptr<COverlay> CRenderer::ConvertLibass(
      // default position of the text, different from the other alignment positions
      double posPx = static_cast<double>(m_subtitlePosition - resInfo.Overscan.top);
  
@@ -10339,7 +11501,7 @@ index dfd4b31227..1774eba28f 100644
      rOpts.position = 100 - pos * 100;
    }
    else if (m_subtitleAlign == SUBTITLES::Align::BOTTOM_OUTSIDE)
-@@ -575,6 +571,12 @@ std::shared_ptr<COverlay> CRenderer::Convert(CDVDOverlay& o, double pts)
+@@ -575,6 +586,12 @@ std::shared_ptr<COverlay> CRenderer::Convert(CDVDOverlay& o, double pts)
    else if (o.IsOverlayType(DVDOVERLAY_TYPE_SPU))
      r = COverlay::Create(static_cast<CDVDOverlaySpu&>(o));
  
@@ -10366,11 +11528,326 @@ index a6690004e6..8126ebc90f 100644
    protected:
      /*!
       * \brief Given the resolution ratio determines if it is a 4/3 resolution
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
+index cf3b31324a..82b6fe3592 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.cpp
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include "OverlayRendererGLES.h"
++#include "PlatformDefs.h"
+ 
+ #include "LinuxRendererGLES.h"
+ #include "OverlayRenderer.h"
+@@ -22,8 +23,14 @@
+ #include "utils/GLUtils.h"
+ #include "utils/MathUtils.h"
+ #include "utils/log.h"
++#include "windowing/GraphicContext.h"
+ #include "windowing/WinSystem.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++#include "settings/VeroSettings.h"
+ 
++#include <algorithm>
++#include <atomic>
+ #include <cmath>
+ 
+ // GLES2.0 cant do CLAMP, but can do CLAMP_TO_EDGE.
+@@ -160,10 +167,49 @@ COverlayTextureGLES::COverlayTextureGLES(const CDVDOverlayImage& o, CRect& rSour
+   }
+   else
+   {
++    // A bitmap subtitle for an HDR title is authored in BT.2020 PQ, whatever FFmpeg took it for. Put
++    // its palette (at most 256 colours) right for the output rather than every pixel in a shader:
++    // undo FFmpeg's BT.709 assumption, and for an SDR output of the HDR source bring it down to sRGB
++    // to match the GUI, which the kernel leaves as it is.
++    CWinSystemBase* winSystem = CServiceBroker::GetWinSystem();
++    CGraphicContext& gfxContext = winSystem->GetGfxContext();
++    PaletteConversion conversion = PaletteConversion::NONE;
++    if (gfxContext.IsSourceHDR())
++      conversion = gfxContext.IsTransferPQ() ? PaletteConversion::HDR10 : PaletteConversion::PQ_TO_SDR;
++    const int maxlum = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(VeroSettings::SETTING_VIDEOSCREEN_MAXLUM);
++    const std::vector<uint32_t> argbPalette = convert_palette(o, conversion, maxlum);
++
+     std::vector<uint32_t> rgba(o.width * o.height);
+     m_pma = !!USE_PREMULTIPLIED_ALPHA;
+-    convert_rgba(o, m_pma, rgba);
++    convert_rgba(o, argbPalette, m_pma, rgba);
+     LoadTexture(GL_TEXTURE_2D, o.width, o.height, o.width * 4, &m_u, &m_v, false, rgba.data());
++
++    // And the same pixels as straight-alpha ARGB for the window system's raw overlay plane
++    static std::atomic<uint64_t> serial{0};
++    m_serial = ++serial;
++
++    // For Dolby Vision output the raw plane needs IPT; the GL texture above stays as it is
++    m_rawIpt = conversion != PaletteConversion::NONE && winSystem->RawOverlayIsIpt();
++    const std::vector<uint32_t> rawPalette =
++        m_rawIpt ? convert_palette(o, PaletteConversion::PQ_TO_IPT, maxlum) : argbPalette;
++
++    auto argb = std::make_shared<std::vector<uint32_t>>(static_cast<size_t>(o.width) * o.height);
++    for (int row = 0; row < o.height; row++)
++      for (int col = 0; col < o.width; col++)
++        (*argb)[static_cast<size_t>(row) * o.width + col] =
++            rawPalette[o.pixels[static_cast<size_t>(row) * o.linesize + col]];
++    m_argb = std::move(argb);
++    m_argbWidth = o.width;
++    m_argbHeight = o.height;
++
++    // where the bitmap sits in the video frame, for the window system's raw overlay plane
++    m_srcX = o.x;
++    m_srcY = o.y;
++    if (o.source_width > 0 && o.source_height > 0)
++    {
++      m_frameWidth = o.source_width;
++      m_frameHeight = o.source_height;
++    }
+   }
+ 
+   glBindTexture(GL_TEXTURE_2D, 0);
+@@ -401,8 +447,48 @@ COverlayTextureGLES::~COverlayTextureGLES()
+   glDeleteTextures(1, &m_texture);
+ }
+ 
++bool COverlayTextureGLES::RenderRaw(const SRenderState& state)
++{
++  if (!m_pgsSubtitle || !m_argb)
++    return false;
++
++  CWinSystemBase* winSystem = CServiceBroker::GetWinSystem();
++  if (!winSystem->SupportsRawOverlay())
++    return false;
++
++  // Only for a PQ output of an HDR source, where the bitmap is already in the output's colour
++  // space (or, for Dolby Vision output that is IPT, has been converted to it) and the kernel would
++  // otherwise convert it again as if it were sRGB. Not 3D: one bitmap cannot serve both eyes.
++  CGraphicContext& gfxContext = winSystem->GetGfxContext();
++  if (!gfxContext.IsSourceHDR() || !gfxContext.IsTransferPQ() ||
++      gfxContext.GetStereoMode() != RENDER_STEREO_MODE_OFF)
++    return false;
++
++  // built for the other kind of output, which has changed since: draw it the usual way
++  if (m_rawIpt != winSystem->RawOverlayIsIpt())
++    return false;
++
++  // the plane needs to know the frame the bitmap belongs to
++  if (m_frameWidth == 0 || m_frameHeight == 0)
++    return false;
++
++  float x = state.x;
++  float y = state.y;
++  if (m_pos == POSITION_RELATIVE)
++  {
++    x -= state.width * 0.5f;
++    y -= state.height * 0.5f;
++  }
++
++  return winSystem->AddRawOverlay(m_argb, m_argbWidth, m_argbHeight, m_serial, m_srcX, m_srcY,
++                                  m_frameWidth, m_frameHeight, x, y, state.width, state.height);
++}
++
+ void COverlayTextureGLES::Render(SRenderState& state)
+ {
++  if (RenderRaw(state))
++    return;
++
+   glEnable(GL_BLEND);
+ 
+   glBindTexture(GL_TEXTURE_2D, m_texture);
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.h
+index 875b4937fd..4ffd0db75b 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererGLES.h
+@@ -9,6 +9,7 @@
+ 
+ #pragma once
+ 
++#include <memory>
+ #include "OverlayRenderer.h"
+ 
+ #include "system_gl.h"
+@@ -38,6 +39,25 @@ public:
+   float m_u;
+   float m_v;
+   bool m_pma; /*< is alpha in texture premultiplied in the values */
++
++private:
++  /*!
++   * \brief Show the bitmap on the window system's raw overlay plane instead of drawing it
++   * \return false if it must be drawn in the usual way
++   */
++  bool RenderRaw(const SRenderState& state);
++
++  //! The bitmap as straight-alpha ARGB, in the form the raw overlay plane takes it
++  std::shared_ptr<const std::vector<uint32_t>> m_argb;
++  unsigned int m_argbWidth{0};
++  unsigned int m_argbHeight{0};
++  //! Position of the bitmap in the video frame, and the frame's size, in the bitmap's own pixels
++  int m_srcX{0};
++  int m_srcY{0};
++  unsigned int m_frameWidth{0};
++  unsigned int m_frameHeight{0};
++  bool m_rawIpt{false}; //!< m_argb is IPT, for Dolby Vision output
++  uint64_t m_serial{0};
+ };
+ 
+ class COverlayGlyphGLES : public COverlay
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
-index 57566719cc..6ef6463185 100644
+index 57566719cc..495ecbc4da 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.cpp
-@@ -271,18 +271,27 @@ bool convert_quad(ASS_Image* images, SQuads& quads, int max_x)
+@@ -16,6 +16,9 @@
+ #include "settings/SettingsComponent.h"
+ #include "windowing/GraphicContext.h"
+ 
++#include <algorithm>
++#include <cmath>
++
+ namespace OVERLAY
+ {
+ 
+@@ -57,6 +60,139 @@ void convert_rgba(const CDVDOverlayImage& o, bool mergealpha, std::vector<uint32
+       rgba[row * o.width + col] = palette[o.pixels[row * o.linesize + col]];
+ }
+ 
++std::vector<uint32_t> convert_palette(const CDVDOverlayImage& o,
++                                      PaletteConversion conversion,
++                                      int maxlum)
++{
++  // ST.2084, with PQ code values and luminance as fractions of 10000 nits
++  constexpr double m1 = 2610.0 / 16384.0;
++  constexpr double m2 = 2523.0 / 4096.0 * 128.0;
++  constexpr double c1 = 3424.0 / 4096.0;
++  constexpr double c2 = 2413.0 / 4096.0 * 32.0;
++  constexpr double c3 = 2392.0 / 4096.0 * 32.0;
++
++  auto clamp01 = [](double v) { return v < 0.0 ? 0.0 : (v > 1.0 ? 1.0 : v); };
++
++  // always 256 entries, so that any pixel value has a colour
++  std::vector<uint32_t> palette(256, 0);
++  for (size_t i = 0; i < o.palette.size() && i < palette.size(); i++)
++  {
++    const uint32_t a = (o.palette[i] >> PIXEL_ASHIFT) & 0xff;
++    double rgb[3] = {((o.palette[i] >> PIXEL_RSHIFT) & 0xff) / 255.0,
++                     ((o.palette[i] >> PIXEL_GSHIFT) & 0xff) / 255.0,
++                     ((o.palette[i] >> PIXEL_BSHIFT) & 0xff) / 255.0};
++
++    // FFmpeg converts PGS to RGB as if it were BT.709. For HDR10 the OSD2 plane converts the bytes
++    // back to YUV with a BT.709 matrix, which undoes that exactly, so they go through as they are.
++    // The other conversions need the true BT.2020 RGB, so correct the error first.
++    if (conversion == PaletteConversion::PQ_TO_SDR || conversion == PaletteConversion::PQ_TO_IPT)
++    {
++      // on BT.2020 video this undoes FFmpeg's error
++      const double r = 0.94990 * rgb[0] + 0.04551 * rgb[1] + 0.00459 * rgb[2];
++      const double g = -0.05422 * rgb[0] + 1.03811 * rgb[1] + 0.01612 * rgb[2];
++      const double b = -0.00296 * rgb[0] - 0.00994 * rgb[1] + 1.01290 * rgb[2];
++      rgb[0] = clamp01(r);
++      rgb[1] = clamp01(g);
++      rgb[2] = clamp01(b);
++    }
++
++    if (conversion == PaletteConversion::PQ_TO_SDR && maxlum > 0)
++    {
++      // PQ to linear light, relative to maxlum nits, which becomes SDR white
++      double lin[3];
++      for (int c = 0; c < 3; c++)
++      {
++        const double p = std::pow(rgb[c], 1.0 / m2);
++        const double y = std::pow(std::max(p - c1, 0.0) / (c2 - c3 * p), 1.0 / m1);
++        lin[c] = y * (10000.0 / maxlum);
++      }
++      // BT.2020 to BT.709 primaries
++      const double r = 1.660491 * lin[0] - 0.587641 * lin[1] - 0.072850 * lin[2];
++      const double g = -0.124550 * lin[0] + 1.132900 * lin[1] - 0.008349 * lin[2];
++      const double b = -0.018151 * lin[0] - 0.100579 * lin[1] + 1.118730 * lin[2];
++      // Out of range: below zero is outside BT.709, above one is brighter than the GUI's white. Clipping
++      // each channel on its own shifts the hue, and by an amount that depends on the white level, so
++      // take the negative part off and scale a too bright pixel down as a whole instead, which keeps
++      // its colour and only costs it brightness.
++      double out[3] = {std::max(r, 0.0), std::max(g, 0.0), std::max(b, 0.0)};
++      const double peak = std::max({1.0, out[0], out[1], out[2]});
++      // and the GUI's transfer function
++      for (int c = 0; c < 3; c++)
++        rgb[c] = std::pow(out[c] / peak, 0.45);
++    }
++
++    if (conversion == PaletteConversion::PQ_TO_IPT)
++    {
++      // BT.2020 PQ to linear light, relative to 10000 nits
++      double lin[3];
++      for (int c = 0; c < 3; c++)
++      {
++        const double p = std::pow(rgb[c], 1.0 / m2);
++        lin[c] = std::pow(std::max(p - c1, 0.0) / (c2 - c3 * p), 1.0 / m1);
++      }
++      // to LMS, then PQ again: the constants are the ones the kernel's HDR2 block uses for its own
++      // BT.2020 to IPT conversion (rgb2lms_ncl2020, 1.0 = 4096, and lms2ipt_ncl2020, 1.0 = 1024)
++      const double lms[3] = {(1747 * lin[0] + 2169 * lin[1] + 180 * lin[2]) / 4096.0,
++                             (673 * lin[0] + 3029 * lin[1] + 394 * lin[2]) / 4096.0,
++                             (49 * lin[0] + 207 * lin[1] + 3839 * lin[2]) / 4096.0};
++      double lmsPq[3];
++      for (int c = 0; c < 3; c++)
++      {
++        const double p = std::pow(clamp01(lms[c]), m1);
++        lmsPq[c] = std::pow((c1 + c2 * p) / (1.0 + c3 * p), m2);
++      }
++      const double i = (410 * lmsPq[0] + 410 * lmsPq[1] + 204 * lmsPq[2]) / 1024.0;
++      const double p = (2281 * lmsPq[0] - 2484 * lmsPq[1] + 203 * lmsPq[2]) / 1024.0 + 0.5;
++      const double t = (413 * lmsPq[0] + 183 * lmsPq[1] - 596 * lmsPq[2]) / 1024.0 + 0.5;
++
++      // The OSD2 plane converts its bytes from RGB to YUV before the blender, with VPP_OSD2_MATRIX
++      // (see the kernel's Documentation/osmc/osd2-subtitle-plane.md). It cannot be switched off, and
++      // for these streams (not profile 7) it is still the reset matrix, BT.709 limited range: rows
++      // 186 627 63 / -102 -344 448 / 448 -406 -40, 1.0 = 1024, offsets 64 512 512 in 10 bits. To get
++      // I, P, T through as they are, send the RGB that this conversion turns into them. Anything it
++      // cannot reach (an I above about 0.92) is clipped.
++      constexpr double a[3][3] = {{186.0 / 1024, 627.0 / 1024, 63.0 / 1024},
++                                  {-102.0 / 1024, -344.0 / 1024, 448.0 / 1024},
++                                  {448.0 / 1024, -406.0 / 1024, -40.0 / 1024}};
++      const double det = a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
++                         a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
++                         a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
++      const double inv[3][3] = {
++          {(a[1][1] * a[2][2] - a[1][2] * a[2][1]) / det,
++           (a[0][2] * a[2][1] - a[0][1] * a[2][2]) / det,
++           (a[0][1] * a[1][2] - a[0][2] * a[1][1]) / det},
++          {(a[1][2] * a[2][0] - a[1][0] * a[2][2]) / det,
++           (a[0][0] * a[2][2] - a[0][2] * a[2][0]) / det,
++           (a[0][2] * a[1][0] - a[0][0] * a[1][2]) / det},
++          {(a[1][0] * a[2][1] - a[1][1] * a[2][0]) / det,
++           (a[0][1] * a[2][0] - a[0][0] * a[2][1]) / det,
++           (a[0][0] * a[1][1] - a[0][1] * a[1][0]) / det}};
++      const double v[3] = {i * 1023.0 - 64.0, p * 1023.0 - 512.0, t * 1023.0 - 512.0};
++      for (int c = 0; c < 3; c++)
++        rgb[c] = clamp01((inv[c][0] * v[0] + inv[c][1] * v[1] + inv[c][2] * v[2]) / 1023.0);
++    }
++
++    auto to8 = [&](double v) { return static_cast<uint32_t>(std::lround(clamp01(v) * 255.0)); };
++    palette[i] = a << 24 | to8(rgb[0]) << 16 | to8(rgb[1]) << 8 | to8(rgb[2]);
++  }
++  return palette;
++}
++
++void convert_rgba(const CDVDOverlayImage& o,
++                  const std::vector<uint32_t>& argbPalette,
++                  bool mergealpha,
++                  std::vector<uint32_t>& rgba)
++{
++  uint32_t palette[256] = {};
++  for (size_t i = 0; i < argbPalette.size() && i < 256; i++)
++    palette[i] = build_rgba(argbPalette[i] >> 24, (argbPalette[i] >> 16) & 0xff,
++                            (argbPalette[i] >> 8) & 0xff, argbPalette[i] & 0xff, mergealpha);
++
++  for (int row = 0; row < o.height; row++)
++    for (int col = 0; col < o.width; col++)
++      rgba[row * o.width + col] = palette[o.pixels[row * o.linesize + col]];
++}
++
+ void convert_rgba(const CDVDOverlaySpu& o,
+                   bool mergealpha,
+                   int& min_x,
+@@ -271,18 +407,27 @@ bool convert_quad(ASS_Image* images, SQuads& quads, int max_x)
    return true;
  }
  
@@ -10379,37 +11856,74 @@ index 57566719cc..6ef6463185 100644
  {
 -  int depth = 0;
 +  RENDER_STEREO_MODE stereoMode = CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode();
++
++  if (stereoMode == RENDER_STEREO_MODE_MONO || stereoMode == RENDER_STEREO_MODE_OFF)
++  {
++    // 2D display, so there's no subtitle depth
++    return 0;
++  }
++
++  // get configured depth
++  int depth = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
  
 -  if(CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_MONO
 -  && CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoMode() != RENDER_STEREO_MODE_OFF)
-+  if (stereoMode == RENDER_STEREO_MODE_MONO || stereoMode == RENDER_STEREO_MODE_OFF)
++  // in case of MVC playback and PGS subtitles, use the subtitle depth info additionally to the configured one
++  if(stereoMode == RENDER_STEREO_MODE_HARDWAREBASED && isPgs)
    {
 -    depth  = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
 -    depth *= (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
-+    // 2D display, so there's no subtitle depth
-+    return 0;
++    depth += subtitleDepth;
    }
  
 -  return depth;
-+  // get configured depth
-+  int depth = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_SUBTITLES_STEREOSCOPICDEPTH);
-+
-+  // in case of MVC playback and PGS subtitles, use the subtitle depth info additionally to the configured one
-+  if(stereoMode == RENDER_STEREO_MODE_HARDWAREBASED && isPgs)
-+  {
-+    depth += subtitleDepth;
-+  }
-+
 +  // correct depth according to the current left/right eye view
 +  return depth * (CServiceBroker::GetWinSystem()->GetGfxContext().GetStereoView() == RENDER_STEREO_VIEW_LEFT ? 1 : -1);
  }
  
  }
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
-index 9e56aad071..e2580ca595 100644
+index 9e56aad071..a51381dd6c 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/OverlayRendererUtil.h
-@@ -45,6 +45,6 @@ void convert_rgba(const CDVDOverlaySpu& o,
+@@ -37,6 +37,36 @@ struct SQuads
+ };
+ 
+ void convert_rgba(const CDVDOverlayImage& o, bool mergealpha, std::vector<uint32_t>& rgba);
++
++/*! \brief How the colours of a bitmap subtitle (PGS/DVB) must be changed to suit the output */
++enum class PaletteConversion
++{
++  NONE, //!< as authored
++  HDR10, //!< BT.2020 PQ as it is: the OSD2 plane's BT.709 RGB to YUV conversion cancels FFmpeg's
++         //!< BT.709 YUV to RGB, so the bytes need no correction
++  PQ_TO_SDR, //!< correct FFmpeg's error, then down to sRGB for an SDR output; maxlum nits is white
++  PQ_TO_IPT //!< correct FFmpeg's error, then to the IPT-PQ-C2 triple (I, P, T in the R, G, B bytes) that Dolby
++            //!< Vision output carries (profile 5, and profile 8 with an HDR10 base layer)
++};
++
++/*!
++ * \brief The palette of an image overlay as 0xAARRGGBB with straight alpha, converted
++ *
++ * A bitmap subtitle has at most 256 colours, so converting the palette costs nothing compared with
++ * converting every pixel of the bitmap in a shader.
++ *
++ * \param maxlum the luminance in nits that PQ_TO_SDR maps to SDR white (the videoscreen.maxlum
++ *        setting); with 0 or less PQ_TO_SDR leaves the colours alone. Other conversions ignore it.
++ */
++std::vector<uint32_t> convert_palette(const CDVDOverlayImage& o,
++                                      PaletteConversion conversion,
++                                      int maxlum);
++
++//! \brief As above, for an image overlay's pixels through an already converted palette
++void convert_rgba(const CDVDOverlayImage& o,
++                  const std::vector<uint32_t>& argbPalette,
++                  bool mergealpha,
++                  std::vector<uint32_t>& rgba);
+ void convert_rgba(const CDVDOverlaySpu& o,
+                   bool mergealpha,
+                   int& min_x,
+@@ -45,6 +75,6 @@ void convert_rgba(const CDVDOverlaySpu& o,
                    int& max_y,
                    std::vector<uint32_t>& rgba);
  bool convert_quad(ASS_Image* images, SQuads& quads, int max_x);
@@ -10445,7 +11959,7 @@ index 54f0524848..ae9ec99dc1 100644
  #define CONF_FLAGS_STEREO_CADENCE(a) ((a) & 0x008000)
  #define CONF_FLAGS_STEREO_CADANCE_LEFT_RIGHT 0x000000
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
-index 61efb3c057..4a4b3a2d4b 100644
+index 61efb3c057..9c5a2fe3de 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 +++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.cpp
 @@ -26,6 +26,8 @@
@@ -10485,7 +11999,29 @@ index 61efb3c057..4a4b3a2d4b 100644
          CServiceBroker::GetWinSystem()->GetGfxContext().SetVideoResolution(res, false);
          UpdateLatencyTweak();
          if (m_pRenderer)
-@@ -1164,10 +1172,9 @@ void CRenderManager::PrepareNextRender()
+@@ -1112,6 +1120,21 @@ int CRenderManager::WaitForBuffer(volatile std::atomic_bool& bStop,
+   return m_queued.size() + m_discard.size();
+ }
+ 
++// True if the frame on screen stays up longer than one video frame before
++// nextFramePts, e.g. a still followed by skipped pictures. Presenting the
++// next frame early there puts it half a frame ahead of the vsync, and as
++// the frame after it can't be presented early again (combined), that one
++// is shown a vsync late: the first moving frame is shown twice. Holding
++// the still one vsync longer can't be seen.
++bool CRenderManager::HeldStillFrame(double nextFramePts) const
++{
++  if (m_fps <= 0.0f || m_presentpts == DVD_NOPTS_VALUE)
++    return false;
++
++  double frameDuration = DVD_TIME_BASE / static_cast<double>(m_fps);
++  return nextFramePts - m_Queue[m_presentsource].pts > 1.5 * frameDuration;
++}
++
+ void CRenderManager::PrepareNextRender()
+ {
+   if (m_queued.empty())
+@@ -1164,10 +1187,9 @@ void CRenderManager::PrepareNextRender()
    }
  
    CLog::LogFC(LOGDEBUG, LOGAVTIMING,
@@ -10499,7 +12035,7 @@ index 61efb3c057..4a4b3a2d4b 100644
  
    bool combined = false;
    if (m_presentsourcePast >= 0)
-@@ -1179,41 +1186,26 @@ void CRenderManager::PrepareNextRender()
+@@ -1179,41 +1201,26 @@ void CRenderManager::PrepareNextRender()
  
    if (renderPts >= nextFramePts || m_forceNext)
    {
@@ -10551,6 +12087,27 @@ index 61efb3c057..4a4b3a2d4b 100644
  
      m_presentstep = PRESENT_FLIP;
      m_discard.push_back(m_presentsource);
+@@ -1224,7 +1231,7 @@ void CRenderManager::PrepareNextRender()
+ 
+     m_playerPort->UpdateRenderBuffers(m_queued.size(), m_discard.size(), m_free.size());
+   }
+-  else if (!combined && renderPts > (nextFramePts - frametime))
++  else if (!combined && renderPts > (nextFramePts - frametime) && !HeldStillFrame(nextFramePts))
+   {
+     m_lateframes = 0;
+     m_presentstep = PRESENT_FLIP;
+diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
+index a450122cef..1c860704b0 100644
+--- a/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
++++ b/xbmc/cores/VideoPlayer/VideoRenderers/RenderManager.h
+@@ -135,6 +135,7 @@ protected:
+   void PresentBlend(bool clear, DWORD flags, DWORD alpha);
+ 
+   void PrepareNextRender();
++  bool HeldStillFrame(double nextFramePts) const;
+   bool IsPresenting();
+   bool IsGuiLayer();
+ 
 diff --git a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt b/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
 index 5bb02199e7..41c87b778a 100644
 --- a/xbmc/cores/VideoPlayer/VideoRenderers/VideoShaders/CMakeLists.txt
@@ -11203,6 +12760,21 @@ index 0859158c9c..988f0f3888 100644
    if(LIBINPUT_FOUND)
      list(APPEND SOURCES LibInputHandler.cpp
                          LibInputKeyboard.cpp
+diff --git a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+index bd04197a51..7cb68a19b4 100644
+--- a/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
++++ b/xbmc/platform/linux/powermanagement/LogindUPowerSyscall.cpp
+@@ -39,8 +39,8 @@ CLogindUPowerSyscall::CLogindUPowerSyscall()
+   if (!m_hasUPower)
+     CLog::Log(LOGINFO, "LogindUPowerSyscall - UPower not found, battery information will not be available");
+ 
+-  m_canPowerdown = LogindCheckCapability("CanPowerOff");
+-  m_canReboot    = LogindCheckCapability("CanReboot");
++  m_canPowerdown = true;
++  m_canReboot    = true;
+   m_canHibernate = LogindCheckCapability("CanHibernate");
+   m_canSuspend   = LogindCheckCapability("CanSuspend");
+ 
 diff --git a/xbmc/platform/linux/storage/UDevProvider.cpp b/xbmc/platform/linux/storage/UDevProvider.cpp
 index 2d94c39daa..58e17c1882 100644
 --- a/xbmc/platform/linux/storage/UDevProvider.cpp
@@ -11273,6 +12845,47 @@ index fb04187763..beec394924 100644
  }
  
  bool CPowerManager::Hibernate()
+diff --git a/xbmc/rendering/gles/GLESShader.cpp b/xbmc/rendering/gles/GLESShader.cpp
+index 961c3f7961..e738cfe2e0 100644
+--- a/xbmc/rendering/gles/GLESShader.cpp
++++ b/xbmc/rendering/gles/GLESShader.cpp
+@@ -48,7 +48,7 @@ void CGLESShader::OnCompiledAndLinked()
+   m_hStep   = glGetUniformLocation(ProgramHandle(), "m_step");
+   m_hContrast   = glGetUniformLocation(ProgramHandle(), "m_contrast");
+   m_hBrightness = glGetUniformLocation(ProgramHandle(), "m_brightness");
+-  m_sdrPeak = glGetUniformLocation(ProgramHandle(), "m_sdrPeak");
++  m_hSdrPeak = glGetUniformLocation(ProgramHandle(), "m_sdrPeak");
+ 
+   // Variables passed directly to the Vertex shader
+   m_hProj  = glGetUniformLocation(ProgramHandle(), "m_proj");
+@@ -169,7 +169,7 @@ bool CGLESShader::OnEnabled()
+   glUniform1f(m_hContrast, 1.0f);
+ 
+   const float sdrPeak = CServiceBroker::GetWinSystem()->GetGuiSdrPeakLuminance();
+-  glUniform1f(m_sdrPeak, sdrPeak);
++  glUniform1f(m_hSdrPeak, sdrPeak);
+ 
+   return true;
+ }
+diff --git a/xbmc/rendering/gles/GLESShader.h b/xbmc/rendering/gles/GLESShader.h
+index 1f59895740..bbe534a2e6 100644
+--- a/xbmc/rendering/gles/GLESShader.h
++++ b/xbmc/rendering/gles/GLESShader.h
+@@ -53,6 +53,7 @@ protected:
+   GLint m_hStep = 0;
+   GLint m_hContrast = 0;
+   GLint m_hBrightness = 0;
++  GLint m_hSdrPeak = 0;
+ 
+   const GLfloat *m_proj;
+   const GLfloat *m_model;
+@@ -62,6 +63,4 @@ protected:
+   GLfloat m_clipXOffset;
+   GLfloat m_clipYFactor;
+   GLfloat m_clipYOffset;
+-
+-  GLfloat m_sdrPeak;
+ };
 diff --git a/xbmc/settings/AdvancedSettings.cpp b/xbmc/settings/AdvancedSettings.cpp
 index 4cb749964a..0a5d365abd 100644
 --- a/xbmc/settings/AdvancedSettings.cpp
@@ -11826,10 +13439,10 @@ index dad5da5528..4a9211342e 100644
    if (settings->GetInt(CSettings::SETTING_AUDIOCDS_AUTOACTION) != AUTOCD_NONE || settings->GetBool(CSettings::SETTING_DVDS_AUTORUN))
 diff --git a/xbmc/utils/AMLUtils.cpp b/xbmc/utils/AMLUtils.cpp
 new file mode 100644
-index 0000000000..b450b6ff83
+index 0000000000..b66a893a14
 --- /dev/null
 +++ b/xbmc/utils/AMLUtils.cpp
-@@ -0,0 +1,918 @@
+@@ -0,0 +1,934 @@
 +/*
 + *  Copyright (C) 2011-2018 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -11910,6 +13523,9 @@ index 0000000000..b450b6ff83
 +		"/sys/class/graphics/fb0/free_scale_axis",
 +		"/sys/class/graphics/fb0/window_axis",
 +		"/sys/class/graphics/fb1/free_scale",
++		"/sys/class/graphics/fb1/free_scale_axis",
++		"/sys/class/graphics/fb1/freescale_mode",
++		"/sys/class/graphics/fb1/window_axis",
 +		"/sys/class/leds/standby/brightness",
 +		"/sys/class/ppmgr/orientation",
 +		"/sys/class/tsync/enable",
@@ -12265,9 +13881,22 @@ index 0000000000..b450b6ff83
 +    }
 +
 +    if (OSMCSecureOS::getInstance().isVeroV()) {
-+        // it's a V
-+        res->iWidth = (width > 4096) ? 1920 : width;
-+        res->iHeight= (height > 2160) ? 1080 : height;
++        // The DDR3 SKU cannot feed a 4K GUI plane and a 4K60 video plane at once. A
++        // 3840x2160x32bpp OSD is read by the VPU every frame, so the cost scales with the refresh
++        // rate: ~1990 MB/s at 59.94Hz but only ~1659 MB/s at 50Hz, against a measured 6336 MB/s
++        // budget. 4K50 was tested on hardware and plays without glitches unclamped, so only 4K60
++        // needs this and everything below keeps a native GUI for artwork.
++        //
++        // An exact halving keeps the display aspect ratio and fPixelRatio valid and gives
++        // free_scale a clean 2:1 source-to-output ratio. aml_handle_scale() then enables the
++        // fb0 scaler because iScreenWidth/iScreenHeight stay at the full mode size.
++        if (width >= 3840 && rrate > 50) {
++            res->iWidth = width / 2;
++            res->iHeight= height / 2;
++        } else {
++            res->iWidth = (width > 4096) ? 1920 : width;
++            res->iHeight= (height > 2160) ? 1080 : height;
++        }
 +    } else {
 +        res->iWidth = (width < 3840) ? width : 1920;
 +        res->iHeight= (height < 2160) ? height : 1080;
@@ -13832,7 +15461,7 @@ index e3300e925c..6801245fa9 100644
  
  void CGraphicContext::GetAllowedResolutions(std::vector<RESOLUTION> &res)
 diff --git a/xbmc/windowing/GraphicContext.h b/xbmc/windowing/GraphicContext.h
-index 0c5201f1e7..cb8bf71bd4 100644
+index 0c5201f1e7..8b7e6ddc9f 100644
 --- a/xbmc/windowing/GraphicContext.h
 +++ b/xbmc/windowing/GraphicContext.h
 @@ -29,11 +29,19 @@
@@ -13874,7 +15503,22 @@ index 0c5201f1e7..cb8bf71bd4 100644
  
    /* \brief Get UI scaling information from a given resolution to the screen resolution.
     Takes account of overscan and UI zooming.
-@@ -198,6 +208,7 @@ protected:
+@@ -182,6 +192,14 @@ public:
+   void SetTransferPQ(bool PQ) { m_isTransferPQ = PQ; }
+   bool IsTransferPQ() const { return m_isTransferPQ; }
+ 
++  // Whether the currently playing video's own source is HDR-graded, regardless
++  // of whether the kernel/display is actually outputting PQ right now (see
++  // IsTransferPQ() above -- that reflects the *output*, this reflects the
++  // *source*, so e.g. "HDR source tone-mapped down to SDR output" is
++  // sourceIsHDR=true, IsTransferPQ()=false).
++  void SetSourceIsHDR(bool isHDR) { m_sourceIsHDR = isHDR; }
++  bool IsSourceHDR() const { return m_sourceIsHDR; }
++
+ protected:
+ 
+   void UpdateCameraPosition(const CPoint &camera, const float &factor);
+@@ -198,6 +216,7 @@ protected:
    bool m_bCalibrating = false;
    RESOLUTION m_Resolution = RES_INVALID;
    float m_fFPSOverride = 0.0f;
@@ -13882,6 +15526,12 @@ index 0c5201f1e7..cb8bf71bd4 100644
  
    RESOLUTION_INFO m_windowResolution;
    std::stack<CPoint> m_cameras;
+@@ -234,4 +253,5 @@ protected:
+   RENDER_STEREO_MODE m_nextStereoMode = RENDER_STEREO_MODE_OFF;
+ 
+   bool m_isTransferPQ{false};
++  bool m_sourceIsHDR{false};
+ };
 diff --git a/xbmc/windowing/Resolution.cpp b/xbmc/windowing/Resolution.cpp
 index 270392c163..0009a8ab5c 100644
 --- a/xbmc/windowing/Resolution.cpp
@@ -14154,7 +15804,7 @@ index 0edf0ffe81..3692befc12 100644
    static float RefreshWeight(float refresh, float fps);
  };
 diff --git a/xbmc/windowing/WinSystem.cpp b/xbmc/windowing/WinSystem.cpp
-index f1d40bf2f0..0ba9b62ba5 100644
+index f1d40bf2f0..7c385fc44f 100644
 --- a/xbmc/windowing/WinSystem.cpp
 +++ b/xbmc/windowing/WinSystem.cpp
 @@ -77,6 +77,8 @@ void CWinSystemBase::UpdateDesktopResolution(RESOLUTION_INFO& newRes,
@@ -14166,7 +15816,37 @@ index f1d40bf2f0..0ba9b62ba5 100644
    if (dwFlags & D3DPRESENTFLAG_MODE3DSBS)
      newRes.strMode += "sbs";
    newRes.strOutput = output;
-@@ -158,9 +160,9 @@ static bool resSortPredicate(const RESOLUTION_WHR& i, const RESOLUTION_WHR& j)
+@@ -131,12 +133,26 @@ static void AddResolution(std::vector<RESOLUTION_WHR> &resolutions, unsigned int
+   const std::string id = resInfo.strId;
+   float refreshrate = resInfo.fRefreshRate;
+ 
++  // An entry is labelled from iScreenWidth/iScreenHeight by
++  // CDisplaySettings::GetDisplayStringFromRes(), so two modes that share their output geometry
++  // and mode flags produce the same string and have to collapse into one entry. Their GUI
++  // render size may legitimately differ without being visible to the user: on GBM
++  // videoscreen.limitguisize picks a different iWidth above 30Hz (see CDRMUtils), and some
++  // platforms reduce it to stay inside their memory bandwidth budget. Comparing iWidth/iHeight
++  // here splits those into duplicate entries that read identically and cannot be told apart.
++  //
++  // What must stay distinct is HiDPI - a GUI rendered larger than the output is labelled
++  // "(HiDPI)" by CDisplaySettings::SettingOptionsResolutionsFiller() and is a different choice.
++  const bool hiDpi = width > screenWidth && height > screenHeight;
++
+   // don't touch RES_DESKTOP
+   for (auto& resolution : resolutions)
+   {
+-    if (resolution.width == width && resolution.height == height &&
+-        resolution.m_screenWidth == screenWidth && resolution.m_screenHeight == screenHeight &&
+-        (resolution.flags & D3DPRESENTFLAG_MODEMASK) == flags)
++    const bool resHiDpi = resolution.width > resolution.m_screenWidth &&
++                          resolution.height > resolution.m_screenHeight;
++
++    if (resolution.m_screenWidth == screenWidth && resolution.m_screenHeight == screenHeight &&
++        resHiDpi == hiDpi && (resolution.flags & D3DPRESENTFLAG_MODEMASK) == flags)
+     {
+       // check if the refresh rate of this resolution is better suited than
+       // the refresh rate of the resolution with the same width/height/interlaced
+@@ -158,9 +174,9 @@ static bool resSortPredicate(const RESOLUTION_WHR& i, const RESOLUTION_WHR& j)
  {
    // note: this comparison must obey "strict weak ordering"
    // a "!=" on the flags comparison resulted in memory corruption
@@ -14180,18 +15860,74 @@ index f1d40bf2f0..0ba9b62ba5 100644
  
  std::vector<RESOLUTION_WHR> CWinSystemBase::ScreenResolutions(float refreshrate)
 diff --git a/xbmc/windowing/WinSystem.h b/xbmc/windowing/WinSystem.h
-index 88218db9e0..a119ccd2d7 100644
+index 88218db9e0..58465e5027 100644
 --- a/xbmc/windowing/WinSystem.h
 +++ b/xbmc/windowing/WinSystem.h
-@@ -219,6 +219,7 @@ public:
+@@ -17,6 +17,7 @@
+ #include "guilib/DispResource.h"
+ #include "utils/HDRCapabilities.h"
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <vector>
+@@ -218,7 +219,55 @@ public:
+   virtual CHDRCapabilities GetDisplayHDRCapabilities() const { return {}; }
    static const char* SETTING_WINSYSTEM_IS_HDR_DISPLAY;
    virtual float GetGuiSdrPeakLuminance() const { return .0f; }
++
++  /*!
++   * \name Raw overlays
++   * Bitmaps already in the output's colour space, such as PGS subtitles for an HDR10 title, can
++   * be put on a hardware plane the display path does not convert, instead of being drawn into the
++   * (sRGB) GUI. A frame's overlays are collected between BeginRawOverlays() and EndRawOverlays(),
++   * and the plane is hidden if there were none.
++   */
++  ///@{
++  virtual bool SupportsRawOverlay() const { return false; }
++  //! \brief Whether the raw overlay plane carries IPT (Dolby Vision output) rather than the output's RGB
++  virtual bool RawOverlayIsIpt() const { return false; }
++  virtual void BeginRawOverlays() {}
++  /*!
++   * \param argb 0xAARRGGBB pixels, straight alpha, width * height; shared so the window system can
++   *        draw it later without copying it
++   * \param width Width of the bitmap in its own pixels
++   * \param height Height of the bitmap in its own pixels
++   * \param serial Identifies the bitmap, so an unchanged frame is not redrawn
++   * \param srcX Position of the bitmap in the video frame, in the bitmap's own pixels
++   * \param srcY Position of the bitmap in the video frame, in the bitmap's own pixels
++   * \param frameWidth Size of the video frame in the bitmap's own pixels
++   * \param frameHeight Size of the video frame in the bitmap's own pixels
++   * \param x Left of the bitmap in framebuffer pixels, where it is drawn on the screen
++   * \param y Top of the bitmap in framebuffer pixels
++   * \param destWidth Width the bitmap is shown at, in framebuffer pixels
++   * \param destHeight Height the bitmap is shown at, in framebuffer pixels
++   * \return false if it cannot be shown this way, and must be drawn as an ordinary overlay
++   */
++  virtual bool AddRawOverlay(const std::shared_ptr<const std::vector<uint32_t>>& argb,
++                             unsigned int width,
++                             unsigned int height,
++                             uint64_t serial,
++                             int srcX,
++                             int srcY,
++                             unsigned int frameWidth,
++                             unsigned int frameHeight,
++                             float x,
++                             float y,
++                             float destWidth,
++                             float destHeight)
++  {
++    return false;
++  }
++  virtual void EndRawOverlays() {}
++  virtual void HideRawOverlay() {}
++  ///@}
    virtual bool HasSystemSdrPeakLuminance() { return false; }
 +  virtual bool IsDolbyVisionOutput() const { return false; }
  
    /*!
     * \brief System supports Video Super Resolution HW upscaler i.e.:
-@@ -235,6 +236,10 @@ public:
+@@ -235,6 +284,10 @@ public:
  
    virtual std::vector<std::string> GetConnectedOutputs() { return {}; }
  
@@ -14202,16 +15938,680 @@ index 88218db9e0..a119ccd2d7 100644
    /*!
     * \brief Return true when HDR display is available and enabled in settings
     *
+diff --git a/xbmc/windowing/amlogic/AMLOsd2.cpp b/xbmc/windowing/amlogic/AMLOsd2.cpp
+new file mode 100644
+index 0000000000..1cff6f8f2c
+--- /dev/null
++++ b/xbmc/windowing/amlogic/AMLOsd2.cpp
+@@ -0,0 +1,482 @@
++/*
++ *  Copyright (C) 2005-2025 Team Kodi
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#include "AMLOsd2.h"
++
++#include "utils/SysfsUtils.h"
++#include "utils/log.h"
++
++#include <algorithm>
++#include <cstring>
++
++#include <fcntl.h>
++#include <linux/fb.h>
++#include <sys/ioctl.h>
++#include <sys/mman.h>
++#include <unistd.h>
++
++namespace
++{
++constexpr const char* FB_DEVICE = "/dev/fb1";
++constexpr const char* FB_SYSFS = "/sys/class/graphics/fb1/";
++
++// source over destination, straight alpha
++uint32_t Over(uint32_t s, uint32_t d)
++{
++  const uint32_t sa = s >> 24;
++  const uint32_t da = d >> 24;
++  if (sa == 0)
++    return d;
++  if (da == 0 || sa == 255)
++    return s;
++
++  const uint32_t ra = sa + da * (255 - sa) / 255;
++  uint32_t out = ra << 24;
++  for (int shift = 0; shift <= 16; shift += 8)
++  {
++    const uint32_t sc = (s >> shift) & 0xff;
++    const uint32_t dc = (d >> shift) & 0xff;
++    out |= ((sc * sa * 255 + dc * da * (255 - sa)) / (ra * 255)) << shift;
++  }
++  return out;
++}
++} // namespace
++
++CAMLOsd2::~CAMLOsd2()
++{
++  Close();
++}
++
++void CAMLOsd2::SetScreenSize(int width, int height)
++{
++  std::unique_lock<std::mutex> lock(m_mutex);
++  m_screenWidth = width;
++  m_screenHeight = height;
++}
++
++bool CAMLOsd2::IsVisible() const
++{
++  std::unique_lock<std::mutex> lock(m_mutex);
++  return m_visibleRequested;
++}
++
++void CAMLOsd2::Post(Request& request)
++{
++  // caller holds m_mutex
++  if (!m_thread.joinable())
++  {
++    m_quit = false;
++    m_thread = std::thread(&CAMLOsd2::Run, this);
++  }
++  // the newest request wins
++  std::swap(m_pending, request);
++  m_cv.notify_one();
++}
++
++bool CAMLOsd2::Show(unsigned int canvasWidth,
++                    unsigned int canvasHeight,
++                    const std::vector<Blit>& blits,
++                    int x,
++                    int y,
++                    int destWidth,
++                    int destHeight)
++{
++  if (canvasWidth == 0 || canvasHeight == 0 || destWidth <= 0 || destHeight <= 0)
++    return false;
++
++  if (canvasWidth > MaxWidth || canvasHeight > MaxHeight)
++  {
++    CLog::LogF(LOGERROR, "{}x{} canvas is larger than the {}x{} plane", canvasWidth, canvasHeight,
++               MaxWidth, MaxHeight);
++    return false;
++  }
++
++  std::unique_lock<std::mutex> lock(m_mutex);
++
++  if (m_screenWidth > 0 && m_screenHeight > 0 &&
++      (x < 0 || y < 0 || x + destWidth > m_screenWidth || y + destHeight > m_screenHeight))
++  {
++    CLog::LogF(LOGERROR, "{}x{} at {},{} does not fit the {}x{} screen", destWidth, destHeight, x, y,
++               m_screenWidth, m_screenHeight);
++    return false;
++  }
++
++  Request request;
++  request.kind = Request::Kind::SHOW;
++  request.canvasWidth = canvasWidth;
++  request.canvasHeight = canvasHeight;
++  request.dest = {x, y, destWidth, destHeight};
++  for (const Blit& blit : blits)
++  {
++    if (blit.argb && blit.width > 0 && blit.height > 0 &&
++        blit.argb->size() >= static_cast<size_t>(blit.width) * blit.height)
++      request.blits.push_back(blit);
++  }
++
++  m_visibleRequested = true;
++  Post(request);
++  return true;
++}
++
++void CAMLOsd2::Hide()
++{
++  std::unique_lock<std::mutex> lock(m_mutex);
++
++  if (!m_visibleRequested)
++    return;
++
++  m_visibleRequested = false;
++  Request request;
++  request.kind = Request::Kind::HIDE;
++  Post(request);
++}
++
++void CAMLOsd2::Reapply()
++{
++  std::unique_lock<std::mutex> lock(m_mutex);
++
++  if (!m_thread.joinable())
++    return;
++
++  // do not replace a newer request, only add a refresh when nothing else is waiting
++  if (m_pending.kind != Request::Kind::NONE)
++    return;
++
++  Request request;
++  request.kind = Request::Kind::REAPPLY;
++  Post(request);
++}
++
++void CAMLOsd2::Close()
++{
++  {
++    std::unique_lock<std::mutex> lock(m_mutex);
++    if (!m_thread.joinable())
++      return;
++    m_visibleRequested = false;
++    m_quit = true;
++  }
++  m_cv.notify_one();
++  m_thread.join();
++}
++
++void CAMLOsd2::Run()
++{
++  for (;;)
++  {
++    Request request;
++    {
++      std::unique_lock<std::mutex> lock(m_mutex);
++      m_cv.wait(lock, [this] { return m_quit || m_pending.kind != Request::Kind::NONE; });
++      if (m_quit)
++        break;
++      request = std::move(m_pending);
++      m_pending = Request();
++    }
++
++    switch (request.kind)
++    {
++      case Request::Kind::SHOW:
++        DoShow(request);
++        break;
++      case Request::Kind::HIDE:
++        DoHide();
++        break;
++      case Request::Kind::REAPPLY:
++        DoReapply();
++        break;
++      default:
++        break;
++    }
++  }
++
++  DoHide();
++  CloseDevice();
++}
++
++bool CAMLOsd2::Open()
++{
++  if (m_fd >= 0)
++    return true;
++
++  const int fd = open(FB_DEVICE, O_RDWR);
++  if (fd < 0)
++  {
++    CLog::LogF(LOGERROR, "unable to open {}: {}", FB_DEVICE, strerror(errno));
++    return false;
++  }
++
++  fb_fix_screeninfo fix;
++  if (ioctl(fd, FBIOGET_FSCREENINFO, &fix) < 0)
++  {
++    CLog::LogF(LOGERROR, "FBIOGET_FSCREENINFO failed: {}", strerror(errno));
++    close(fd);
++    return false;
++  }
++
++  void* map = mmap(nullptr, fix.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++  if (map == MAP_FAILED)
++  {
++    CLog::LogF(LOGERROR, "mmap of {} bytes failed: {}", fix.smem_len, strerror(errno));
++    close(fd);
++    return false;
++  }
++
++  m_fd = fd;
++  m_map = static_cast<uint8_t*>(map);
++  m_mapLength = fix.smem_len;
++  m_lineLength = fix.line_length;
++  m_modeSet = false;
++  m_placementValid = false;
++  CLog::LogF(LOGDEBUG, "opened {}, {} bytes", FB_DEVICE, m_mapLength);
++  return true;
++}
++
++void CAMLOsd2::CloseDevice()
++{
++  if (m_fd < 0)
++    return;
++
++  munmap(m_map, m_mapLength);
++  close(m_fd);
++  m_fd = -1;
++  m_map = nullptr;
++  m_mapLength = 0;
++  m_modeSet = false;
++  m_visible = false;
++  m_placementValid = false;
++  m_front = 0;
++}
++
++bool CAMLOsd2::SetMode(unsigned int width, unsigned int height, bool doubleBuffered)
++{
++  if (m_modeSet && m_modeWidth == width && m_modeHeight == height && m_modeDouble == doubleBuffered)
++    return true;
++
++  fb_var_screeninfo var;
++  if (ioctl(m_fd, FBIOGET_VSCREENINFO, &var) < 0)
++  {
++    CLog::LogF(LOGERROR, "FBIOGET_VSCREENINFO failed: {}", strerror(errno));
++    return false;
++  }
++
++  // the rows are padded to a multiple of 16 pixels (64 bytes), as the hardware wants an aligned stride
++  var.xres = width;
++  var.xres_virtual = (width + 15) & ~15u;
++  var.yres = height;
++  var.yres_virtual = doubleBuffered ? 2 * height : height;
++  var.xoffset = var.yoffset = 0;
++  var.bits_per_pixel = 32;
++  // the driver picks the pixel format from these fields: ARGB8888
++  var.red = {16, 8, 0};
++  var.green = {8, 8, 0};
++  var.blue = {0, 8, 0};
++  var.transp = {24, 8, 0};
++
++  if (ioctl(m_fd, FBIOPUT_VSCREENINFO, &var) < 0)
++  {
++    CLog::LogF(LOGERROR, "FBIOPUT_VSCREENINFO {}x{} failed: {}", width, height, strerror(errno));
++    return false;
++  }
++
++  fb_fix_screeninfo fix;
++  if (ioctl(m_fd, FBIOGET_FSCREENINFO, &fix) < 0)
++  {
++    CLog::LogF(LOGERROR, "FBIOGET_FSCREENINFO failed: {}", strerror(errno));
++    return false;
++  }
++  m_lineLength = fix.line_length;
++
++  // start from a transparent canvas in both halves
++  std::memset(m_map, 0, std::min<size_t>(m_mapLength, static_cast<size_t>(m_lineLength) * var.yres_virtual));
++  m_dirty[0] = m_dirty[1] = Rect();
++
++  m_modeSet = true;
++  m_modeWidth = width;
++  m_modeHeight = height;
++  m_modeDouble = doubleBuffered;
++  m_front = 0;
++  m_placementValid = false;
++  CLog::LogF(LOGDEBUG, "{} set to {}x{}, {}, line length {}", FB_DEVICE, width, height,
++             doubleBuffered ? "double buffered" : "single buffered", m_lineLength);
++  return true;
++}
++
++void CAMLOsd2::WriteSysfs(const char* attr, const std::string& value)
++{
++  SysfsUtils::SetString(std::string(FB_SYSFS) + attr, value);
++}
++
++void CAMLOsd2::Place(unsigned int width,
++                     unsigned int height,
++                     unsigned int firstRow,
++                     const Rect& dest)
++{
++  const bool destChanged = !m_placementValid || !(m_placed == dest);
++  if (!destChanged && m_placedWidth == width && m_placedHeight == height && m_placedRow == firstRow)
++    return;
++
++  // Source rectangle in the framebuffer, then the screen rectangle, then the scaler. The first two
++  // only set driver state; the write that enables the scaler is what applies them together, at a
++  // vsync, and makes the kernel refresh the blend setup. The scaler is not turned off first: that
++  // would show the plane unscaled, at its old window, for a moment.
++  //
++  // Which half of the framebuffer is displayed is chosen here, with the source rectangle, rather
++  // than by panning: a pan resets the kernel's source rectangle to the whole pan window.
++  WriteSysfs("free_scale_axis", "0 " + std::to_string(firstRow) + " " + std::to_string(width - 1) +
++                                    " " + std::to_string(firstRow + height - 1));
++  if (destChanged)
++  {
++    WriteSysfs("window_axis", std::to_string(dest.x) + " " + std::to_string(dest.y) + " " +
++                                  std::to_string(dest.x + dest.w - 1) + " " +
++                                  std::to_string(dest.y + dest.h - 1));
++    WriteSysfs("freescale_mode", "1");
++  }
++  WriteSysfs("free_scale", "0x10001");
++
++  m_placedWidth = width;
++  m_placedHeight = height;
++  m_placedRow = firstRow;
++  m_placed = dest;
++  m_placementValid = true;
++}
++
++void CAMLOsd2::DoShow(const Request& request)
++{
++  if (!Open())
++    return;
++
++  const size_t rowBytes = static_cast<size_t>((request.canvasWidth + 15) & ~15u) * 4;
++  const bool doubleBuffered = 2 * static_cast<size_t>(request.canvasHeight) * rowBytes <= m_mapLength;
++  if (!doubleBuffered && static_cast<size_t>(request.canvasHeight) * rowBytes > m_mapLength)
++  {
++    CLog::LogF(LOGERROR, "{}x{} canvas does not fit the {} bytes of {}", request.canvasWidth,
++               request.canvasHeight, m_mapLength, FB_DEVICE);
++    return;
++  }
++
++  // the mode only changes with the video: a different canvas size
++  if (!SetMode(request.canvasWidth, request.canvasHeight, doubleBuffered))
++    return;
++
++  // draw into the half that is not being displayed
++  const unsigned int back = doubleBuffered ? 1 - m_front : 0;
++  const size_t firstRow = static_cast<size_t>(back) * request.canvasHeight;
++
++  // the area the new bitmaps really cover: they are often the whole frame with a small part drawn
++  int minX = request.canvasWidth, minY = request.canvasHeight, maxX = 0, maxY = 0;
++  for (const Blit& blit : request.blits)
++  {
++    const uint32_t* pixels = blit.argb->data();
++    for (unsigned int row = 0; row < blit.height; ++row)
++    {
++      const int y = blit.y + static_cast<int>(row);
++      if (y < 0 || y >= static_cast<int>(request.canvasHeight))
++        continue;
++
++      const uint32_t* line = pixels + static_cast<size_t>(row) * blit.width;
++      const int first = blit.x < 0 ? -blit.x : 0;
++      const int last = std::min<int>(blit.width, static_cast<int>(request.canvasWidth) - blit.x);
++      int left = -1, right = -1;
++      for (int col = first; col < last; ++col)
++      {
++        if (line[col] >> 24)
++        {
++          if (left < 0)
++            left = col;
++          right = col;
++        }
++      }
++      if (left < 0)
++        continue;
++
++      minX = std::min(minX, blit.x + left);
++      maxX = std::max(maxX, blit.x + right + 1);
++      minY = std::min(minY, y);
++      maxY = std::max(maxY, y + 1);
++    }
++  }
++  const Rect covered = maxX > minX && maxY > minY ? Rect{minX, minY, maxX - minX, maxY - minY} : Rect();
++
++  // what to write: the new content, and whatever this half last showed, which has to be cleared
++  const Rect old = m_dirty[back];
++  Rect region = covered;
++  if (region.Empty())
++    region = old;
++  else if (!old.Empty())
++  {
++    const int x0 = std::min(region.x, old.x);
++    const int y0 = std::min(region.y, old.y);
++    const int x1 = std::max(region.x + region.w, old.x + old.w);
++    const int y1 = std::max(region.y + region.h, old.y + old.h);
++    region = {x0, y0, x1 - x0, y1 - y0};
++  }
++
++  if (!region.Empty())
++  {
++    // compose in ordinary memory, then copy the rows across: the plane's memory is slow to read
++    m_scratch.assign(static_cast<size_t>(region.w) * region.h, 0);
++    for (const Blit& blit : request.blits)
++    {
++      const uint32_t* pixels = blit.argb->data();
++      for (unsigned int row = 0; row < blit.height; ++row)
++      {
++        const int y = blit.y + static_cast<int>(row);
++        if (y < region.y || y >= region.y + region.h)
++          continue;
++
++        const int first = std::max(0, region.x - blit.x);
++        const int last = std::min<int>(blit.width, region.x + region.w - blit.x);
++        if (first >= last)
++          continue;
++
++        const uint32_t* src = pixels + static_cast<size_t>(row) * blit.width + first;
++        uint32_t* dst = m_scratch.data() + static_cast<size_t>(y - region.y) * region.w +
++                        (blit.x + first - region.x);
++        for (int col = first; col < last; ++col, ++src, ++dst)
++          *dst = Over(*src, *dst);
++      }
++    }
++
++    for (int row = 0; row < region.h; ++row)
++      std::memcpy(m_map + (firstRow + region.y + row) * m_lineLength + static_cast<size_t>(region.x) * 4,
++                  m_scratch.data() + static_cast<size_t>(row) * region.w,
++                  static_cast<size_t>(region.w) * 4);
++  }
++  m_dirty[back] = covered;
++
++  Place(request.canvasWidth, request.canvasHeight, static_cast<unsigned int>(firstRow), request.dest);
++  if (doubleBuffered)
++    m_front = back;
++
++  if (!m_visible)
++  {
++    if (ioctl(m_fd, FBIOBLANK, FB_BLANK_UNBLANK) < 0)
++      CLog::LogF(LOGERROR, "unblank failed: {}", strerror(errno));
++    m_visible = true;
++  }
++}
++
++void CAMLOsd2::DoHide()
++{
++  if (m_fd < 0 || !m_visible)
++    return;
++
++  if (ioctl(m_fd, FBIOBLANK, FB_BLANK_NORMAL) < 0)
++    CLog::LogF(LOGERROR, "blank failed: {}", strerror(errno));
++  m_visible = false;
++}
++
++void CAMLOsd2::DoReapply()
++{
++  if (m_fd < 0 || !m_placementValid)
++    return;
++
++  m_placementValid = false;
++  Place(m_placedWidth, m_placedHeight, m_placedRow, m_placed);
++}
+diff --git a/xbmc/windowing/amlogic/AMLOsd2.h b/xbmc/windowing/amlogic/AMLOsd2.h
+new file mode 100644
+index 0000000000..8119d62ce9
+--- /dev/null
++++ b/xbmc/windowing/amlogic/AMLOsd2.h
+@@ -0,0 +1,168 @@
++/*
++ *  Copyright (C) 2005-2025 Team Kodi
++ *  This file is part of Kodi - https://kodi.tv
++ *
++ *  SPDX-License-Identifier: GPL-2.0-or-later
++ *  See LICENSES/README.md for more information.
++ */
++
++#pragma once
++
++#include <condition_variable>
++#include <memory>
++#include <cstddef>
++#include <cstdint>
++#include <mutex>
++#include <string>
++#include <thread>
++#include <vector>
++
++/*!
++ * \brief The second OSD plane (/dev/fb1) on Amlogic.
++ *
++ * OSD2 is composited by the VPU after, and independently of, the OSD1 plane the GUI is drawn on.
++ * The kernel does not apply its HDR/SDR conversion to it, so whatever is written here reaches the
++ * display unchanged: it is for content that is already in the output's colour space, such as PGS
++ * subtitles authored for an HDR10 title.
++ *
++ * The plane works like OSD1 does for the GUI. Its framebuffer is a fixed "canvas", the size of the
++ * video frame in the subtitles' own pixels, and its scaler maps the whole canvas onto the frame's
++ * rectangle on the screen. Both are set up once and left alone: the kernel applies a change of
++ * mode, scaler or window in several steps, and an animated subtitle that kept changing them showed
++ * the intermediate states. An update only draws the bitmaps into the half of the (double buffered)
++ * canvas that is not being displayed, at their own positions, and then switches to it.
++ *
++ * The framebuffer memory is slow to read, and not much faster to write, so a frame is composed in
++ * ordinary memory and only the area that changed is copied to it.
++ *
++ * The kernel also waits for a vsync in most of the calls that change the plane, so they are made on
++ * a worker thread. Show() and Hide() only record the latest request, and never block the caller; if
++ * requests arrive faster than the plane can follow, only the newest is acted on.
++ */
++class CAMLOsd2
++{
++public:
++  CAMLOsd2() = default;
++  ~CAMLOsd2();
++
++  CAMLOsd2(const CAMLOsd2&) = delete;
++  CAMLOsd2& operator=(const CAMLOsd2&) = delete;
++
++  //! \brief A bitmap to draw on the canvas
++  struct Blit
++  {
++    //! 0xAARRGGBB, straight (not premultiplied) alpha, width * height, shared so it is not copied
++    std::shared_ptr<const std::vector<uint32_t>> argb;
++    unsigned int width;
++    unsigned int height;
++    int x; //!< position on the canvas
++    int y;
++  };
++
++  /*!
++   * \brief Show the bitmaps on a canvas, which is scaled onto a rectangle of the screen.
++   * \param canvasWidth Width of the canvas in pixels, at most MaxWidth
++   * \param canvasHeight Height of the canvas in pixels, at most MaxHeight
++   * \param blits The bitmaps, drawn in order; kept until they have been drawn
++   * \param x Left of the rectangle the canvas covers, in screen pixels
++   * \param y Top of that rectangle
++   * \param destWidth Width of that rectangle
++   * \param destHeight Height of that rectangle
++   * \return false if the request was refused (too big, or the rectangle is outside the screen)
++   */
++  bool Show(unsigned int canvasWidth,
++            unsigned int canvasHeight,
++            const std::vector<Blit>& blits,
++            int x,
++            int y,
++            int destWidth,
++            int destHeight);
++
++  /*!
++   * \brief Tell the plane the size of the screen in pixels, so that rectangles outside it are
++   *        refused. A rectangle larger than the output corrupts the blend setup.
++   */
++  void SetScreenSize(int width, int height);
++
++  //! \brief Blank the plane, leaving it open.
++  void Hide();
++
++  //! \brief Rewrite the plane's placement, e.g. after the display mode changed.
++  void Reapply();
++
++  //! \brief Hide and release the framebuffer, and stop the worker thread.
++  void Close();
++
++  //! \brief Whether the plane has been asked to show something.
++  bool IsVisible() const;
++
++  //! The largest canvas accepted
++  static constexpr unsigned int MaxWidth = 1920;
++  static constexpr unsigned int MaxHeight = 1080;
++
++private:
++  struct Rect
++  {
++    int x{0};
++    int y{0};
++    int w{0};
++    int h{0};
++    bool operator==(const Rect& o) const { return x == o.x && y == o.y && w == o.w && h == o.h; }
++    bool Empty() const { return w <= 0 || h <= 0; }
++  };
++
++  struct Request
++  {
++    enum class Kind
++    {
++      NONE,
++      SHOW,
++      HIDE,
++      REAPPLY
++    } kind{Kind::NONE};
++    unsigned int canvasWidth{0};
++    unsigned int canvasHeight{0};
++    std::vector<Blit> blits;
++    Rect dest;
++  };
++
++  void Post(Request& request);
++  void Run();
++  void DoShow(const Request& request);
++  void DoHide();
++  void DoReapply();
++  bool Open();
++  void CloseDevice();
++  bool SetMode(unsigned int width, unsigned int height, bool doubleBuffered);
++  void Place(unsigned int width, unsigned int height, unsigned int firstRow, const Rect& dest);
++  static void WriteSysfs(const char* attr, const std::string& value);
++
++  // shared with the worker thread
++  mutable std::mutex m_mutex;
++  std::condition_variable m_cv;
++  Request m_pending;
++  bool m_quit{false};
++  bool m_visibleRequested{false};
++  int m_screenWidth{0};
++  int m_screenHeight{0};
++  std::thread m_thread;
++
++  // only touched by the worker thread
++  int m_fd{-1};
++  uint8_t* m_map{nullptr};
++  size_t m_mapLength{0};
++  unsigned int m_lineLength{0};
++  bool m_modeSet{false};
++  unsigned int m_modeWidth{0};
++  unsigned int m_modeHeight{0};
++  bool m_modeDouble{false};
++  unsigned int m_front{0}; //!< which half is being displayed, when double buffered
++  Rect m_dirty[2]; //!< what each half has been drawn on since it was last clear
++  std::vector<uint32_t> m_scratch; //!< a frame is composed in ordinary memory, never in the plane's
++  bool m_visible{false};
++  bool m_placementValid{false};
++  unsigned int m_placedWidth{0};
++  unsigned int m_placedHeight{0};
++  unsigned int m_placedRow{0};
++  Rect m_placed;
++};
 diff --git a/xbmc/windowing/amlogic/CMakeLists.txt b/xbmc/windowing/amlogic/CMakeLists.txt
 new file mode 100644
-index 0000000000..5df7176c70
+index 0000000000..e1885313c0
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/CMakeLists.txt
-@@ -0,0 +1,12 @@
-+set(SOURCES WinSystemAmlogic.cpp
+@@ -0,0 +1,14 @@
++set(SOURCES AMLOsd2.cpp
++            WinSystemAmlogic.cpp
 +            VideoSyncAML.cpp)
 +
-+set(HEADERS WinSystemAmlogic.h
++set(HEADERS AMLOsd2.h
++            WinSystemAmlogic.h
 +            VideoSyncAML.h)
 +
 +if(OPENGLES_FOUND)
@@ -14355,10 +16755,10 @@ index 0000000000..55b23d9927
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.cpp b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
 new file mode 100755
-index 0000000000..b65b0fe3e4
+index 0000000000..67a2d46297
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.cpp
-@@ -0,0 +1,511 @@
+@@ -0,0 +1,628 @@
 +/*
 + *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14369,8 +16769,12 @@ index 0000000000..b65b0fe3e4
 +
 +#include "WinSystemAmlogic.h"
 +
++#include <algorithm>
++#include <cmath>
 +#include <string>
++#include <vector>
 +
++#include "AMLOsd2.h"
 +#include "ServiceBroker.h"
 +#include "cores/AudioEngine/AESinkFactory.h"
 +#include "cores/AudioEngine/Sinks/AESinkALSA.h"
@@ -14399,7 +16803,7 @@ index 0000000000..b65b0fe3e4
 +
 +
 +CWinSystemAmlogic::CWinSystemAmlogic()
-+    : m_libinput(new CLibInputHandler)
++    : m_libinput(new CLibInputHandler), m_osd2(new CAMLOsd2)
 +{
 +  const char *env_framebuffer = getenv("FRAMEBUFFER");
 +
@@ -14532,6 +16936,7 @@ index 0000000000..b65b0fe3e4
 +bool CWinSystemAmlogic::DestroyWindowSystem()
 +{
 +  m_bWindowCreated = false;
++  m_osd2->Close();
 +
 +  return true;
 +}
@@ -14568,6 +16973,8 @@ index 0000000000..b65b0fe3e4
 +    return false;
 +  }
 +
++  m_osd2->SetScreenSize(m_displayWidth, m_displayHeight);
++
 +  ResetDisplay();
 +
 +  m_bWindowCreated = true;
@@ -14594,6 +17001,9 @@ index 0000000000..b65b0fe3e4
 +  }
 +
 +  m_delayDispReset = false;
++
++  // the screen mode may have changed, so the OSD2 window needs rewriting
++  m_osd2->Reapply();
 +}
 +
 +void CWinSystemAmlogic::OnLostDisplay()
@@ -14823,8 +17233,115 @@ index 0000000000..b65b0fe3e4
 +  return GetDisplayHDRCapabilities().SupportsHDR10();
 +}
 +
++bool CWinSystemAmlogic::SupportsRawOverlay() const
++{
++  return true;
++}
++
++void CWinSystemAmlogic::BeginRawOverlays()
++{
++  m_rawOverlays.clear();
++}
++
++bool CWinSystemAmlogic::AddRawOverlay(const std::shared_ptr<const std::vector<uint32_t>>& argb,
++                                      unsigned int width,
++                                      unsigned int height,
++                                      uint64_t serial,
++                                      int srcX,
++                                      int srcY,
++                                      unsigned int frameWidth,
++                                      unsigned int frameHeight,
++                                      float x,
++                                      float y,
++                                      float destWidth,
++                                      float destHeight)
++{
++  if (!argb || argb->size() < static_cast<size_t>(width) * height || width == 0 || height == 0 ||
++      destWidth <= 0.0f || destHeight <= 0.0f || frameWidth == 0 || frameHeight == 0 || frameWidth > CAMLOsd2::MaxWidth ||
++      frameHeight > CAMLOsd2::MaxHeight)
++    return false;
++
++  RawOverlay overlay{argb,
++                     width,
++                     height,
++                     serial,
++                     srcX,
++                     srcY,
++                     frameWidth,
++                     frameHeight,
++                     x - srcX * (destWidth / width),
++                     y - srcY * (destHeight / height),
++                     destWidth / width,
++                     destHeight / height};
++
++  // all the overlays of a frame share one canvas: the same video frame, at the same place and scale
++  if (!m_rawOverlays.empty())
++  {
++    const RawOverlay& first = m_rawOverlays.front();
++    if (frameWidth != first.frameWidth || frameHeight != first.frameHeight ||
++        std::fabs(overlay.scaleX / first.scaleX - 1.0f) > 0.01f ||
++        std::fabs(overlay.scaleY / first.scaleY - 1.0f) > 0.01f ||
++        std::fabs(overlay.frameX - first.frameX) > 2.0f ||
++        std::fabs(overlay.frameY - first.frameY) > 2.0f)
++      return false;
++  }
++
++  m_rawOverlays.push_back(overlay);
++  return true;
++}
++
++void CWinSystemAmlogic::EndRawOverlays()
++{
++  if (m_rawOverlays.empty())
++  {
++    HideRawOverlay();
++    return;
++  }
++
++  const RawOverlay& first = m_rawOverlays.front();
++
++  // where the whole video frame falls on the display: the rectangle the canvas is scaled onto
++  const float fx = m_nWidth > 0 ? static_cast<float>(m_displayWidth) / m_nWidth : 1.0f;
++  const float fy = m_nHeight > 0 ? static_cast<float>(m_displayHeight) / m_nHeight : 1.0f;
++  const int x = std::lround(first.frameX * fx);
++  const int y = std::lround(first.frameY * fy);
++  const int w = std::lround(first.frameWidth * first.scaleX * fx);
++  const int h = std::lround(first.frameHeight * first.scaleY * fy);
++
++  // identify the frame, so the plane is only rewritten when something changed
++  std::string key = StringUtils::Format("{}x{}@{},{} {}x{}", first.frameWidth, first.frameHeight, x,
++                                        y, w, h);
++  for (const RawOverlay& o : m_rawOverlays)
++    key += StringUtils::Format(" {}", o.serial);
++  if (key == m_rawKey && m_osd2->IsVisible())
++    return;
++  m_rawKey = key;
++
++  std::vector<CAMLOsd2::Blit> blits;
++  blits.reserve(m_rawOverlays.size());
++  for (const RawOverlay& o : m_rawOverlays)
++    blits.push_back({o.argb, o.width, o.height, o.srcX, o.srcY});
++
++  CLog::Log(LOGDEBUG,
++            "CWinSystemAmlogic::EndRawOverlays - {} overlay(s) on a {}x{} canvas shown at {},{} {}x{}",
++            blits.size(), first.frameWidth, first.frameHeight, x, y, w, h);
++
++  // a frame that does not fit on the screen (a zoomed video, say) is refused, and the plane hidden
++  if (!m_osd2->Show(first.frameWidth, first.frameHeight, blits, x, y, w, h))
++    m_osd2->Hide();
++}
++
++void CWinSystemAmlogic::HideRawOverlay()
++{
++  m_rawOverlays.clear();
++  m_rawKey.clear();
++  m_osd2->Hide();
++}
++
 +float CWinSystemAmlogic::GetGuiSdrPeakLuminance() const
 +{
++  // The kernel converts the sRGB GUI for the output format, so the setting is
++  // only a 0.5 - 1.0 scale on the GUI's code values (the GLES shaders multiply by it).
 +  const int guiSdrPeak = m_settings->GetInt(CSettings::SETTING_VIDEOSCREEN_GUISDRPEAKLUMINANCE);
 +
 +  return 0.5f * guiSdrPeak / 100.0f + 0.5f;
@@ -14872,10 +17389,10 @@ index 0000000000..b65b0fe3e4
 +}
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogic.h b/xbmc/windowing/amlogic/WinSystemAmlogic.h
 new file mode 100644
-index 0000000000..135be28fc1
+index 0000000000..e35fc638e4
 --- /dev/null
 +++ b/xbmc/windowing/amlogic/WinSystemAmlogic.h
-@@ -0,0 +1,85 @@
+@@ -0,0 +1,134 @@
 +/*
 + *  Copyright (C) 2005-2025 Team Kodi
 + *  This file is part of Kodi - https://kodi.tv
@@ -14887,10 +17404,13 @@ index 0000000000..135be28fc1
 +#pragma once
 +
 +#include "threads/SystemClock.h"
++
++#include <atomic>
 +#include "rendering/gles/RenderSystemGLES.h"
 +#include "platform/linux/input/LibInputHandler.h"
 +#include "windowing/WinSystem.h"
 +
++class CAMLOsd2;
 +class VeroSettings;
 +class CSettings;
 +class IDispResource;
@@ -14918,11 +17438,31 @@ index 0000000000..135be28fc1
 +  std::string m_lastEdid;
 +
 +  std::unique_ptr<CLibInputHandler> m_libinput;
++  std::unique_ptr<CAMLOsd2> m_osd2;
++
++  struct RawOverlay
++  {
++    std::shared_ptr<const std::vector<uint32_t>> argb;
++    unsigned int width;
++    unsigned int height;
++    uint64_t serial;
++    int srcX;
++    int srcY;
++    unsigned int frameWidth;
++    unsigned int frameHeight;
++    float frameX; //!< where the video frame falls in the framebuffer
++    float frameY;
++    float scaleX; //!< framebuffer pixels per bitmap pixel
++    float scaleY;
++  };
++  std::vector<RawOverlay> m_rawOverlays;
++  std::string m_rawKey;
 +
 +  RENDER_STEREO_MODE m_stereo_mode;
 +  std::vector<RESOLUTION_INFO> resolutions3d;
 +
 +  bool m_dvOutput = false;
++  std::atomic<bool> m_dvIptOutput{false};
 +
 +  void StartMonitorHWEvent();
 +  void StopMonitorHWEvent();
@@ -14959,6 +17499,32 @@ index 0000000000..135be28fc1
 +  CHDRCapabilities GetDisplayHDRCapabilities() const override;
 +  bool IsHDRDisplay() override;
 +  float GetGuiSdrPeakLuminance() const override;
++
++  bool SupportsRawOverlay() const override;
++  bool RawOverlayIsIpt() const override { return m_dvIptOutput; }
++
++  /*!
++   * \brief Say whether the video being played goes to the display as IPT, which is what the OSD2
++   *        plane then has to carry. Only profile 5, and profile 8 with an HDR10 base layer (8.1),
++   *        do: profile 7 is sent as a YUV 4:2:2 PQ base layer, for which the plane takes the same
++   *        bytes as it does for HDR10.
++   */
++  void SetDvIptOutput(bool ipt) { m_dvIptOutput = ipt; }
++  void BeginRawOverlays() override;
++  bool AddRawOverlay(const std::shared_ptr<const std::vector<uint32_t>>& argb,
++                     unsigned int width,
++                     unsigned int height,
++                     uint64_t serial,
++                     int srcX,
++                     int srcY,
++                     unsigned int frameWidth,
++                     unsigned int frameHeight,
++                     float x,
++                     float y,
++                     float destWidth,
++                     float destHeight) override;
++  void EndRawOverlays() override;
++  void HideRawOverlay() override;
 +  bool IsDolbyVisionOutput() const override;
 +};
 diff --git a/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp b/xbmc/windowing/amlogic/WinSystemAmlogicGLESContext.cpp
