@@ -217,6 +217,7 @@ then
             -DCORE_PLATFORM_NAME=gbm \
             -DAPP_RENDER_SYSTEM=gles \
             -DWITH_ARCH=arm \
+            -DENABLE_NEON=ON \
             -DENABLE_APP_AUTONAME=OFF \
             -DENABLE_INTERNAL_FMT=OFF \
             -DENABLE_INTERNAL_FLATBUFFERS=OFF \
@@ -257,7 +258,7 @@ then
             -DENABLE_OPTICAL=1 \
             -DENABLE_DVDCSS=1 \
             -DWITH_ARCH=arm \
-            -DWITH_CPU="cortex-a53" \
+            -DENABLE_NEON=ON \
             -DCORE_PLATFORM_NAME=aml \
             -DCORE_SYSTEM_NAME=linux \
             -DENABLE_APP_AUTONAME=OFF \
@@ -298,7 +299,7 @@ then
             -DENABLE_OPTICAL=1 \
             -DENABLE_DVDCSS=1 \
             -DWITH_ARCH=arm \
-            -DWITH_CPU="cortex-a55" \
+            -DENABLE_NEON=ON \
             -DCORE_PLATFORM_NAME=aml \
             -DCORE_SYSTEM_NAME=linux \
             -DENABLE_APP_AUTONAME=OFF \
