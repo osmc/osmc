@@ -4,7 +4,7 @@
 #!/bin/bash
 
 . ../common.sh
-VERSION="1.4.0"
+VERSION="1.4.1"
 pull_source "https://github.com/osmc/aml-vnc-server/archive/${VERSION}.tar.gz" "$(pwd)/src"
 if [ $? != 0 ]; then echo -e "Error downloading" && exit 1; fi
 # Build in native environment
@@ -24,7 +24,6 @@ then
 	echo "Package: ${1}-aml-vnc-app-osmc" >> files/DEBIAN/control && APP_FILE="files/etc/osmc/apps.d/${1}-aml-vnc-app-osmc"
 	echo -e "VNC Server\naml-vnc.service" > $APP_FILE
 	pushd src/aml-vnc-server*
-	install_patch "../../patches" "all"
 	make DISABLE_DRM=1
 	mkdir -p ${out}/usr/bin
 	cp -ar aml-vnc ${out}/usr/bin
