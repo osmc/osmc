@@ -7,9 +7,6 @@
 
 for option in $(cat /proc/cmdline); do
 	case $option in
-	  osmcdev=*)
-	    OPTION_OSMCDEV="${option#*=}"
-	    ;;
 	  root=UUID=*)
 	    OPTION_UUID=$(echo "${option#root=UUID=*}" | sed 's/"//g')
 	    ;;
@@ -58,11 +55,6 @@ then
 	for DEVICE in $DEVICES; do
 		echo 1024 > "/sys/dev/block/$DEVICE/queue/read_ahead_kb"
 	done
-fi
-
-if [ "$OPTION_OSMCDEV" = "vero2" ] || [ "$OPTION_OSMCDEV" = "vero3" ]
-then
-     if grep -q 4kplus /proc/cmdline; then echo 5 > /sys/class/mpgpu/cur_freq; fi
 fi
 
 if [ ! -f /safe_mode ]
