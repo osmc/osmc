@@ -1,0 +1,21 @@
+diff --git a/cmake/scripts/common/HandleDepends.cmake b/cmake/scripts/common/HandleDepends.cmake
+index de994b80e2..c002253c01 100644
+--- a/cmake/scripts/common/HandleDepends.cmake
++++ b/cmake/scripts/common/HandleDepends.cmake
+@@ -269,8 +269,15 @@ function(add_addon_depends addon searchpath)
+               message(AUTHOR_WARNING "${dir}/${id}.sha256 is missing")
+             endif()
+ 
++            # Fall back to Kodi's mirror when the dependency's own site is unavailable
++            set(urls ${url})
++            if(KODI_MIRROR AND NOT url MATCHES "^https?://mirrors\\.(kodi\\.tv|xbmc\\.org)/")
++              get_filename_component(archive ${url} NAME)
++              list(APPEND urls ${KODI_MIRROR}/build-deps/sources/${archive})
++            endif()
++
+             externalproject_add(${id}
+-                                URL ${url}
++                                URL ${urls}
+                                 ${URL_HASH_COMMAND}
+                                 DOWNLOAD_DIR ${DOWNLOAD_DIR}
+                                 CONFIGURE_COMMAND ${CONFIGURE_COMMAND}
