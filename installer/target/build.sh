@@ -25,7 +25,8 @@ python3
 python-is-python3
 bison
 flex
-libssl-dev"
+libssl-dev
+xz-utils"
 
 for package in $packages
 do
@@ -93,7 +94,7 @@ else
            let count=count-1
     done
 fi
-if [ ! -f ../../../filesystem.tar.xz ] && [ "$PROVISION" -ne 1 ]; then echo -e "No filesystem available for target" && exit 1; fi
+if [ "$PROVISION" -ne 1 ] && ! xz -t ../../../filesystem.tar.xz; then echo -e "No valid filesystem available for target" && exit 1; fi
 if [ "$1" == "rbp2" ] || [ "$1" == "rbp4" ] || [ "$1" == "vero3" ] || [ "$1" == "vero5" ] && [ "$PROVISION" -ne 1 ]
 then
 	echo -e "Building disk image"
