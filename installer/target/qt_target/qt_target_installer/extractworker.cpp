@@ -33,7 +33,8 @@ void ExtractWorker::extract()
         process->start("/bin/sh -c \"" + sourceName + "\"");
     }
     process->waitForFinished(-1);
-    if (process->exitCode() != 0)
+    /* A process killed by a signal has an exit code of 0 */
+    if (process->exitStatus() != QProcess::NormalExit || process->exitCode() != 0)
     {
         emit error("Extraction failed. Error: " + QString(process->readAllStandardError()));
         return;

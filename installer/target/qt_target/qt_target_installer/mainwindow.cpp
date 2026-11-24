@@ -405,7 +405,7 @@ void MainWindow::dumpLog()
 
 void MainWindow::finished()
 {
-    /* A killed extract process exits with code 0 and still gets here */
+    /* The extract process can report an error and still exit with status 0 */
     if (installFailed)
         return;
     logger->addLine("Extraction of root filesystem completed");
