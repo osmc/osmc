@@ -50,6 +50,7 @@ private:
     QString installTarget;
     QString locale;
     bool useNFS = false;
+    bool installFailed = false;
     Network *nw;
     BootloaderConfig *bc;
 };

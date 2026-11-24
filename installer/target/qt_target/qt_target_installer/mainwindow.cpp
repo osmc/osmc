@@ -384,11 +384,17 @@ void MainWindow::setupBootLoader()
 
 void MainWindow::haltInstall(QString errorMsg)
 {
+    /* Keep the first error on screen: the extract process can report one failure twice */
+    if (installFailed)
+        return;
+    installFailed = true;
     logger->addLine("Halting Install. Error message was: " + errorMsg);
     ui->statusProgressBar->setMaximum(100);
     ui->statusProgressBar->setValue(0);
     ui->statusLabel->setText(tr("Install failed: ") + errorMsg);
     dumpLog();
+    /* Nothing unmounts the install media after a failure: get the log on to it before the power is removed */
+    system("/bin/sync");
 }
 
 void MainWindow::dumpLog()
@@ -399,6 +405,9 @@ void MainWindow::dumpLog()
 
 void MainWindow::finished()
 {
+    /* A killed extract process exits with code 0 and still gets here */
+    if (installFailed)
+        return;
     logger->addLine("Extraction of root filesystem completed");
     logger->addLine("Configuring bootloader");
     setupBootLoader();

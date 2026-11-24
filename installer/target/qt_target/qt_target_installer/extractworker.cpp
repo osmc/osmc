@@ -24,7 +24,8 @@ void ExtractWorker::extract()
     if (sourceName.endsWith("xz"))
     {
         logger->addLine("Extracting from " + sourceName);
-        process->start("/bin/sh -c \"/usr/bin/pv -n " + sourceName + " | tar xJf - -C " + destName + "\"");
+        /* xz verifies the archive's integrity check, which BusyBox tar's own decompressor skips. pipefail reports a failure of pv or xz too */
+        process->start("/bin/sh -c \"set -o pipefail; /usr/bin/pv -n " + sourceName + " | /usr/bin/xz -dc | tar xf - -C " + destName + "\"");
     }
     else
     {
@@ -49,17 +50,21 @@ void ExtractWorker::readFromStdOut()
 
 void ExtractWorker::readFromStdErr()
 {
-    QString value = process->readAllStandardError();
-    value = value.split("\n").at(0);
-
-    bool ok;
-    int i_value = value.toInt(&ok);
-    if (ok)
-        emit progressUpdate(i_value);
-    else
+    /* Output arrives in pieces (xz writes its name and its message separately): only act on whole lines */
+    stdErr += process->readAllStandardError();
+    while (stdErr.contains('\n'))
     {
-        process->kill();
-        emit error(value);
-    }
+        QString value = stdErr.section('\n', 0, 0);
+        stdErr.remove(0, value.length() + 1);
 
+        bool ok;
+        int i_value = value.toInt(&ok);
+        if (ok)
+            emit progressUpdate(i_value);
+        else
+        {
+            process->kill();
+            emit error(value);
+        }
+    }
 }

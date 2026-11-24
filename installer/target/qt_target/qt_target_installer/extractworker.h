@@ -35,6 +35,7 @@ private:
     QString sourceName;
     QString destName;
     Logger *logger;
+    QString stdErr; /* Output not yet split in to lines */
 
 };
 
