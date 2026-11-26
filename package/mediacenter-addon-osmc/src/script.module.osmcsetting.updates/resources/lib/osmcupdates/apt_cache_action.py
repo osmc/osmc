@@ -88,15 +88,14 @@ class Main(object):
             print('%s %s exception occurred' % (datetime.now(), 'apt_cache_action.py'))
             print('%s %s exception value : %s' % (datetime.now(), 'apt_cache_action.py', e))
 
-            deets = 'Error Type and Args: %s : %s \n\n %s' % \
-                    (type(e).__name__, e.args, traceback.format_exc())
+            # leave the report to respond(). This used to send apt_error itself and leave
+            # error_message empty, so respond() also reported the action complete and the
+            # settings addon carried on as though nothing had gone wrong.
+            self.error_detail = 'Error Type and Args: %s : %s \n\n %s' % \
+                                (type(e).__name__, e.args, traceback.format_exc())
 
-            # send the error to the parent (parent will kill the progress bar)
-            call_parent('apt_error', {
-                'error': self.error_message,
-                'package': self.error_package,
-                'exception': deets
-            })
+            if not self.error_message:
+                self.error_message = str(e) or type(e).__name__
 
         self.cache = None
         self.removals_not_found = []
@@ -114,7 +113,8 @@ class Main(object):
         if self.action == 'action_list' and self.error_message != '':
             call_parent('apt_action_list_error', {
                 'error': self.error_message,
-                'package': self.error_package
+                'package': self.error_package,
+                'exception': self.error_detail or self.error_message
             })
 
         elif self.error_message == '':
