@@ -59,6 +59,8 @@ class Main(object):
 
         self.error_package = ''
         self.error_message = ''
+        self.error_detail = ''
+        self.unreachable = False
         self.partial_error = ''
         self.heading = 'Updater'
 
@@ -126,7 +128,8 @@ class Main(object):
             call_parent('apt_error', {
                 'error': self.error_message,
                 'package': self.error_package,
-                'exception': self.error_message
+                'exception': self.error_detail or self.error_message,
+                'unreachable': self.unreachable
             })
 
     def act(self):
@@ -250,6 +253,8 @@ class Main(object):
 
             if not self.usable_lists():
                 self.error_message = 'Unable to reach any update server...'
+                self.error_detail = self.partial_error
+                self.unreachable = True
                 print('%s %s ERROR no usable package lists, aborting' %
                       (datetime.now(), 'apt_cache_action.py'))
 
@@ -297,22 +302,6 @@ class Main(object):
                     return True
 
         return False
-
-    @staticmethod
-    def failed_fetch_origin(message):
-        """
-            Pull the host out of apt's 'Failed to fetch <url>' text so the user is
-            told which repository is broken rather than just that something is.
-        """
-        for line in message.split('\n'):
-            if 'Failed to fetch' not in line:
-                continue
-
-            for word in line.split():
-                if '://' in word:
-                    return word.split('://')[1].split('/')[0]
-
-        return '(unknown repository)'
 
     @staticmethod
     def request_offline_update():
@@ -412,13 +401,17 @@ class Main(object):
             self.cache.fetch_archives(progress=download_progress)
 
         except apt.cache.FetchFailedException as e:
-            # An EOL Debian suite keeps publishing an index for packages that have
-            # already been reaped from the pool, so individual .debs 404 while the
-            # metadata still advertises them. Report which repository is at fault
-            # instead of the generic 'an error occurred' dialog, and do not pretend
-            # the download succeeded.
+            # The connection can drop part way through, or a repository can lose the
+            # file (an EOL Debian suite's pool is reaped while its index still lists
+            # the packages). Neither is a fault in a package, so the user gets the
+            # connection dialog rather than 'Error installing', and apt's own message
+            # goes to the log. Do not pretend the download succeeded.
             self.error_message = 'Some packages could not be downloaded...'
-            self.error_package = self.failed_fetch_origin(str(e))
+            # only apt's first line: a dropout fails every remaining package, one line
+            # each, and the settings addon reads a message with a single recv(8192).
+            # The whole text is printed below.
+            self.error_detail = str(e).split('\n')[0]
+            self.unreachable = True
 
             print('%s %s ERROR fetch failed: %s' %
                   (datetime.now(), 'apt_cache_action.py', e))

@@ -704,8 +704,9 @@ class Main(object):
         # kill the progress bar
         self.progress_bar(kill=True)
 
-        # specifically handle a failure to connect to the apt server
-        if 'Unable to connect to' in kwargs.get('exception', ''):
+        # specifically handle a failure to reach the apt server, while connecting to it
+        # or while downloading from it
+        if kwargs.get('unreachable') or 'Unable to connect to' in kwargs.get('exception', ''):
             _ = DIALOG.ok(self.lang(32087), '[CR]'.join([self.lang(32131), self.lang(32132)]))
 
         else:
