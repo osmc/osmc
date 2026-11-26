@@ -42,12 +42,19 @@ rm -f $failed
 tmp=$(mktemp)
 if ! debconf-apt-progress --logfile $tmp -- apt-get-noninteractive -f -y dist-upgrade > /dev/tty1
 then
-	pkg=$(basename $(grep -i -A 1 "Errors were encountered while processing" $tmp | tail -n 1)); pkgarr=(${pkg//_/ })
-	package="${pkgarr[0]}"; if [ -n "${pkgarr[1]}" ]; then package="$package (${pkgarr[1]})"; fi
-	if [ -z "$package" ]; then package="(unknown package)"; fi
+	if grep -q "^E: Failed to fetch" $tmp
+	then
+		# a download failed: no package is at fault, and apt resumes from what was fetched
+		keep_downloads=1
+		dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    The updates could not be downloaded. Please check your\n    network connection and try again later.\n\n    Attempting to restart Kodi in 30 seconds...\n" 8 74 > /dev/tty1
+	else
+		pkg=$(basename $(grep -i -A 1 "Errors were encountered while processing" $tmp | tail -n 1)); pkgarr=(${pkg//_/ })
+		package="${pkgarr[0]}"; if [ -n "${pkgarr[1]}" ]; then package="$package (${pkgarr[1]})"; fi
+		if [ -z "$package" ]; then package="(unknown package)"; fi
 
-	dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum, making sure to\n    include debug logs. Attempting to restart Kodi in 30 seconds...\n" 9 74 > /dev/tty1
-	echo $package > $failed; chown osmc:osmc $failed
+		dialog --backtitle "Package configuration" --title "OSMC Update Error" --infobox "\n    An error occurred while installing the following package:\n    $package\n\n    Please report this problem on the OSMC forum, making sure to\n    include debug logs. Attempting to restart Kodi in 30 seconds...\n" 9 74 > /dev/tty1
+		echo $package > $failed; chown osmc:osmc $failed
+	fi
 	sleep 25
 else
 	rm -f $suppress
@@ -68,7 +75,7 @@ else
 		fi
 	fi
 fi
-apt-get clean
+[ "$keep_downloads" = 1 ] || apt-get clean
 sleep 5
 
 rm -f $tmp
