@@ -15,6 +15,7 @@
 #include <QWSServer>
 #endif
 #include <QFile>
+#include <QFileInfo>
 #include "targetlist.h"
 #include "target.h"
 #include <QTranslator>
@@ -311,7 +312,19 @@ void MainWindow::install()
         return;
     }
     if (useNFS)
+    {
         system("rm -rf /mnt/root/*"); /* BusyBox tar does not like overwrites. Clear nfsroot first */
+        /* If the server squashes root, tar cannot give files their owners and does not say so */
+        QFile testFile(QString(MNT_ROOT) + "/osmc-nfs-test");
+        bool rootOwned = testFile.open(QIODevice::WriteOnly) && QFileInfo(testFile).ownerId() == 0;
+        testFile.remove();
+        if (! rootOwned)
+        {
+            logger->addLine("Could not create a file owned by root on " + device->getRoot());
+            haltInstall(tr("the NFS share must be writable by root (no_root_squash)"));
+            return;
+        }
+    }
    /* Extract root filesystem */
    ui->statusLabel->setText(tr("Installing files"));
    logger->addLine("Extracting files to root filesystem");
